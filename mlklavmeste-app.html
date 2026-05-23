@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark" data-accent="blue">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="mlklavmeste">
+<meta name="theme-color" content="#0a0a0f" id="theme-color-meta">
+<meta name="description" content="трекер курса — капсулы, вес, калории, вода, шаги">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230a0a0f'/><text x='90' y='125' text-anchor='middle' font-size='95'>💊</text></svg>">
+<title>mlklavmeste</title>
+<style>
+:root {
+  --bg:#0a0a0f;--bg2:#111118;--card:rgba(255,255,255,.05);--card-border:rgba(255,255,255,.08);
+  --text:#f0f0f5;--muted:rgba(240,240,245,.45);--accent:#4f8ef7;--accent-glow:rgba(79,142,247,.25);
+  --accent-soft:rgba(79,142,247,.15);--shadow:0 8px 32px rgba(0,0,0,.4);
+  --radius:20px;--radius-sm:12px;--font:'SF Pro Display',-apple-system,'Helvetica Neue',sans-serif;
+}
+[data-theme="light"]{--bg:#f5f5f7;--bg2:#fff;--card:rgba(255,255,255,.85);--card-border:rgba(0,0,0,.07);
+  --text:#1a1a2e;--muted:rgba(26,26,46,.45);--shadow:0 4px 24px rgba(0,0,0,.1);
+  --accent-glow:rgba(79,142,247,.15);--accent-soft:rgba(79,142,247,.1);}
+[data-accent="blue"]  {--accent:#4f8ef7;--accent-glow:rgba(79,142,247,.25);--accent-soft:rgba(79,142,247,.15);}
+[data-accent="green"] {--accent:#34c77b;--accent-glow:rgba(52,199,123,.25);--accent-soft:rgba(52,199,123,.15);}
+[data-accent="red"]   {--accent:#f75c5c;--accent-glow:rgba(247,92,92,.25);--accent-soft:rgba(247,92,92,.15);}
+[data-accent="purple"]{--accent:#a78bfa;--accent-glow:rgba(167,139,250,.25);--accent-soft:rgba(167,139,250,.15);}
+[data-accent="orange"]{--accent:#fb923c;--accent-glow:rgba(251,146,60,.25);--accent-soft:rgba(251,146,60,.15);}
+[data-accent="teal"]  {--accent:#2dd4bf;--accent-glow:rgba(45,212,191,.25);--accent-soft:rgba(45,212,191,.15);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;height:-webkit-fill-available;}body{height:100%;height:-webkit-fill-available;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;transform:translateY(16px);overflow:hidden}
+.screen.active{opacity:1;pointer-events:all;transform:translateY(0)}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:var(--shadow)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 16px calc(110px + env(safe-area-inset-bottom,0px))}
+.scroll::-webkit-scrollbar{display:none}
+.navbar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--card-border);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 4px calc(10px + env(safe-area-inset-bottom,0px));z-index:100}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);cursor:pointer;transition:color .2s,transform .15s;padding:6px 12px;border-radius:12px;min-width:56px}
+.nav-btn.active{color:var(--accent)}.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn span{font-size:10px;font-weight:500;letter-spacing:.2px}.nav-btn:active{transform:scale(.88)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:var(--radius-sm);border:none;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:-.2px;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 20px var(--accent-glow)}.btn-primary:active{transform:scale(.97);box-shadow:none}
+.btn-ghost{background:var(--card);border:1px solid var(--card-border);color:var(--text)}.btn-ghost:active{transform:scale(.97)}
+.btn-danger{background:rgba(247,92,92,.12);border:1px solid rgba(247,92,92,.25);color:#f75c5c}
+.btn-sm{padding:9px 18px;width:auto;font-size:14px}
+input[type="text"],input[type="number"]{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:13px 15px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color .2s;font-family:var(--font)}
+input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
+.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.input-group label{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.3px}
+.progress-wrap{background:var(--card);border-radius:50px;overflow:hidden;height:8px;width:100%}
+.progress-bar{height:100%;border-radius:50px;transition:width .6s cubic-bezier(.4,0,.2,1);background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:7px 14px;border-radius:50px;border:1px solid var(--card-border);background:var(--card);font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text)}
+.chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}.chip:active{transform:scale(.93)}
+.label{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:22px 0 10px}
+.section-head h3{font-size:17px;font-weight:600}.section-head .action{font-size:13px;color:var(--accent);cursor:pointer;font-weight:500}
+.toggle{position:relative;width:46px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--card);border:1px solid var(--card-border);border-radius:50px;cursor:pointer;transition:.2s}
+.toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.toggle input:checked+.toggle-track::after{left:22px}
+.warning{background:rgba(247,92,92,.1);border:1px solid rgba(247,92,92,.3);border-radius:var(--radius-sm);padding:11px 14px;display:flex;gap:9px;align-items:flex-start;margin-bottom:10px}
+.warning svg{flex-shrink:0;color:#f75c5c;margin-top:2px}.warning p{font-size:13px;color:#f75c5c;line-height:1.5}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(6px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--bg2);border-radius:26px 26px 0 0;padding:24px 20px calc(44px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);width:100%;max-height:92vh;overflow-y:auto}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:34px;height:4px;background:var(--card-border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:20px;font-weight:700;margin-bottom:18px;letter-spacing:-.3px}
+.divider{height:1px;background:var(--card-border);margin:6px 0}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--card-border)}
+.setting-row:last-child{border-bottom:none}.setting-label{font-size:15px;font-weight:500}
+.setting-value{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer}
+.setting-value svg{width:15px;height:15px}
+.accent-picker{display:flex;gap:9px;flex-wrap:wrap;padding:10px 0}
+.accent-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;transition:transform .18s,box-shadow .18s;border:2px solid transparent}
+.accent-dot.active{transform:scale(1.22);box-shadow:0 0 0 2px var(--bg),0 0 0 4px currentColor}
+/* ONBOARD */
+#screen-onboard{background:var(--bg);justify-content:center;align-items:center;text-align:center}
+.onboard-logo{font-size:40px;font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.onboard-tagline{font-size:16px;color:var(--muted);max-width:260px;line-height:1.6;margin-bottom:44px}
+/* REGISTER */
+.register-scroll{flex:1;overflow-y:auto;padding:20px 20px 36px}
+.step{display:none}.step.active{display:block}
+.step-indicator{display:flex;gap:5px;justify-content:center;margin-bottom:28px}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--card-border);transition:.2s}
+.step-dot.active{width:20px;border-radius:3px;background:var(--accent)}
+.gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:14px 0}
+.gender-card{padding:22px 14px;border-radius:var(--radius);border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+.gender-card.selected{border-color:var(--accent);background:var(--accent-soft)}.gender-card:active{transform:scale(.97)}
+.gender-icon{font-size:34px}.gender-label{font-size:15px;font-weight:600}
+.course-card{padding:18px;border-radius:var(--radius);border:2px solid var(--card-border);background:var(--card);cursor:pointer;transition:all .2s;margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+.course-card.selected{border-color:var(--accent);background:var(--accent-soft)}.course-card:active{transform:scale(.98)}
+.course-badge{background:var(--accent);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:50px;white-space:nowrap}
+/* HOME */
+.home-header{padding:52px 16px 6px;display:flex;justify-content:space-between;align-items:flex-start}
+.greeting{font-size:23px;font-weight:700;letter-spacing:-.4px}
+.avatar-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.stat-card{padding:16px;border-radius:var(--radius)}
+.stat-val{font-size:27px;font-weight:700;letter-spacing:-.5px;margin:7px 0 4px}
+.stat-sub{font-size:12px;color:var(--muted)}
+.capsule-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:4px}
+.capsule-card{padding:16px;border-radius:var(--radius);cursor:pointer;transition:all .18s}
+.capsule-card:active{transform:scale(.97)}.capsule-card.done{opacity:.6}
+.capsule-pill{display:inline-flex;align-items:center;gap:5px;background:var(--accent-soft);color:var(--accent);padding:5px 10px;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:8px}
+.capsule-pill svg{width:13px;height:13px}
+.capsule-card h3{font-size:14px;font-weight:600;margin-bottom:3px}
+.capsule-card p{font-size:12px;color:var(--muted);line-height:1.4}
+.capsule-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--card-border);background:transparent;display:flex;align-items:center;justify-content:center;margin-top:9px;transition:all .2s}
+.capsule-card.done .capsule-check{background:var(--accent);border-color:var(--accent)}
+/* capsule counter */
+.cap-counter{display:flex;align-items:center;gap:8px;margin-top:8px}
+.cap-count-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--card-border);background:var(--card);color:var(--text);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;flex-shrink:0}
+.cap-count-btn:active{background:var(--accent-soft);border-color:var(--accent)}
+.cap-count-num{font-size:16px;font-weight:700;min-width:20px;text-align:center;color:var(--accent)}
+/* water */
+.water-card{padding:18px;border-radius:var(--radius);margin-bottom:14px}
+.water-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.water-val{font-size:27px;font-weight:700;letter-spacing:-.5px}
+.water-goal-txt{font-size:13px;color:var(--muted);margin-top:2px}
+.water-progress{background:rgba(0,0,0,.2);border-radius:50px;height:9px;overflow:hidden;margin-bottom:12px}
+.water-bar{height:100%;border-radius:50px;transition:width .6s cubic-bezier(.4,0,.2,1),background .6s}
+.water-controls{display:flex;gap:7px}
+.water-btn{flex:1;padding:9px 6px;border-radius:var(--radius-sm);border:1px solid var(--card-border);background:var(--card);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;font-family:var(--font)}
+.water-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 10px var(--accent-glow)}
+.water-btn:active{transform:scale(.94)}
+/* food */
+.food-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.food-item:last-child{border-bottom:none}.food-name{font-size:14px;font-weight:500}
+.food-kcal{font-size:14px;font-weight:600;color:var(--accent)}
+.food-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px;border-radius:7px;transition:.18s;display:flex}
+.food-delete:active{color:#f75c5c;transform:scale(.88)}
+.empty{text-align:center;padding:28px 0;color:var(--muted)}
+.empty svg{width:36px;height:36px;margin:0 auto 10px;opacity:.35}
+.streak-badge{display:inline-flex;align-items:center;gap:5px;background:var(--accent-soft);color:var(--accent);padding:7px 14px;border-radius:50px;font-size:13px;font-weight:700}
+/* STATS SCREEN */
+.stats-today-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.stat-today-card{padding:16px;border-radius:var(--radius)}
+.stat-today-val{font-size:26px;font-weight:700;letter-spacing:-.5px;margin:5px 0 2px}
+.stat-today-sub{font-size:11px;color:var(--muted)}
+.mood-badge{display:inline-block;padding:4px 10px;border-radius:50px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;margin-top:4px}
+.bmi-ring-wrap{display:flex;align-items:center;gap:16px;padding:16px 0}
+.chart-wrap{padding:18px;border-radius:var(--radius)}
+/* PROFILE */
+.profile-header{padding:56px 20px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.profile-avatar{width:76px;height:76px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#fff;border:3px solid var(--accent-glow);overflow:hidden}
+.profile-name{font-size:21px;font-weight:700;letter-spacing:-.3px}.profile-sub{font-size:13px;color:var(--muted)}
+.profile-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--card-border);border-radius:var(--radius);overflow:hidden;margin:0 16px 18px}
+.pstat{background:var(--bg2);padding:14px 6px;text-align:center}
+.pstat-val{font-size:19px;font-weight:700;letter-spacing:-.3px}.pstat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.settings-group{margin:0 16px 16px}
+/* course instructions */
+.instruction-card{padding:18px;border-radius:var(--radius);margin-bottom:11px}
+.inst-step{display:flex;gap:11px;margin-bottom:11px;align-items:flex-start}.inst-step:last-child{margin-bottom:0}
+.inst-num{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.inst-text{font-size:13px;line-height:1.6;color:var(--text)}.inst-text strong{color:var(--accent)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .35s ease both}
+.delay-1{animation-delay:.05s}.delay-2{animation-delay:.1s}.delay-3{animation-delay:.15s}
+.delay-4{animation-delay:.2s}.delay-5{animation-delay:.25s}
+.status-pad{padding-top:calc(env(safe-area-inset-top,20px) + 16px)}
+/* Channel button */
+.channel-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text);text-decoration:none;font-size:14px;font-weight:600;margin:4px 0 8px;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.channel-btn:active{transform:scale(.97);background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.channel-btn svg{width:18px;height:18px;flex-shrink:0}
+.channel-wrap{padding:0 0 4px}
+
+@media(min-width:520px){
+  body{display:flex;justify-content:center;align-items:stretch;background:#000;}
+  .screen,.navbar,#install-banner,#ios-hint,.modal-overlay{max-width:430px;margin:0 auto;}
+  .screen{left:50%;transform:translateX(-50%) translateY(16px);right:auto;width:430px;}
+  .screen.active{transform:translateX(-50%) translateY(0);}
+  .navbar{left:50%;transform:translateX(-50%);right:auto;width:430px;}
+  #install-banner{left:50%;transform:translateX(-50%) translateY(-100%);right:auto;width:430px;}
+  #install-banner.show{transform:translateX(-50%) translateY(0);}
+  .modal-overlay{left:50%;transform:translateX(-50%);right:auto;width:430px;}
+  #ios-hint{left:calc(50% - 430px/2 + 16px);right:auto;width:calc(430px - 32px);}
+}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="screen-onboard" class="screen">
+  <div style="padding:0 32px;width:100%">
+    <div class="onboard-logo">mlklavmeste</div>
+    <div class="onboard-tagline" id="onboard-tagline">каждый день — это шаг к новой версии тебя</div>
+    <button class="btn btn-primary" onclick="App.startOnboarding()">начать</button>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="screen-register" class="screen">
+  <div class="register-scroll">
+    <div style="padding-top:48px">
+      <div class="step-indicator" id="step-dots"></div>
+      <div class="step active" id="step-1">
+        <h2 style="margin-bottom:6px">твой пол</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:18px">поможет точнее рассчитать цели</p>
+        <div class="gender-grid">
+          <div class="gender-card" data-gender="male" onclick="Reg.selectGender('male')"><div class="gender-icon">♂</div><div class="gender-label">мужчина</div></div>
+          <div class="gender-card" data-gender="female" onclick="Reg.selectGender('female')"><div class="gender-icon">♀</div><div class="gender-label">женщина</div></div>
+        </div>
+        <button class="btn btn-primary" onclick="Reg.nextStep()">продолжить</button>
+      </div>
+      <div class="step" id="step-2">
+        <h2 style="margin-bottom:6px">параметры тела</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:20px">для расчёта ИМТ и персонализации</p>
+        <div class="input-group"><label>имя (необязательно)</label><input type="text" id="reg-name" placeholder="как тебя зовут?"></div>
+        <div class="input-group"><label>рост (см)</label><input type="number" id="reg-height" placeholder="170" min="100" max="250"></div>
+        <div class="input-group"><label>вес (кг)</label><input type="number" id="reg-weight" placeholder="70" min="30" max="300"></div>
+        <div class="input-group"><label>целевой вес (кг, необязательно)</label><input type="number" id="reg-goal-weight" placeholder="65" min="30" max="300"></div>
+        <button class="btn btn-primary" onclick="Reg.nextStep()">продолжить</button>
+      </div>
+      <div class="step" id="step-3">
+        <h2 style="margin-bottom:6px">дневные цели</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:20px">персональные нормы</p>
+        <div class="input-group"><label>калории / день (мин. 900)</label><input type="number" id="reg-kcal" placeholder="1200" min="900" max="5000"></div>
+        <div class="input-group"><label>вода / день (литры, мин. 2)</label><input type="number" id="reg-water" placeholder="2.5" min="2" max="10" step="0.1"></div>
+        <div class="input-group"><label>цель шагов / день</label><input type="number" id="reg-steps" placeholder="8000" min="1000" max="50000"></div>
+        <button class="btn btn-primary" onclick="Reg.nextStep()">продолжить</button>
+      </div>
+      <div class="step" id="step-4">
+        <h2 style="margin-bottom:6px">выбери курс</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:18px">от этого зависит суточный лимит</p>
+        <div onclick="Reg.selectCourse('plus')" class="course-card" data-course="plus">
+          <div><h3 style="font-size:15px;font-weight:700">plus</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">1→2 капсулы · с 16-го дня</p></div>
+          <div class="course-badge">40 капсул</div>
+        </div>
+        <div onclick="Reg.selectCourse('premium')" class="course-card" data-course="premium">
+          <div><h3 style="font-size:15px;font-weight:700">premium</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">2 капсулы с 1-го дня</p></div>
+          <div class="course-badge" style="background:#a78bfa">46 капсул</div>
+        </div>
+        <div onclick="Reg.selectCourse('turbo')" class="course-card" data-course="turbo">
+          <div><h3 style="font-size:15px;font-weight:700">turbo ozempic</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">2 капсулы, усиленная формула</p></div>
+          <div class="course-badge" style="background:#34c77b">60 капсул</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="Reg.finish()">готово</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+  <div class="home-header status-pad">
+    <div><div style="font-size:12px;color:var(--muted);margin-bottom:3px">привет 👋</div><div class="greeting" id="home-greeting">загрузка</div></div>
+    <button class="avatar-btn" id="home-avatar" onclick="App.switchTab('profile')"></button>
+  </div>
+  <div class="scroll">
+    <div style="margin-bottom:18px" class="fade-up">
+      <span class="streak-badge"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span id="streak-label">серия: 0 дней</span></span>
+    </div>
+    <div id="warnings-container"></div>
+    <div class="stats-grid fade-up delay-1">
+      <div class="stat-card card">
+        <div class="label">калории</div><div class="stat-val" id="kcal-val">0</div>
+        <div style="margin-bottom:6px"><div class="progress-wrap"><div class="progress-bar" id="kcal-bar" style="width:0%"></div></div></div>
+        <div class="stat-sub" id="kcal-sub">цель: 0 ккал</div>
+      </div>
+      <div class="stat-card card">
+        <div class="label">вода</div><div class="stat-val" id="water-val-home">0л</div>
+        <div style="margin-bottom:6px"><div class="water-progress" style="height:8px;border-radius:50px"><div class="water-bar" id="water-bar-home" style="width:0%"></div></div></div>
+        <div class="stat-sub" id="water-sub-home">цель: 0л</div>
+      </div>
+    </div>
+
+    <!-- Capsules -->
+    <div class="section-head fade-up delay-2">
+      <h3>капсулы</h3>
+      <span class="action" onclick="UI.openCapsuleModal()">изменить день</span>
+    </div>
+    <div style="margin-bottom:6px;font-size:12px;color:var(--muted)" id="course-day-info"></div>
+    <div id="capsule-cards-wrap" class="fade-up delay-2"></div>
+    <div style="margin-bottom:14px;font-size:12px;color:var(--muted);text-align:center" id="capsule-limit-info"></div>
+
+    <!-- Water -->
+    <div class="section-head fade-up delay-3"><h3>вода</h3></div>
+    <div class="water-card card fade-up delay-3">
+      <div class="water-header">
+        <div><div class="water-val" id="water-display">0.0 л</div><div class="water-goal-txt" id="water-goal-display">из 2.0 л</div></div>
+        <div style="font-size:26px" id="water-emoji">💧</div>
+      </div>
+      <div class="water-progress"><div class="water-bar" id="water-bar-main" style="width:0%"></div></div>
+      <div class="water-controls">
+        <button class="water-btn primary" onclick="Tracker.addWater(.25)">+250 мл</button>
+        <button class="water-btn primary" onclick="Tracker.addWater(.5)">+500 мл</button>
+        <button class="water-btn" onclick="Tracker.addWater(-.25)">−</button>
+      </div>
+    </div>
+
+    <!-- Steps -->
+    <div class="section-head fade-up delay-3"><h3>шаги</h3></div>
+    <div class="card fade-up delay-3" style="padding:16px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div><div class="label">сегодня</div><div style="font-size:26px;font-weight:700;margin-top:4px" id="steps-display">0</div></div>
+        <div style="text-align:right"><div class="label">цель</div><div style="font-size:15px;font-weight:600;margin-top:4px;color:var(--accent)" id="steps-goal-display">—</div></div>
+      </div>
+      <div class="progress-wrap" style="margin-bottom:12px"><div class="progress-bar" id="steps-bar" style="width:0%"></div></div>
+      <div style="display:flex;gap:7px">
+        <input type="number" id="steps-input" placeholder="введи шаги" style="flex:1" min="0" max="100000">
+        <button class="btn btn-primary btn-sm" onclick="Tracker.saveSteps()">сохранить</button>
+      </div>
+    </div>
+
+    <!-- Food -->
+    <div class="section-head fade-up delay-4">
+      <h3>питание</h3>
+      <span class="action" onclick="UI.openFoodModal()">+ добавить</span>
+    </div>
+    <div class="card fade-up delay-4" style="padding:0 16px"><div id="food-list"></div></div>
+
+    <!-- Mood -->
+    <div class="section-head fade-up delay-5"><h3>самочувствие</h3></div>
+    <div class="card fade-up delay-5" style="padding:18px">
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--muted)">физически</div>
+        <div class="chips" id="mood-physical">
+          <div class="chip" data-mood="отлично" onclick="Tracker.setMood('physical','отлично',this)">отлично</div>
+          <div class="chip" data-mood="хорошо" onclick="Tracker.setMood('physical','хорошо',this)">хорошо</div>
+          <div class="chip" data-mood="нормально" onclick="Tracker.setMood('physical','нормально',this)">нормально</div>
+          <div class="chip" data-mood="плохо" onclick="Tracker.setMood('physical','плохо',this)">плохо</div>
+        </div>
+      </div>
+      <div class="divider" style="margin:12px 0"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--muted)">морально</div>
+        <div class="chips" id="mood-mental">
+          <div class="chip" data-mood="позитив" onclick="Tracker.setMood('mental','позитив',this)">позитив</div>
+          <div class="chip" data-mood="спокойно" onclick="Tracker.setMood('mental','спокойно',this)">спокойно</div>
+          <div class="chip" data-mood="тревога" onclick="Tracker.setMood('mental','тревога',this)">тревога</div>
+          <div class="chip" data-mood="устал" onclick="Tracker.setMood('mental','устал',this)">устал</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weight log -->
+    <div class="section-head fade-up delay-5"><h3>вес сегодня</h3></div>
+    <div class="card fade-up delay-5" style="padding:16px;margin-bottom:14px">
+      <div id="weight-entries-list"></div>
+      <div style="display:flex;gap:7px;margin-top:10px">
+        <input type="number" id="weight-input" placeholder="кг" style="flex:1" min="30" max="300" step="0.1">
+        <select id="weight-label-sel" style="background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:0 10px;font-size:14px;color:var(--text);outline:none;font-family:var(--font);cursor:pointer">
+          <option value="утро">утро</option>
+          <option value="день">день</option>
+          <option value="вечер">вечер</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="Tracker.saveWeight()">+</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px" id="weight-today-info"></div>
+    </div>
+
+    <!-- Channel -->
+    <div class="channel-wrap">
+      <a href="https://t.me/molectracker" target="_blank" class="channel-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 6.75a2.25 2.25 0 0 0 .126 4.238l3.712 1.164 2.303 6.909a.75.75 0 0 0 1.241.325l2.439-2.44 4.116 3.09a2.25 2.25 0 0 0 3.509-1.38l2.625-14.25a2.25 2.25 0 0 0-2.549-2.62z"/></svg>
+        канал трекера
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="screen-stats" class="screen">
+  <div class="home-header status-pad"><h2>статистика</h2></div>
+  <div class="scroll" style="padding-top:4px">
+    <!-- Today snapshot -->
+    <div class="section-head"><h3>сегодня</h3></div>
+    <div id="today-snapshot"></div>
+
+    <!-- BMI / weight goal -->
+    <div class="section-head"><h3>вес и имт</h3></div>
+    <div class="card" style="padding:18px;margin-bottom:14px" id="bmi-card"></div>
+
+    <!-- Weight loss summary -->
+    <div class="section-head"><h3>скинутый вес</h3></div>
+    <div class="card" style="padding:18px;margin-bottom:14px" id="weight-loss-card"></div>
+
+    <!-- AI analytics -->
+    <div class="section-head"><h3>аналитика</h3></div>
+    <div class="card" style="padding:18px;margin-bottom:14px" id="ai-analytics-card">
+      <div style="font-size:14px;color:var(--muted);text-align:center;padding:12px 0">загрузка аналитики…</div>
+    </div>
+
+    <!-- Weight chart -->
+    <div class="section-head"><h3>динамика веса</h3></div>
+    <div class="chart-wrap card" style="margin-bottom:14px"><canvas id="chart-weight" height="160"></canvas></div>
+
+    <!-- Steps chart -->
+    <div class="section-head"><h3>шаги — 7 дней</h3></div>
+    <div class="chart-wrap card" style="margin-bottom:14px"><canvas id="chart-steps" height="140"></canvas></div>
+
+    <!-- Week summary -->
+    <div class="section-head"><h3>сводка недели</h3></div>
+    <div class="card" style="padding:18px;margin-bottom:14px" id="stats-summary"></div>
+
+    <!-- Channel -->
+    <div class="channel-wrap">
+      <a href="https://t.me/molectracker" target="_blank" class="channel-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 6.75a2.25 2.25 0 0 0 .126 4.238l3.712 1.164 2.303 6.909a.75.75 0 0 0 1.241.325l2.439-2.44 4.116 3.09a2.25 2.25 0 0 0 3.509-1.38l2.625-14.25a2.25 2.25 0 0 0-2.549-2.62z"/></svg>
+        канал трекера
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- COURSE -->
+<div id="screen-course" class="screen">
+  <div class="home-header status-pad"><h2>курс & инструкции</h2></div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="section-head"><h3>твой курс</h3></div>
+    <div class="card" style="padding:18px;margin-bottom:14px" id="course-current-card"></div>
+    <div class="section-head"><h3>как принимать</h3></div>
+    <div id="course-instructions"></div>
+    <div class="section-head"><h3>⚠️ запреты</h3></div>
+    <div class="card" style="padding:18px;margin-bottom:14px">
+      <div class="inst-step"><div class="inst-num">!</div><div class="inst-text"><strong>кофеин запрещён</strong> — кофе, чай, кола, энергетики</div></div>
+      <div class="inst-step"><div class="inst-num">!</div><div class="inst-text"><strong>алкоголь запрещён</strong> в течение всего курса</div></div>
+      <div class="inst-step"><div class="inst-num">!</div><div class="inst-text"><strong>жиросжигатели</strong> и препараты давления запрещены</div></div>
+      <div class="inst-step"><div class="inst-num">!</div><div class="inst-text"><strong>максимум рекомендовано 2 капсулы</strong> в сутки</div></div>
+    </div>
+    <div class="channel-wrap">
+      <a href="https://t.me/molectracker" target="_blank" class="channel-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 6.75a2.25 2.25 0 0 0 .126 4.238l3.712 1.164 2.303 6.909a.75.75 0 0 0 1.241.325l2.439-2.44 4.116 3.09a2.25 2.25 0 0 0 3.509-1.38l2.625-14.25a2.25 2.25 0 0 0-2.549-2.62z"/></svg>
+        канал трекера
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="screen-profile" class="screen">
+  <div class="scroll" style="padding:0;padding-bottom:110px">
+    <div class="profile-header status-pad">
+      <div class="profile-avatar" id="profile-avatar-el"></div>
+      <div class="profile-name" id="profile-name-el">—</div>
+      <div class="profile-sub" id="profile-sub-el">—</div>
+    </div>
+    <div class="profile-stats-grid" id="profile-stats-el"></div>
+
+    <div class="section-head" style="padding:0 16px"><h3>личные данные</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row"><div class="setting-label">имя</div><div class="setting-value" onclick="Profile.editField('name')"><span id="set-name">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">рост (см)</div><div class="setting-value" onclick="Profile.editField('height')"><span id="set-height">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">вес (кг)</div><div class="setting-value" onclick="Profile.editField('weight')"><span id="set-weight">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">пол</div><div class="setting-value" onclick="Profile.editField('gender')"><span id="set-gender">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      </div>
+    </div>
+
+    <div class="section-head" style="padding:0 16px"><h3>цели</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row"><div class="setting-label">калории / день</div><div class="setting-value" onclick="Profile.editField('kcal_goal')"><span id="set-kcal">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">вода / день</div><div class="setting-value" onclick="Profile.editField('water_goal')"><span id="set-water">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">целевой вес (кг)</div><div class="setting-value" onclick="Profile.editField('goal_weight')"><span id="set-goal-weight">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">шаги / день</div><div class="setting-value" onclick="Profile.editField('steps_goal')"><span id="set-steps">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">курс</div><div class="setting-value" onclick="Profile.editField('course')"><span id="set-course">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      </div>
+    </div>
+
+    <div class="section-head" style="padding:0 16px"><h3>внешний вид</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row"><div class="setting-label">тёмная тема</div><label class="toggle"><input type="checkbox" id="theme-toggle" onchange="Profile.toggleTheme()"><div class="toggle-track"></div></label></div>
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:4px"><div class="setting-label">цвет акцента</div><div class="accent-picker" id="accent-picker"></div></div>
+      </div>
+    </div>
+
+    <div class="section-head" style="padding:0 16px"><h3>приложение</h3></div>
+    <div style="padding:0 16px;margin-bottom:16px">
+      <div class="card" style="padding:16px">
+        <div id="pwa-install-btn-wrap"><div style="font-size:13px;color:var(--muted)">проверка…</div></div>
+      </div>
+    </div>
+    <div style="padding:0 16px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-danger" onclick="Profile.resetData()">сбросить все данные</button>
+    </div>
+    <div class="channel-wrap" style="padding:0 16px 4px">
+      <a href="https://t.me/molectracker" target="_blank" class="channel-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 6.75a2.25 2.25 0 0 0 .126 4.238l3.712 1.164 2.303 6.909a.75.75 0 0 0 1.241.325l2.439-2.44 4.116 3.09a2.25 2.25 0 0 0 3.509-1.38l2.625-14.25a2.25 2.25 0 0 0-2.549-2.62z"/></svg>
+        канал трекера
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="main-nav" style="display:none">
+  <button class="nav-btn active" id="nav-home" onclick="App.switchTab('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>главная</span>
+  </button>
+  <button class="nav-btn" id="nav-stats" onclick="App.switchTab('stats')">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>статистика</span>
+  </button>
+  <button class="nav-btn" id="nav-course" onclick="App.switchTab('course')">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>курс</span>
+  </button>
+  <button class="nav-btn" id="nav-profile" onclick="App.switchTab('profile')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>профиль</span>
+  </button>
+</nav>
+
+<!-- MODAL: FOOD (manual) -->
+<div class="modal-overlay" id="food-modal" onclick="UI.closeBgModal('food-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">добавить еду</div>
+    <div class="input-group"><label>название блюда</label><input type="text" id="food-name-input" placeholder="например: овсянка"></div>
+    <div class="input-group"><label>калории (ккал)</label><input type="number" id="food-kcal-input" placeholder="300" min="1" max="5000"></div>
+    <button class="btn btn-primary" style="margin-top:6px" onclick="Tracker.addFood()">добавить</button>
+  </div>
+</div>
+
+
+<!-- MODAL: GENERIC EDIT -->
+<div class="modal-overlay" id="edit-modal" onclick="UI.closeBgModal('edit-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="edit-modal-title">изменить</div>
+    <div id="edit-modal-body"></div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="Profile.saveField()">сохранить</button>
+  </div>
+</div>
+
+<!-- MODAL: CAPSULE DAY -->
+<div class="modal-overlay" id="capsule-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">день курса</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:20px">скорректируй, если начал курс до установки приложения</p>
+    <div class="input-group">
+      <label>текущий день курса</label>
+      <input type="number" id="course-day-input" min="1" max="60" placeholder="1">
+    </div>
+    <div class="input-group">
+      <label>капсул выпито всего за весь курс</label>
+      <input type="number" id="course-caps-input" min="0" max="60" placeholder="0">
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">укажи сколько капсул уже было принято до сегодня — это скорректирует счётчик курса</div>
+    </div>
+    <button class="btn btn-primary" onclick="Tracker.saveCourseDay()">сохранить</button>
+  </div>
+</div>
+
+<!-- MODAL: EXTRA CAPSULE CONFIRM -->
+<div class="modal-overlay" id="extra-cap-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="font-size:32px;text-align:center;margin-bottom:12px">⚠️</div>
+    <div class="modal-title" style="text-align:center">дополнительная капсула</div>
+    <div class="warning" style="margin-bottom:20px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p>3-я капсула превышает рекомендуемую суточную норму. возможны побочные эффекты: учащённое сердцебиение, тревожность, нарушение сна. принимать только осознанно.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-danger" onclick="Tracker._confirmExtraCapsule()">понимаю риски, записать</button>
+      <button class="btn btn-ghost" onclick="UI.closeModal('extra-cap-modal')">отмена</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE HELPERS — обратная совместимость со старыми данными
+// ══════════════════════════════════════════════════════
+const STATE={
+  get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))},
+  remove(k){localStorage.removeItem(k)}
+};
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function getUser(){return STATE.get('mlk_user')}
+function saveUser(u){STATE.set('mlk_user',u)}
+function getHistory(){return STATE.get('mlk_history')||{}}
+// Migrate: ensure new fields exist without losing old data
+function getTodayData(){
+  const h=getHistory(),k=todayKey();
+  const base={kcal:0,water:0,morning:false,evening:false,capsules:0,food:[],physical:'',mental:'',steps:0,weight:null,weights:[]};
+  const d=h[k]||{};
+  if(!('capsules' in d)) d.capsules=(d.morning?1:0)+(d.evening?1:0);
+  // migrate single weight → weights array
+  if(!d.weights) d.weights=d.weight?[{t:'утро',v:d.weight}]:[];
+  return Object.assign({},base,d);
+}
+function saveTodayData(d){const h=getHistory();h[todayKey()]=d;STATE.set('mlk_history',h)}
+// Migrate user: add missing new fields
+function migrateUser(u){
+  if(!u) return u;
+  if(!u.steps_goal) u.steps_goal=8000;
+  if(!u.goal_weight) u.goal_weight=null;
+  if(!u.course_day_offset) u.course_day_offset=0;
+  if(!u.capsules_offset) u.capsules_offset=0;
+  saveUser(u);
+  return u;
+}
+
+const TAGLINES=['каждый день — это шаг к новой версии тебя','дисциплина важнее мотивации','маленькие действия дают большой результат','ты уже начал путь'];
+const COURSE_LIMITS={plus:40,premium:46,turbo:60};
+const COURSE_NAMES={plus:'plus',premium:'premium',turbo:'turbo ozempic'};
+const ACCENTS={blue:'#4f8ef7',green:'#34c77b',red:'#f75c5c',purple:'#a78bfa',orange:'#fb923c',teal:'#2dd4bf'};
+
+// ══════════════════════════════════════════════════════
+// APP
+// ══════════════════════════════════════════════════════
+const App={
+  currentTab:'home',
+  init(){
+    let u=getUser();
+    if(u){
+      u=migrateUser(u);
+      this.applyTheme(u.theme||'dark',u.accent||'blue');
+      this.showApp();
+    } else {
+      this.applyTheme('dark','blue');
+      document.getElementById('onboard-tagline').textContent=TAGLINES[Math.floor(Math.random()*TAGLINES.length)];
+      this.showScreen('onboard');
+    }
+  },
+  applyTheme(t,a){
+    document.documentElement.setAttribute('data-theme',t);
+    document.documentElement.setAttribute('data-accent',a||'blue');
+  },
+  showScreen(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const el=document.getElementById('screen-'+name);
+    if(el) el.classList.add('active');
+  },
+  startOnboarding(){Reg.currentStep=1;Reg.data={};Reg.renderDots();this.showScreen('register');},
+  showApp(){
+    ['onboard','register'].forEach(id=>{
+      const el=document.getElementById('screen-'+id);
+      if(el){el.classList.remove('active');el.style.display='none';}
+    });
+    document.getElementById('main-nav').style.display='flex';
+    this.switchTab('home');
+    Home.render();
+  },
+  switchTab(tab){
+    this.currentTab=tab;
+    ['home','stats','course','profile'].forEach(t=>{
+      const btn=document.getElementById('nav-'+t);
+      const scr=document.getElementById('screen-'+t);
+      if(btn) btn.classList.toggle('active',t===tab);
+      if(scr) scr.classList.toggle('active',t===tab);
+    });
+    if(tab==='stats') Stats.render();
+    if(tab==='course') Course.render();
+    if(tab==='profile') Profile.render();
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// REGISTRATION
+// ══════════════════════════════════════════════════════
+const Reg={
+  currentStep:1,totalSteps:4,data:{},
+  renderDots(){
+    const c=document.getElementById('step-dots');c.innerHTML='';
+    for(let i=1;i<=this.totalSteps;i++){
+      const d=document.createElement('div');
+      d.className='step-dot'+(i===this.currentStep?' active':'');c.appendChild(d);
+    }
+  },
+  goToStep(n){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    const el=document.getElementById('step-'+n);if(el) el.classList.add('active');
+    this.currentStep=n;this.renderDots();
+  },
+  selectGender(g){this.data.gender=g;document.querySelectorAll('.gender-card').forEach(c=>c.classList.toggle('selected',c.dataset.gender===g));},
+  selectCourse(c){this.data.course=c;document.querySelectorAll('.course-card').forEach(el=>el.classList.toggle('selected',el.dataset.course===c));},
+  nextStep(){
+    if(this.currentStep===1&&!this.data.gender){alert('выбери пол');return;}
+    if(this.currentStep===2){
+      const h=+document.getElementById('reg-height').value;
+      const w=+document.getElementById('reg-weight').value;
+      if(!h||h<100||h>250){alert('введи корректный рост');return;}
+      if(!w||w<30||w>300){alert('введи корректный вес');return;}
+      this.data.height=h;this.data.weight=w;
+      this.data.name=document.getElementById('reg-name').value.trim();
+      const gw=+document.getElementById('reg-goal-weight').value;
+      this.data.goal_weight=gw||null;
+    }
+    if(this.currentStep===3){
+      let k=+document.getElementById('reg-kcal').value||1200;
+      let wt=+document.getElementById('reg-water').value||2.5;
+      let st=+document.getElementById('reg-steps').value||8000;
+      if(k<900) k=900;if(wt<2) wt=2;
+      this.data.kcal_goal=k;this.data.water_goal=wt;this.data.steps_goal=st;
+    }
+    if(this.currentStep<this.totalSteps) this.goToStep(this.currentStep+1);
+  },
+  finish(){
+    if(!this.data.course){alert('выбери курс');return;}
+    const user={
+      name:this.data.name||'',gender:this.data.gender,height:this.data.height,weight:this.data.weight,
+      goal_weight:this.data.goal_weight||null,kcal_goal:this.data.kcal_goal,
+      water_goal:this.data.water_goal,steps_goal:this.data.steps_goal||8000,
+      course:this.data.course,theme:'dark',accent:'blue',created:todayKey(),course_day_offset:0
+    };
+    saveUser(user);App.applyTheme('dark','blue');App.showApp();
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════════════
+const Home={
+  render(){
+    const u=getUser();if(!u) return;
+    const d=getTodayData();
+    const hr=new Date().getHours();
+    const greet=hr<12?'доброе утро':hr<18?'добрый день':'добрый вечер';
+    document.getElementById('home-greeting').textContent=u.name?`${greet}, ${u.name}`:`${greet}!`;
+    document.getElementById('home-avatar').innerHTML=u.name?u.name[0].toUpperCase():'👤';
+    document.getElementById('streak-label').textContent=`серия: ${this.calcStreak()} ${this.pluralDays(this.calcStreak())}`;
+    // kcal
+    const kpct=Math.min(100,Math.round(((d.kcal||0)/u.kcal_goal)*100));
+    document.getElementById('kcal-val').textContent=d.kcal||0;
+    document.getElementById('kcal-sub').textContent='цель: '+u.kcal_goal+' ккал';
+    document.getElementById('kcal-bar').style.width=kpct+'%';
+    // water top
+    const wl=d.water||0,wpct=Math.min(100,Math.round((wl/u.water_goal)*100));
+    document.getElementById('water-val-home').textContent=wl.toFixed(1)+'л';
+    document.getElementById('water-sub-home').textContent='цель: '+u.water_goal+'л';
+    const whb=document.getElementById('water-bar-home');whb.style.width=wpct+'%';whb.style.background=this.waterColor(wpct);
+    this.renderWater(d,u);
+    this.renderCapsules(d,u);
+    this.renderFood(d);
+    this.renderSteps(d,u);
+    this.renderMood(d);
+    this.renderWarnings(d);
+    this.renderWeightInput(d);
+    // course day info
+    const dn=this.dayNumber(u);
+    document.getElementById('course-day-info').textContent=`день курса: ${dn}`;
+  },
+  renderWater(d,u){
+    const wl=d.water||0,wpct=Math.min(100,Math.round((wl/u.water_goal)*100));
+    document.getElementById('water-display').textContent=wl.toFixed(2)+' л';
+    document.getElementById('water-goal-display').textContent='из '+u.water_goal.toFixed(1)+' л';
+    const bar=document.getElementById('water-bar-main');bar.style.width=wpct+'%';bar.style.background=this.waterColor(wpct);
+    document.getElementById('water-emoji').textContent=wpct<30?'🪣':wpct<60?'💧':wpct<90?'🫧':'✨';
+  },
+  waterColor(p){return p<50?'#1a3a6b':p<80?'#2563eb':'linear-gradient(90deg,#2563eb,#06b6d4)';},
+  renderCapsules(d,u){
+    const wrap=document.getElementById('capsule-cards-wrap');
+    const count=d.capsules||0;
+    const dayNum=this.dayNumber(u);
+    const limit=COURSE_LIMITS[u.course];
+    const used=this.usedCapsules();
+    // build grid of capsule slots (up to 3 for logging freedom)
+    const slots=Math.max(count,u.course==='plus'&&dayNum<16?1:2);
+    let html='<div class="capsule-row">';
+    for(let i=0;i<Math.min(slots,3);i++){
+      const done=i<count;
+      html+=`<div class="capsule-card card${done?' done':''}" onclick="Tracker.toggleCapsuleIdx(${i})">
+        <div class="capsule-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>${i===0?'утро':i===1?'вечер':'доп'}</div>
+        <h3>${i===0?'утренняя':i===1?'вечерняя':'дополнительная'}</h3>
+        <p>${i===0?'за 40 мин до еды':i===1?'за 7–8 ч до сна':'зафиксировать'}</p>
+        <div class="capsule-check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>`;
+    }
+    html+='</div>';
+    // add button for 3rd capsule if needed
+    if(count<3){
+      html+=`<div style="text-align:center;margin-bottom:4px"><span class="action" style="font-size:13px" onclick="Tracker.addExtraCapsule()">+ записать ещё одну</span></div>`;
+    }
+    wrap.innerHTML=html;
+    document.getElementById('capsule-limit-info').textContent=`использовано: ${used} / ${limit} капсул курса`;
+  },
+  renderFood(d){
+    const list=document.getElementById('food-list');
+    const food=d.food||[];
+    if(!food.length){
+      list.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><div>нет записей</div></div>';
+      return;
+    }
+    list.innerHTML=food.map((f,i)=>`
+      <div class="food-item">
+        <div class="food-name">${f.name}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="food-kcal">${f.kcal} ккал</div>
+          <button class="food-delete" onclick="Tracker.removeFood(${i})">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>`).join('');
+  },
+  renderSteps(d,u){
+    const steps=d.steps||0;
+    const goal=u.steps_goal||8000;
+    const pct=Math.min(100,Math.round(steps/goal*100));
+    document.getElementById('steps-display').textContent=steps.toLocaleString('ru');
+    document.getElementById('steps-goal-display').textContent=goal.toLocaleString('ru');
+    document.getElementById('steps-bar').style.width=pct+'%';
+    const inp=document.getElementById('steps-input');
+    if(steps) inp.value=steps;
+  },
+  renderMood(d){
+    ['physical','mental'].forEach(t=>{
+      document.querySelectorAll(`#mood-${t} .chip`).forEach(c=>c.classList.toggle('active',c.dataset.mood===d[t]));
+    });
+  },
+  renderWarnings(d){
+    const warns=[];
+    if((d.capsules||0)>=3) warns.push('сегодня выпито 3 капсулы — превышена рекомендуемая норма');
+    else if((d.capsules||0)>=2) warns.push('принято 2 капсулы — суточный максимум достигнут');
+    document.getElementById('warnings-container').innerHTML=warns.map(w=>`
+      <div class="warning"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p>${w}</p></div>`).join('');
+  },
+  renderWeightInput(d){
+    const entries=d.weights||[];
+    const list=document.getElementById('weight-entries-list');
+    const info=document.getElementById('weight-today-info');
+    if(!list) return;
+    if(!entries.length){
+      list.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0">замеры не добавлены</div>';
+      if(info) info.textContent='';
+      return;
+    }
+    list.innerHTML=entries.map((e,i)=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--card-border)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:11px;color:var(--muted);background:var(--card);border:1px solid var(--card-border);padding:2px 8px;border-radius:50px">${e.t}</span>
+          <span style="font-size:17px;font-weight:700">${e.v} кг</span>
+          ${i>0?`<span style="font-size:12px;font-weight:600;color:${entries[i-1].v-e.v>0.01?'#34c77b':entries[i-1].v-e.v<-0.01?'#f75c5c':'var(--muted)'}">
+            ${entries[i-1].v-e.v>0.01?'−'+(entries[i-1].v-e.v).toFixed(1):entries[i-1].v-e.v<-0.01?'+'+(e.v-entries[i-1].v).toFixed(1):'—'} кг
+          </span>`:''}
+        </div>
+        <button onclick="Tracker.removeWeight(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:3px;display:flex">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        </button>
+      </div>`).join('');
+    // day delta: first vs last
+    if(entries.length>=2){
+      const delta=entries[0].v-entries[entries.length-1].v;
+      const sign=delta>0.01?'−':delta<-0.01?'+':'';
+      const color=delta>0.01?'#34c77b':delta<-0.01?'#f75c5c':'var(--muted)';
+      if(info) info.innerHTML=`за день: <strong style="color:${color}">${sign}${Math.abs(delta).toFixed(1)} кг</strong>`;
+    } else {
+      if(info) info.textContent='добавь ещё замер чтобы увидеть изменение';
+    }
+  },
+  calcStreak(){
+    const h=getHistory();let streak=0;const dt=new Date();
+    for(let i=0;i<365;i++){
+      const k=dt.toISOString().slice(0,10);const day=h[k];
+      if(day&&(day.capsules>0||day.kcal>0)) streak++;
+      else if(i>0) break;
+      dt.setDate(dt.getDate()-1);
+    }
+    return streak;
+  },
+  pluralDays(n){
+    if(n%10===1&&n%100!==11) return 'день';
+    if(n%10>=2&&n%10<=4&&!(n%100>=11&&n%100<=14)) return 'дня';
+    return 'дней';
+  },
+  dayNumber(u){
+    const offset=u.course_day_offset||0;
+    const created=new Date(u.created||todayKey());
+    const today=new Date(todayKey());
+    return Math.floor((today-created)/(864e5))+1+offset;
+  },
+  usedCapsules(){
+    const h=getHistory();let total=0;
+    Object.values(h).forEach(d=>{total+=(d.capsules||((d.morning?1:0)+(d.evening?1:0)));});
+    const u=getUser();
+    return total+(u&&u.capsules_offset||0);
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// TRACKER
+// ══════════════════════════════════════════════════════
+const Tracker={
+  toggleCapsuleIdx(idx){
+    const u=getUser();if(!u) return;
+    const d=getTodayData();
+    const cur=d.capsules||0;
+    const usedTotal=Home.usedCapsules();
+    const limit=COURSE_LIMITS[u.course];
+    if(idx<cur){
+      // remove one
+      d.capsules=Math.max(0,cur-1);
+    } else {
+      // add one
+      if(usedTotal>=limit){alert(`лимит курса ${COURSE_NAMES[u.course]} (${limit} капсул) исчерпан`);return;}
+      d.capsules=cur+1;
+    }
+    // keep legacy fields
+    d.morning=d.capsules>=1;d.evening=d.capsules>=2;
+    saveTodayData(d);Home.render();
+  },
+  addExtraCapsule(){
+    // Show safety warning modal instead of directly adding
+    document.getElementById('extra-cap-modal').classList.add('open');
+  },
+  _confirmExtraCapsule(){
+    const u=getUser();if(!u) return;
+    const d=getTodayData();
+    const cur=d.capsules||0;
+    const usedTotal=Home.usedCapsules();
+    const limit=COURSE_LIMITS[u.course];
+    if(usedTotal>=limit){UI.closeModal('extra-cap-modal');alert('лимит курса исчерпан');return;}
+    d.capsules=cur+1;d.morning=d.capsules>=1;d.evening=d.capsules>=2;
+    saveTodayData(d);
+    UI.closeModal('extra-cap-modal');
+    Home.render();
+  },
+  addFood(){
+    const n=document.getElementById('food-name-input').value.trim();
+    const k=+document.getElementById('food-kcal-input').value;
+    if(!n){alert('введи название');return;}if(!k||k<1){alert('введи калории');return;}
+    const d=getTodayData();
+    if(!d.food) d.food=[];
+    d.food.push({name:n,kcal:k});d.kcal=(d.kcal||0)+k;
+    saveTodayData(d);
+    document.getElementById('food-name-input').value='';document.getElementById('food-kcal-input').value='';
+    UI.closeModal('food-modal');Home.render();
+  },
+  removeFood(idx){
+    const d=getTodayData();
+    if(!d.food||!d.food[idx]) return;
+    d.kcal=Math.max(0,(d.kcal||0)-d.food[idx].kcal);d.food.splice(idx,1);
+    saveTodayData(d);Home.render();
+  },
+  addWater(amt){
+    const u=getUser();if(!u) return;
+    const d=getTodayData();
+    d.water=Math.max(0,Math.round(((d.water||0)+amt)*100)/100);
+    saveTodayData(d);Home.renderWater(d,u);
+    const wpct=Math.min(100,Math.round((d.water/u.water_goal)*100));
+    document.getElementById('water-val-home').textContent=d.water.toFixed(1)+'л';
+    const whb=document.getElementById('water-bar-home');whb.style.width=wpct+'%';whb.style.background=Home.waterColor(wpct);
+  },
+  setMood(type,val,el){
+    const d=getTodayData();d[type]=val;saveTodayData(d);
+    document.querySelectorAll(`#mood-${type} .chip`).forEach(c=>c.classList.toggle('active',c===el));
+  },
+  saveSteps(){
+    const v=+document.getElementById('steps-input').value;
+    if(!v||v<0){alert('введи количество шагов');return;}
+    const d=getTodayData();d.steps=v;saveTodayData(d);
+    const u=getUser();Home.renderSteps(d,u);
+  },
+  saveWeight(){
+    const v=+document.getElementById('weight-input').value;
+    const lbl=document.getElementById('weight-label-sel').value;
+    if(!v||v<30||v>300){alert('введи корректный вес');return;}
+    const d=getTodayData();
+    if(!d.weights) d.weights=[];
+    d.weights.push({t:lbl,v:v});
+    // keep weight field as last entry for backwards compat
+    d.weight=v;
+    saveTodayData(d);
+    document.getElementById('weight-input').value='';
+    Home.renderWeightInput(d);
+  },
+  removeWeight(idx){
+    const d=getTodayData();
+    if(!d.weights||!d.weights[idx]) return;
+    d.weights.splice(idx,1);
+    d.weight=d.weights.length?d.weights[d.weights.length-1].v:null;
+    saveTodayData(d);
+    Home.renderWeightInput(d);
+  },
+  saveCourseDay(){
+    const dayVal=+document.getElementById('course-day-input').value;
+    const capsVal=document.getElementById('course-caps-input').value;
+    if(!dayVal||dayVal<1||dayVal>60){alert('введи день курса (1–60)');return;}
+    const u=getUser();if(!u) return;
+    // Adjust course start offset so dayNumber() returns dayVal
+    const actualDayWithoutOffset=Math.floor((new Date(todayKey())-new Date(u.created||todayKey()))/(864e5))+1;
+    u.course_day_offset=dayVal-actualDayWithoutOffset;
+    // If user specified total capsules taken — store as override in user profile
+    // We'll store it as a separate field and subtract from live count in usedCapsules()
+    if(capsVal!==''&&capsVal!==null){
+      const totalCapsEntered=+capsVal;
+      if(totalCapsEntered>=0&&totalCapsEntered<=60){
+        // Calculate what's already tracked in history
+        const trackedCaps=Home.usedCapsules();
+        // Store an offset: if they say 10 taken but history shows 3, offset = 7
+        u.capsules_offset=Math.max(0,totalCapsEntered-trackedCaps);
+      }
+    }
+    saveUser(u);
+    UI.closeModal('capsule-modal');
+    Home.render();
+    if(App.currentTab==='course') Course.render();
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════════════════
+const Stats={
+  render(){
+    const u=getUser();if(!u) return;
+    const h=getHistory();
+    const days=[];
+    for(let i=6;i>=0;i--){
+      const dt=new Date();dt.setDate(dt.getDate()-i);
+      const k=dt.toISOString().slice(0,10);
+      days.push({k,label:['вс','пн','вт','ср','чт','пт','сб'][dt.getDay()],data:h[k]||{}});
+    }
+    this.renderTodaySnapshot(days[days.length-1].data,u);
+    this.renderBMI(u,days);
+    this.renderWeightLoss(u);
+    this.renderSummary(days,u);
+    this.drawWeightChart(days);
+    this.drawStepsChart(days,u);
+    this.renderAIAnalytics(days,u);
+  },
+  renderTodaySnapshot(d,u){
+    const wrap=document.getElementById('today-snapshot');
+    const caps=d.capsules||(d.morning?1:0)+(d.evening?1:0);
+    wrap.innerHTML=`
+    <div class="stats-today-grid">
+      <div class="stat-today-card card">
+        <div class="label">калории</div>
+        <div class="stat-today-val">${d.kcal||0}</div>
+        <div style="margin:6px 0 2px"><div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(100,Math.round(((d.kcal||0)/u.kcal_goal)*100))}%"></div></div></div>
+        <div class="stat-today-sub">цель: ${u.kcal_goal} ккал</div>
+      </div>
+      <div class="stat-today-card card">
+        <div class="label">вода</div>
+        <div class="stat-today-val">${(d.water||0).toFixed(1)}л</div>
+        <div style="margin:6px 0 2px"><div class="water-progress" style="height:7px;border-radius:50px"><div class="water-bar" style="width:${Math.min(100,Math.round(((d.water||0)/u.water_goal)*100))}%;background:${Home.waterColor(Math.round(((d.water||0)/u.water_goal)*100))}"></div></div></div>
+        <div class="stat-today-sub">цель: ${u.water_goal}л</div>
+      </div>
+      <div class="stat-today-card card">
+        <div class="label">капсулы</div>
+        <div class="stat-today-val" style="color:var(--accent)">${caps}</div>
+        <div class="stat-today-sub">${caps===0?'не принято':caps===1?'принята 1':caps===2?'принято 2':'принято '+caps}</div>
+      </div>
+      <div class="stat-today-card card">
+        <div class="label">шаги</div>
+        <div class="stat-today-val">${(d.steps||0).toLocaleString('ru')}</div>
+        <div style="margin:6px 0 2px"><div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(100,Math.round(((d.steps||0)/(u.steps_goal||8000))*100))}%"></div></div></div>
+        <div class="stat-today-sub">цель: ${(u.steps_goal||8000).toLocaleString('ru')}</div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:20px">
+      <div><div class="label">физически</div><div class="mood-badge">${d.physical||'—'}</div></div>
+      <div><div class="label">морально</div><div class="mood-badge">${d.mental||'—'}</div></div>
+    </div>`;
+  },
+  renderBMI(u,days){
+    function dayW(d){const w=d.weights;if(w&&w.length) return w[w.length-1].v;return d.weight||null;}
+    let lastW=u.weight;for(let i=days.length-1;i>=0;i--){const w=dayW(days[i].data);if(w){lastW=w;break;}}
+    const bmi=lastW&&u.height?+(lastW/((u.height/100)**2)).toFixed(1):null;
+    const bmiLabel=!bmi?'—':bmi<18.5?'дефицит':bmi<25?'норма':bmi<30?'избыток':'ожирение';
+    const bmiColor=!bmi?'var(--muted)':bmi<18.5?'#fb923c':bmi<25?'#34c77b':bmi<30?'#fb923c':'#f75c5c';
+    const goalW=u.goal_weight;const diff=lastW&&goalW?(lastW-goalW):null;
+    document.getElementById('bmi-card').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div><div class="label">вес сейчас</div><div style="font-size:22px;font-weight:700;margin-top:4px">${lastW||'—'} кг</div></div>
+      <div><div class="label">имт</div><div style="font-size:22px;font-weight:700;margin-top:4px;color:${bmiColor}">${bmi||'—'}</div><div style="font-size:11px;color:${bmiColor};margin-top:2px">${bmiLabel}</div></div>
+      <div><div class="label">до цели</div><div style="font-size:22px;font-weight:700;margin-top:4px;color:var(--accent)">${diff!==null?(diff>0.05?'−'+diff.toFixed(1):diff<-0.05?'+'+Math.abs(diff).toFixed(1):'✓')+'кг':'—'}</div>${goalW?`<div style="font-size:11px;color:var(--muted);margin-top:2px">цель: ${goalW} кг</div>`:''}</div>
+    </div>`;
+  },
+  renderWeightLoss(u){
+    const el=document.getElementById('weight-loss-card');if(!el) return;
+    const h=getHistory();
+    const allDays=Object.entries(h).sort((a,b)=>a[0].localeCompare(b[0]));
+    // helper: get last weight of day
+    function dayW(d){const w=d.weights;if(w&&w.length) return w[w.length-1].v;return d.weight||null;}
+    function dayWFirst(d){const w=d.weights;if(w&&w.length) return w[0].v;return d.weight||null;}
+    // Find first ever recorded weight
+    let firstW=null,firstDate=null;
+    for(const [k,d] of allDays){const w=dayW(d);if(w){firstW=w;firstDate=k;break;}}
+    if(!firstW) firstW=u.weight;
+    // last recorded
+    let lastW=u.weight;
+    for(let i=allDays.length-1;i>=0;i--){const w=dayW(allDays[i][1]);if(w){lastW=w;break;}}
+    // today intraday
+    const todayD=h[todayKey()]||{};
+    const todayFirst=dayWFirst(todayD);const todayLast=dayW(todayD);
+    const intradayDelta=(todayFirst&&todayLast&&todayD.weights&&todayD.weights.length>1)?(todayFirst-todayLast):null;
+    // yesterday
+    const ydt=new Date();ydt.setDate(ydt.getDate()-1);
+    const yKey=ydt.toISOString().slice(0,10);
+    const ydW=dayW(h[yKey]||{});
+    const vsYesterday=lastW&&ydW?(ydW-lastW):null;
+    // 7-day
+    const weekWs=[];
+    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().slice(0,10);const w=dayW(h[k]||{});if(w) weekWs.push(w);}
+    const weekLost=weekWs.length>=2?(weekWs[0]-weekWs[weekWs.length-1]):null;
+    const totalLost=firstW&&lastW?(firstW-lastW):null;
+    const vsGoal=lastW&&u.goal_weight?(lastW-u.goal_weight):null;
+    function fmt(v){
+      if(v===null||isNaN(v)) return '<span style="color:var(--muted)">—</span>';
+      const a=Math.abs(v).toFixed(1);
+      if(v>0.05) return `<span style="color:#34c77b;font-weight:700">−${a} кг</span>`;
+      if(v<-0.05) return `<span style="color:#f75c5c;font-weight:700">+${Math.abs(v).toFixed(1)} кг</span>`;
+      return `<span style="color:var(--muted)">0.0 кг</span>`;
+    }
+    el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div class="label">за всё время</div>
+        <div style="font-size:22px;font-weight:700;margin-top:4px">${fmt(totalLost)}</div>
+        ${firstDate?`<div style="font-size:11px;color:var(--muted);margin-top:2px">с ${firstDate.slice(5).replace('-','.')} · было ${firstW} кг</div>`:''}
+      </div>
+      <div>
+        <div class="label">за неделю</div>
+        <div style="font-size:22px;font-weight:700;margin-top:4px">${fmt(weekLost)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${weekWs.length<2?'мало данных':weekWs.length+' замеров'}</div>
+      </div>
+      <div>
+        <div class="label">за сегодня</div>
+        <div style="font-size:22px;font-weight:700;margin-top:4px">${fmt(intradayDelta)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${intradayDelta!==null?`${todayFirst} → ${todayLast} кг`:'добавь утро и вечер'}</div>
+      </div>
+      <div>
+        <div class="label">до цели</div>
+        <div style="font-size:22px;font-weight:700;margin-top:4px">${fmt(vsGoal)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${u.goal_weight?`цель: ${u.goal_weight} кг`:'не задана'}</div>
+      </div>
+    </div>
+    ${totalLost!==null&&totalLost>0.05?`<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--card-border);display:flex;align-items:center;gap:10px">
+      <div style="font-size:20px">🏆</div>
+      <div style="font-size:13px;color:var(--muted)">уже скинула <strong style="color:var(--accent)">${totalLost.toFixed(1)} кг</strong> — ${totalLost>=10?'невероятный':totalLost>=5?'отличный':'хороший'} результат!</div>
+    </div>`:''}`;
+  },
+  renderAIAnalytics(days,u){
+    const el=document.getElementById('ai-analytics-card');
+    // compute simple analytics without API
+    const kcals=days.map(d=>d.data.kcal||0);
+    const waters=days.map(d=>d.data.water||0);
+    const steps=days.map(d=>d.data.steps||0);
+    const caps=days.map(d=>d.data.capsules||(d.data.morning?1:0)+(d.data.evening?1:0));
+    const avgK=Math.round(kcals.reduce((a,b)=>a+b,0)/7);
+    const avgW=(waters.reduce((a,b)=>a+b,0)/7).toFixed(1);
+    const avgS=Math.round(steps.reduce((a,b)=>a+b,0)/7);
+    const totalCaps=caps.reduce((a,b)=>a+b,0);
+    const activeDays=days.filter(d=>d.data.kcal>0||d.data.capsules>0).length;
+
+    // generate insights
+    const insights=[];
+    if(avgK>0&&avgK<u.kcal_goal*0.7) insights.push({icon:'⚠️',text:`средние калории за неделю (${avgK} ккал) ниже нормы — риск замедления метаболизма`});
+    else if(avgK>u.kcal_goal*1.15) insights.push({icon:'📈',text:`средние калории выше цели — попробуй сократить перекусы`});
+    else if(avgK>0) insights.push({icon:'✅',text:`питание в норме — средние ${avgK} ккал/день`});
+    if(+avgW<u.water_goal*0.8) insights.push({icon:'💧',text:`пьёшь мало воды — среднее ${avgW}л, норма ${u.water_goal}л`});
+    else insights.push({icon:'💧',text:`водный баланс хороший — ${avgW}л в среднем`});
+    if(avgS>0&&avgS<(u.steps_goal||8000)*0.6) insights.push({icon:'🚶',text:`шагов мало — попробуй увеличить активность`});
+    else if(avgS>=(u.steps_goal||8000)) insights.push({icon:'🏃',text:`отличная активность — ${avgS.toLocaleString('ru')} шагов в среднем`});
+    if(activeDays<4) insights.push({icon:'🔥',text:`активных дней всего ${activeDays} из 7 — попробуй не пропускать`});
+    if(u.goal_weight){
+      const lw=this._lastWeight(days,u);
+      if(lw&&lw>u.goal_weight){
+        const wkDiff=(lw-u.goal_weight);
+        const estWeeks=Math.ceil(wkDiff/0.5);
+        insights.push({icon:'🎯',text:`до цели ${wkDiff.toFixed(1)} кг — при темпе −0.5кг/нед примерно ${estWeeks} нед.`});
+      }
+    }
+    if(!insights.length) insights.push({icon:'📊',text:'записывай данные каждый день — аналитика станет точнее'});
+
+    el.innerHTML=insights.map(i=>`
+      <div style="display:flex;gap:10px;margin-bottom:12px;align-items:flex-start">
+        <div style="font-size:18px;flex-shrink:0">${i.icon}</div>
+        <div style="font-size:13px;line-height:1.6;color:var(--text)">${i.text}</div>
+      </div>`).join('');
+  },
+  _lastWeight(days,u){
+    for(let i=days.length-1;i>=0;i--){if(days[i].data.weight) return days[i].data.weight;}
+    return u.weight||null;
+  },
+  renderSummary(days,u){
+    const el=document.getElementById('stats-summary');
+    const avgK=Math.round(days.map(d=>d.data.kcal||0).reduce((a,b)=>a+b,0)/7);
+    const avgW=(days.map(d=>d.data.water||0).reduce((a,b)=>a+b,0)/7).toFixed(1);
+    const totalCaps=days.reduce((s,d)=>s+(d.data.capsules||(d.data.morning?1:0)+(d.data.evening?1:0)),0);
+    const streak=Home.calcStreak();
+    el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div><div class="label">ср. калории</div><div style="font-size:20px;font-weight:700;margin-top:3px">${avgK}</div></div>
+      <div><div class="label">ср. вода</div><div style="font-size:20px;font-weight:700;margin-top:3px">${avgW}л</div></div>
+      <div><div class="label">капсул за 7д</div><div style="font-size:20px;font-weight:700;margin-top:3px">${totalCaps}</div></div>
+      <div><div class="label">серия дней</div><div style="font-size:20px;font-weight:700;margin-top:3px">${streak}</div></div>
+    </div>`;
+  },
+  drawWeightChart(days){
+    // use last entry of day if weights array exists, else single weight field
+    const vals=days.map(d=>{
+      const w=d.data.weights;
+      if(w&&w.length) return w[w.length-1].v;
+      return d.data.weight||null;
+    });
+    const mornVals=days.map(d=>{
+      const w=d.data.weights;
+      if(w&&w.length>1) return w[0].v;
+      return null;
+    });
+    const labels=days.map(d=>d.label);
+    this._drawLineChartWithDelta('chart-weight',vals,mornVals,labels,'кг',{nullGap:true,height:180});
+  },
+  _drawLineChartWithDelta(id,vals,mornVals,labels,unit,opts={}){
+    const canvas=document.getElementById(id);if(!canvas) return;
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.parentElement.clientWidth-36;const H=opts.height||180;
+    canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+    const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+    const pad={t:20,r:14,b:32,l:42};const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+    const allVals=[...vals,...mornVals].filter(v=>v!==null);
+    if(!allVals.length){
+      ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;
+    }
+    const rawMin=Math.min(...allVals);const rawMax=Math.max(...allVals);
+    const pad_=Math.max((rawMax-rawMin)*0.3,0.5);
+    const min=rawMin-pad_;const max=rawMax+pad_;
+    ctx.clearRect(0,0,W,H);
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    const gridC=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';
+    const textC=isDark?'rgba(255,255,255,.32)':'rgba(0,0,0,.32)';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    for(let i=0;i<=3;i++){const y=pad.t+ch*(1-i/3);ctx.strokeStyle=gridC;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+    const xs=vals.map((_,i)=>pad.l+i*(cw/(vals.length-1||1)));
+    const ys=vals.map(v=>v===null?null:pad.t+ch*(1-(v-min)/(max-min)));
+    const yms=mornVals.map(v=>v===null?null:pad.t+ch*(1-(v-min)/(max-min)));
+    // Morning dots (light)
+    for(let i=0;i<mornVals.length;i++){
+      if(yms[i]===null) continue;
+      ctx.beginPath();ctx.arc(xs[i],yms[i],3,0,Math.PI*2);
+      ctx.fillStyle=isDark?'rgba(255,255,255,.25)':'rgba(0,0,0,.18)';ctx.fill();
+      // vertical line morning→evening
+      if(ys[i]!==null){
+        ctx.strokeStyle=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+        ctx.setLineDash([2,2]);ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(xs[i],yms[i]);ctx.lineTo(xs[i],ys[i]);ctx.stroke();ctx.setLineDash([]);
+      }
+    }
+    // Evening/last line
+    let drawing=false;ctx.beginPath();
+    for(let i=0;i<vals.length;i++){
+      if(ys[i]===null){drawing=false;continue;}
+      if(!drawing){ctx.moveTo(xs[i],ys[i]);drawing=true;}
+      else{const mx=(xs[i-1]+xs[i])/2;ctx.bezierCurveTo(mx,ys[i-1],mx,ys[i],xs[i],ys[i]);}
+    }
+    ctx.strokeStyle=accent;ctx.lineWidth=2.2;ctx.shadowColor=accent;ctx.shadowBlur=6;ctx.stroke();ctx.shadowBlur=0;
+    // Dots + intraday delta labels
+    for(let i=0;i<vals.length;i++){
+      if(ys[i]===null) continue;
+      const isLast=i===vals.length-1;
+      ctx.beginPath();ctx.arc(xs[i],ys[i],isLast?5:3.5,0,Math.PI*2);
+      ctx.fillStyle=isLast?accent:isDark?'rgba(255,255,255,.5)':'rgba(0,0,0,.3)';ctx.fill();
+      if(isLast){ctx.strokeStyle='#fff';ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(xs[i],ys[i],5,0,Math.PI*2);ctx.stroke();}
+      // intraday delta
+      if(mornVals[i]!==null&&ys[i]!==null){
+        const delta=(mornVals[i]-vals[i]);
+        if(Math.abs(delta)>0.05){
+          ctx.fillStyle=delta>0?'#34c77b':'#f75c5c';
+          ctx.font=`bold 9px system-ui`;ctx.textAlign='center';
+          ctx.fillText((delta>0?'−':'+')+(Math.abs(delta)).toFixed(1),xs[i],ys[i]-9);
+        }
+      }
+    }
+    // value labels
+    ctx.fillStyle=textC;ctx.font='11px system-ui';ctx.textAlign='center';
+    labels.forEach((l,i)=>ctx.fillText(l,xs[i],H-7));
+    ctx.textAlign='right';
+    for(let i=0;i<=3;i++){const v=min+(max-min)*i/3;ctx.fillText(v.toFixed(1),pad.l-4,pad.t+ch*(1-i/3)+4);}
+  },
+  drawStepsChart(days,u){
+    const vals=days.map(d=>d.data.steps||0);
+    const labels=days.map(d=>d.label);
+    this._drawLineChart('chart-steps',vals,labels,u.steps_goal||8000,'шаги',{height:140});
+  },
+  _drawLineChart(id,values,labels,goal,unit,opts={}){
+    const canvas=document.getElementById(id);if(!canvas) return;
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.parentElement.clientWidth-36;
+    const H=opts.height||160;
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.style.width=W+'px';canvas.style.height=H+'px';
+    const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+    const pad={t:16,r:14,b:32,l:38};
+    const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+    const nonNull=values.filter(v=>v!==null);
+    if(!nonNull.length){
+      ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='13px system-ui';ctx.textAlign='center';
+      ctx.fillText('нет данных',W/2,H/2);return;
+    }
+    const max=Math.max(goal||0,...nonNull)*1.2||1;
+    const min=opts.nullGap?Math.max(0,Math.min(...nonNull)*0.9):0;
+    ctx.clearRect(0,0,W,H);
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    const gridC=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';
+    const textC=isDark?'rgba(255,255,255,.32)':'rgba(0,0,0,.32)';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    // grid
+    for(let i=0;i<=3;i++){
+      const y=pad.t+ch*(1-i/3);
+      ctx.strokeStyle=gridC;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    }
+    // goal line
+    if(goal){
+      const gy=pad.t+ch*(1-(goal-min)/(max-min));
+      ctx.strokeStyle=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+      ctx.setLineDash([3,3]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(pad.l+cw,gy);ctx.stroke();ctx.setLineDash([]);
+    }
+    const xs=values.map((_,i)=>pad.l+i*(cw/(values.length-1||1)));
+    const ys=values.map(v=>v===null?null:pad.t+ch*(1-(v-min)/(max-min)));
+    // gradient fill
+    const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+    grad.addColorStop(0,accent+'44');grad.addColorStop(1,accent+'00');
+    // draw segments
+    let drawing=false;
+    ctx.beginPath();
+    for(let i=0;i<values.length;i++){
+      if(ys[i]===null){drawing=false;continue;}
+      if(!drawing){ctx.moveTo(xs[i],ys[i]);drawing=true;}
+      else{
+        const mx=(xs[i-1]+xs[i])/2;
+        ctx.bezierCurveTo(mx,ys[i-1],mx,ys[i],xs[i],ys[i]);
+      }
+    }
+    ctx.strokeStyle=accent;ctx.lineWidth=2.2;ctx.shadowColor=accent;ctx.shadowBlur=6;ctx.stroke();ctx.shadowBlur=0;
+    // dots
+    for(let i=0;i<values.length;i++){
+      if(ys[i]===null) continue;
+      const isLast=i===values.length-1;
+      ctx.beginPath();ctx.arc(xs[i],ys[i],isLast?5:3,0,Math.PI*2);
+      ctx.fillStyle=isLast?accent:isDark?'rgba(255,255,255,.4)':'rgba(0,0,0,.25)';ctx.fill();
+      if(isLast){ctx.strokeStyle='#fff';ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(xs[i],ys[i],5,0,Math.PI*2);ctx.stroke();}
+    }
+    // labels
+    ctx.fillStyle=textC;ctx.font='11px system-ui';ctx.textAlign='center';
+    labels.forEach((l,i)=>ctx.fillText(l,xs[i],H-7));
+    ctx.textAlign='right';
+    for(let i=0;i<=3;i++){
+      const v=min+(max-min)*i/3;
+      const y=pad.t+ch*(1-i/3)+4;
+      ctx.fillText(unit==='шаги'?Math.round(v/1000)+'к':+v.toFixed(1),pad.l-4,y);
+    }
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// COURSE
+// ══════════════════════════════════════════════════════
+const Course={
+  render(){
+    const u=getUser();if(!u) return;
+    const c=u.course,limit=COURSE_LIMITS[c],used=Home.usedCapsules();
+    document.getElementById('course-current-card').innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div><div class="label">текущий курс</div><div style="font-size:21px;font-weight:700;margin-top:3px">${COURSE_NAMES[c]}</div></div>
+        <div style="text-align:right"><div class="label">капсулы</div><div style="font-size:21px;font-weight:700;margin-top:3px;color:var(--accent)">${used} / ${limit}</div></div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(100,Math.round(used/limit*100))}%"></div></div>`;
+    const map={
+      plus:[
+        {n:1,t:'дни 1–15',d:'1 капсула за <strong>40 минут до первого приёма пищи</strong>'},
+        {n:2,t:'с 16-го дня',d:'+1 капсула перед 3-м приёмом пищи за <strong>40 минут</strong>'},
+        {n:3,t:'перед сном',d:'последняя капсула минимум за <strong>8 часов до сна</strong>'},
+        {n:4,t:'питание',d:'3 приёма: 2 плотных + 1 перекус'},
+        {n:5,t:'при побочных',d:'вернуться к <strong>1 капсуле</strong>'},
+      ],
+      premium:[
+        {n:1,t:'с 1-го дня',d:'<strong>2 капсулы</strong> в день'},
+        {n:2,t:'утром',d:'за <strong>40 минут</strong> до первого приёма'},
+        {n:3,t:'вечером',d:'до 3-го приёма за <strong>40 минут</strong>'},
+        {n:4,t:'перед сном',d:'последняя за <strong>7–8 часов</strong> до сна'},
+        {n:5,t:'при побочных',d:'убрать вечернюю капсулу'},
+      ],
+      turbo:[
+        {n:1,t:'с 1-го дня',d:'<strong>2 капсулы</strong> — усиленная формула'},
+        {n:2,t:'утром',d:'за <strong>40 минут</strong> до первого приёма'},
+        {n:3,t:'вечером',d:'до 3-го приёма за <strong>40 минут</strong>'},
+        {n:4,t:'перед сном',d:'последняя за <strong>7–8 часов</strong> до сна'},
+        {n:5,t:'при побочных',d:'убрать вечернюю капсулу'},
+      ]
+    };
+    const list=map[c]||map.plus;
+    document.getElementById('course-instructions').innerHTML=`<div class="card instruction-card">${list.map(s=>`<div class="inst-step"><div class="inst-num">${s.n}</div><div class="inst-text"><strong>${s.t}:</strong> ${s.d}</div></div>`).join('')}</div>`;
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════════════════
+const Profile={
+  _editingField:null,
+  render(){
+    const u=getUser();if(!u) return;
+    document.getElementById('profile-avatar-el').innerHTML=u.name?u.name[0].toUpperCase():'👤';
+    document.getElementById('profile-name-el').textContent=u.name||'пользователь';
+    const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
+    document.getElementById('profile-sub-el').textContent=`${u.gender==='male'?'♂':'♀'} · ${u.height}см · ${u.weight}кг${bmi?' · имт '+bmi:''}`;
+    const streak=Home.calcStreak(),used=Home.usedCapsules(),limit=COURSE_LIMITS[u.course];
+    document.getElementById('profile-stats-el').innerHTML=`
+      <div class="pstat"><div class="pstat-val">${streak}</div><div class="pstat-label">серия</div></div>
+      <div class="pstat"><div class="pstat-val">${used}</div><div class="pstat-label">капсул</div></div>
+      <div class="pstat"><div class="pstat-val">${limit-used}</div><div class="pstat-label">осталось</div></div>`;
+    document.getElementById('set-name').textContent=u.name||'не указано';
+    document.getElementById('set-height').textContent=u.height+'см';
+    document.getElementById('set-weight').textContent=u.weight+'кг';
+    document.getElementById('set-gender').textContent=u.gender==='male'?'мужчина':'женщина';
+    document.getElementById('set-kcal').textContent=u.kcal_goal+' ккал';
+    document.getElementById('set-water').textContent=u.water_goal+'л';
+    document.getElementById('set-goal-weight').textContent=u.goal_weight?u.goal_weight+'кг':'не задан';
+    document.getElementById('set-steps').textContent=(u.steps_goal||8000).toLocaleString('ru');
+    document.getElementById('set-course').textContent=COURSE_NAMES[u.course];
+    document.getElementById('theme-toggle').checked=u.theme==='dark';
+    this.renderAccentPicker(u.accent||'blue');
+    if(typeof Install!=='undefined') setTimeout(()=>Install.updateBtn(),50);
+  },
+  renderAccentPicker(cur){
+    document.getElementById('accent-picker').innerHTML=Object.entries(ACCENTS).map(([k,v])=>`
+      <div class="accent-dot${k===cur?' active':''}" style="background:${v};color:${v}" onclick="Profile.setAccent('${k}')"></div>`).join('');
+  },
+  setAccent(a){const u=getUser();u.accent=a;saveUser(u);App.applyTheme(u.theme,a);this.renderAccentPicker(a);},
+  toggleTheme(){const u=getUser();u.theme=document.getElementById('theme-toggle').checked?'dark':'light';saveUser(u);App.applyTheme(u.theme,u.accent);},
+  editField(field){
+    this._editingField=field;
+    const u=getUser();
+    const configs={
+      name:{title:'изменить имя',type:'text',val:u.name||'',placeholder:'твоё имя'},
+      height:{title:'рост (см)',type:'number',val:u.height,placeholder:'170',min:100,max:250},
+      weight:{title:'вес (кг)',type:'number',val:u.weight,placeholder:'70',min:30,max:300,step:0.1},
+      gender:{title:'пол',type:'gender'},
+      kcal_goal:{title:'калории / день',type:'number',val:u.kcal_goal,placeholder:'1200',min:900,max:5000},
+      water_goal:{title:'вода / день (л)',type:'number',val:u.water_goal,placeholder:'2.5',min:2,max:10,step:0.1},
+      goal_weight:{title:'целевой вес (кг)',type:'number',val:u.goal_weight||'',placeholder:'65',min:30,max:300,step:0.1},
+      steps_goal:{title:'шаги / день',type:'number',val:u.steps_goal||8000,placeholder:'8000',min:1000,max:50000},
+      course:{title:'выбери курс',type:'course'},
+    };
+    const cfg=configs[field];if(!cfg) return;
+    document.getElementById('edit-modal-title').textContent=cfg.title;
+    let body='';
+    if(cfg.type==='text'||cfg.type==='number'){
+      body=`<div class="input-group"><input type="${cfg.type}" id="edit-input" value="${cfg.val}" placeholder="${cfg.placeholder||''}"${cfg.min!==undefined?' min="'+cfg.min+'"':''}${cfg.max!==undefined?' max="'+cfg.max+'"':''}${cfg.step?' step="'+cfg.step+'"':''}></div>`;
+    } else if(cfg.type==='gender'){
+      body=`<div class="gender-grid">
+        <div class="gender-card${u.gender==='male'?' selected':''}" onclick="this.parentElement.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');document.getElementById('edit-gender-val').value='male'"><div class="gender-icon">♂</div><div class="gender-label">мужчина</div></div>
+        <div class="gender-card${u.gender==='female'?' selected':''}" onclick="this.parentElement.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');document.getElementById('edit-gender-val').value='female'"><div class="gender-icon">♀</div><div class="gender-label">женщина</div></div>
+        </div><input type="hidden" id="edit-gender-val" value="${u.gender}">`;
+    } else if(cfg.type==='course'){
+      body=['plus','premium','turbo'].map(c=>`
+        <div onclick="document.querySelectorAll('.edit-course-card').forEach(x=>x.classList.remove('selected'));this.classList.add('selected');document.getElementById('edit-course-val').value='${c}'" class="course-card edit-course-card${u.course===c?' selected':''}">
+          <div><h3 style="font-size:14px;font-weight:700">${COURSE_NAMES[c]}</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">${COURSE_LIMITS[c]} капсул</p></div>
+        </div>`).join('')+`<input type="hidden" id="edit-course-val" value="${u.course}">`;
+    }
+    document.getElementById('edit-modal-body').innerHTML=body;
+    document.getElementById('edit-modal').classList.add('open');
+    setTimeout(()=>{const inp=document.getElementById('edit-input');if(inp) inp.focus();},350);
+  },
+  saveField(){
+    const u=getUser();const f=this._editingField;
+    if(f==='gender'){u.gender=document.getElementById('edit-gender-val').value;}
+    else if(f==='course'){u.course=document.getElementById('edit-course-val').value;}
+    else{
+      let v=document.getElementById('edit-input').value;
+      if(f==='name'){u.name=v.trim();}
+      else{
+        v=parseFloat(v);
+        const mins={height:100,weight:30,kcal_goal:900,water_goal:2,goal_weight:30,steps_goal:1000};
+        if(mins[f]&&v<mins[f]) v=mins[f];
+        u[f]=v||u[f];
+      }
+    }
+    saveUser(u);UI.closeModal('edit-modal');this.render();
+    if(App.currentTab==='home') Home.render();
+    if(App.currentTab==='course') Course.render();
+  },
+  resetData(){
+    if(confirm('сбросить все данные? это нельзя отменить')){localStorage.clear();location.reload();}
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════
+const UI={
+  openFoodModal(){document.getElementById('food-modal').classList.add('open');setTimeout(()=>document.getElementById('food-name-input').focus(),350);},
+  openCapsuleModal(){
+    const u=getUser();if(!u) return;
+    document.getElementById('course-day-input').value=Home.dayNumber(u);
+    document.getElementById('course-caps-input').value=Home.usedCapsules();
+    document.getElementById('capsule-modal').classList.add('open');
+    setTimeout(()=>document.getElementById('course-day-input').focus(),350);
+  },
+  closeModal(id){document.getElementById(id).classList.remove('open');},
+};
+// Close modals on background click
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click',function(e){if(e.target===this) this.classList.remove('open');});
+});
+
+// ══════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════
+// ══════════════════════════════════
+// PWA INSTALL
+// ══════════════════════════════════
+const Install={
+  _prompt:null,
+  init(){
+    window.addEventListener('beforeinstallprompt',e=>{
+      e.preventDefault();this._prompt=e;
+      if(!STATE.get('mlk_install_dismissed')) setTimeout(()=>this.showBanner(),1000);
+    });
+    window.addEventListener('appinstalled',()=>{
+      const b=document.getElementById('install-banner');if(b) b.classList.remove('show');
+      this.updateBtn();
+    });
+    const ibBtn=document.getElementById('ib-install-btn');
+    if(ibBtn) ibBtn.onclick=()=>this.install();
+    const ibClose=document.getElementById('ib-dismiss-btn');
+    if(ibClose) ibClose.onclick=()=>this.dismiss();
+    // iOS hint
+    const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone=window.navigator.standalone;
+    if(isIos&&!isStandalone&&!STATE.get('mlk_ios_dismissed')){
+      setTimeout(()=>{const h=document.getElementById('ios-hint');if(h)h.style.display='block';},1200);
+    }
+    const iosClose=document.getElementById('ios-hint-close');
+    if(iosClose) iosClose.onclick=()=>{STATE.set('mlk_ios_dismissed',true);document.getElementById('ios-hint').style.display='none';};
+  },
+  showBanner(){const b=document.getElementById('install-banner');if(b) b.classList.add('show');},
+  async install(){
+    if(!this._prompt) return;
+    this._prompt.prompt();
+    const{outcome}=await this._prompt.userChoice;
+    if(outcome==='accepted'){const b=document.getElementById('install-banner');if(b) b.classList.remove('show');}
+    this._prompt=null;
+  },
+  dismiss(){
+    const b=document.getElementById('install-banner');if(b) b.classList.remove('show');
+    STATE.set('mlk_install_dismissed',true);
+  },
+  isInstalled(){return window.navigator.standalone||window.matchMedia('(display-mode:standalone)').matches;},
+  updateBtn(){
+    const el=document.getElementById('pwa-install-btn-wrap');if(!el) return;
+    const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    if(this.isInstalled()){el.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:4px 0">✅ приложение установлено</div>';}
+    else if(this._prompt){el.innerHTML='<button class="btn btn-primary" style="margin-top:4px" onclick="Install.install()">📲 установить приложение</button>';}
+    else if(isIos){el.innerHTML='<div style="font-size:13px;color:var(--muted);line-height:1.6;padding:4px 0">откройте в <strong style="color:var(--text)">Safari</strong> → кнопка «поделиться» → «на экран Домой»</div>';}
+    else{el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0">откройте в Chrome или Safari для установки</div>';}
+  }
+};
+
+App.init();
+Install.init();
+</script>
+
+<!-- PWA INSTALL BANNER -->
+<div id="install-banner" style="position:fixed;top:0;left:0;right:0;background:var(--accent);color:#fff;z-index:500;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 12px;display:flex;align-items:center;gap:10px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 20px var(--accent-glow)">
+  <div style="flex:1"><div style="font-size:14px;font-weight:700">установить как приложение</div><div style="font-size:11px;opacity:.8;margin-top:2px">работает без интернета</div></div>
+  <button id="ib-install-btn" style="padding:8px 14px;border-radius:50px;border:none;background:#fff;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">установить</button>
+  <button id="ib-dismiss-btn" style="padding:8px 10px;border-radius:50px;border:none;background:rgba(255,255,255,.2);color:#fff;font-size:13px;cursor:pointer;font-family:var(--font)">✕</button>
+</div>
+<!-- iOS HINT -->
+<div id="ios-hint" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);left:16px;right:16px;background:var(--bg2);border:1px solid var(--card-border);border-radius:20px;padding:16px;z-index:400;box-shadow:var(--shadow)">
+  <button id="ios-hint-close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1">✕</button>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:22px">📱</div><div style="font-size:15px;font-weight:700">добавить на экран</div></div>
+  <div style="font-size:13px;color:var(--muted);line-height:1.7">нажми <strong style="color:var(--text)">«Поделиться»</strong> внизу Safari,<br>затем <strong style="color:var(--text)">«На экран "Домой"»</strong></div>
+</div>
+</body>
+</html>
