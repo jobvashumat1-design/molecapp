@@ -170,6 +170,43 @@ input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
 .channel-wrap{padding:0 0 4px}
 
 
+
+/* PREMIUM */
+.premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#f7c948,#fb923c);color:#000;font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px;letter-spacing:.3px}
+.btn-premium{background:linear-gradient(135deg,#f7c948,#fb923c);color:#000;font-weight:800;box-shadow:0 4px 20px rgba(247,201,72,.35);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:var(--radius-sm);border:none;font-size:16px;cursor:pointer;transition:all .2s;font-family:var(--font);text-decoration:none}
+.btn-premium:active{transform:scale(.97)}
+.plan-card{padding:18px;border-radius:var(--radius);border:2px solid var(--card-border);background:var(--card);margin-bottom:11px;cursor:pointer;transition:all .2s}
+.plan-card.selected{border-color:var(--accent);background:var(--accent-soft)}
+.plan-card:active{transform:scale(.98)}
+.plan-price{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.plan-name{font-size:13px;color:var(--muted);margin-top:2px}
+.plan-features{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+.plan-feature{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:flex-start}
+.plan-feature::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0}
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.heatmap-cell{aspect-ratio:1;border-radius:4px;background:var(--card)}
+.heatmap-cell.lvl1{background:var(--accent-soft)}
+.heatmap-cell.lvl2{background:rgba(79,142,247,.4)}
+.heatmap-cell.lvl3{background:rgba(79,142,247,.7)}
+.heatmap-cell.lvl4{background:var(--accent)}
+.photo-slot{aspect-ratio:3/4;border-radius:var(--radius);border:2px dashed var(--card-border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;overflow:hidden;background:var(--card);transition:all .2s;position:relative}
+.photo-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.photo-slot:active{transform:scale(.97)}
+.photo-compare{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.side-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--card-border)}
+.side-row:last-child{border-bottom:none}
+.intensity-btns{display:flex;gap:5px}
+.intensity-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--card-border);background:var(--card);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;color:var(--muted)}
+.intensity-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.time-input{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color .2s;font-family:var(--font)}
+.time-input:focus{border-color:var(--accent)}
+.capsule-time-card{background:linear-gradient(135deg,var(--accent-soft),transparent);border:1px solid var(--accent);border-radius:var(--radius);padding:18px;margin-bottom:11px}
+.capsule-time-card h3{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.capsule-time-card .time-big{font-size:32px;font-weight:800;letter-spacing:-.5px;margin:6px 0}
+.report-section{padding:16px;border-radius:var(--radius);margin-bottom:11px;background:var(--card);border:1px solid var(--card-border)}
+.report-metric{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--card-border)}
+.report-metric:last-child{border-bottom:none}
+
 /* ACHIEVEMENTS */
 #screen-achievements{padding-top:0}
 .ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:14px}
@@ -261,7 +298,7 @@ textarea:focus{border-color:var(--accent)}
           <div><h3 style="font-size:15px;font-weight:700">turbo ozempic</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">2 капсулы, усиленная формула</p></div>
           <div class="course-badge" style="background:#34c77b">60 капсул</div>
         </div>
-        <button class="btn btn-primary" style="margin-top:4px" onclick="Reg.finish()">готово</button>
+        <button class="btn btn-primary" style="margin-top:4px;margin-bottom:80px" onclick="Reg.finish()">готово</button>
       </div>
     </div>
   </div>
@@ -376,6 +413,20 @@ textarea:focus{border-color:var(--accent)}
       <div style="font-size:12px;color:var(--muted);margin-top:8px" id="weight-today-info"></div>
     </div>
 
+    <!-- Smart Day -->
+    <div id="smart-day-card" style="display:none;margin-bottom:14px"></div>
+    <!-- Heatmap -->
+    <div id="heatmap-section" style="display:none">
+      <div class="section-head"><h3>активность 30 дней</h3></div>
+      <div class="card" style="padding:16px;margin-bottom:14px">
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+        <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--card);border:1px solid var(--card-border)"></div>нет</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent-soft)"></div>частично</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>всё</div>
+        </div>
+      </div>
+    </div>
     <!-- Channel -->
     <div class="channel-wrap">
       <a href="https://t.me/molectracker" target="_blank" class="channel-btn">
@@ -424,6 +475,20 @@ textarea:focus{border-color:var(--accent)}
     <div class="section-head"><h3>замеры тела</h3></div>
     <div class="chart-wrap card" style="margin-bottom:14px"><canvas id="chart-meas-stats" height="140"></canvas></div>
 
+    <!-- Smart Day -->
+    <div id="smart-day-card" style="display:none;margin-bottom:14px"></div>
+    <!-- Heatmap -->
+    <div id="heatmap-section" style="display:none">
+      <div class="section-head"><h3>активность 30 дней</h3></div>
+      <div class="card" style="padding:16px;margin-bottom:14px">
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+        <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--card);border:1px solid var(--card-border)"></div>нет</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent-soft)"></div>частично</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--accent)"></div>всё</div>
+        </div>
+      </div>
+    </div>
     <!-- Channel -->
     <div class="channel-wrap">
       <a href="https://t.me/molectracker" target="_blank" class="channel-btn">
@@ -496,6 +561,67 @@ textarea:focus{border-color:var(--accent)}
         <div class="setting-row"><div class="setting-label">кнопка 2 (мл)</div><div class="setting-value"><input type="number" id="water-btn2-val" style="width:80px;text-align:right;background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font)" min="50" max="2000" step="50" placeholder="500" onchange="Profile.saveWaterBtns()"></div></div>
       </div>
     </div>
+    <div class="section-head" style="padding:0 16px"><h3>напоминания</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row" id="remind-sync-row" style="display:none">
+          <div class="setting-label" style="color:var(--accent)">синхронизировать с режимом дня</div>
+          <div class="setting-value"><button onclick="Reminders.syncFromSchedule()" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:0">обновить</button></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">утренняя капсула</div>
+          <div class="setting-value" style="gap:8px">
+            <input type="time" id="remind-morning" value="08:00" style="background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right" onchange="Reminders.save()">
+            <label class="toggle"><input type="checkbox" id="remind-morning-on" onchange="Reminders.save()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">вечерняя капсула</div>
+          <div class="setting-value" style="gap:8px">
+            <input type="time" id="remind-evening" value="19:00" style="background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right" onchange="Reminders.save()">
+            <label class="toggle"><input type="checkbox" id="remind-evening-on" onchange="Reminders.save()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">доп. капсула</div>
+          <div class="setting-value" style="gap:8px">
+            <input type="time" id="remind-extra" value="13:00" style="background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right" onchange="Reminders.save()">
+            <label class="toggle"><input type="checkbox" id="remind-extra-on" onchange="Reminders.save()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">если капсула не принята</div>
+          <div class="setting-value" style="gap:8px">
+            <input type="time" id="remind-missed" value="22:00" style="background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right" onchange="Reminders.save()">
+            <label class="toggle"><input type="checkbox" id="remind-missed-on" onchange="Reminders.save()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">вода (каждые N часов)</div>
+          <div class="setting-value" style="gap:8px">
+            <select id="remind-water-interval" style="background:var(--card);border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right" onchange="Reminders.save()">
+              <option value="0">выкл</option>
+              <option value="1">1 ч</option>
+              <option value="2">2 ч</option>
+              <option value="3">3 ч</option>
+              <option value="4">4 ч</option>
+            </select>
+            <label class="toggle"><input type="checkbox" id="remind-water-on" onchange="Reminders.save()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">вечерний итог дня</div>
+          <div class="setting-value" style="gap:8px">
+            <input type="time" id="remind-evening-summary" value="21:00" style="background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right" onchange="Reminders.save()">
+            <label class="toggle"><input type="checkbox" id="remind-summary-on" onchange="Reminders.save()"><div class="toggle-track"></div></label>
+          </div>
+        </div>
+        <div id="remind-permission-row" style="display:none;padding:12px 0">
+          <button class="btn btn-primary btn-sm" onclick="Reminders.requestPermission()" style="width:100%">разрешить уведомления</button>
+        </div>
+        <div id="remind-status" style="font-size:12px;color:var(--muted);padding:10px 0;display:none"></div>
+      </div>
+    </div>
     <div class="section-head" style="padding:0 16px"><h3>внешний вид</h3></div>
     <div class="settings-group">
       <div class="card" style="padding:0 16px">
@@ -506,6 +632,17 @@ textarea:focus{border-color:var(--accent)}
       </div>
     </div>
 
+    <div class="section-head" style="padding:0 16px"><h3>премиум</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row"><div class="setting-label">статус</div><div class="setting-value" id="premium-status-row" onclick="App.switchTab('premium')"><span id="premium-status-text">бесплатно</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row" id="schedule-row" style="display:none"><div class="setting-label">режим дня</div><div class="setting-value" onclick="App.switchTab('schedule')"><span>настроить</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row" id="sides-row" style="display:none"><div class="setting-label">побочные эффекты</div><div class="setting-value" onclick="App.switchTab('sides')"><span>открыть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row" id="photos-row" style="display:none"><div class="setting-label">фото-прогресс</div><div class="setting-value" onclick="App.switchTab('photos')"><span>открыть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row" id="biorhythm-row" style="display:none"><div class="setting-label">биоритм веса</div><div class="setting-value" onclick="App.switchTab('biorhythm')"><span>открыть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row" id="report-row" style="display:none"><div class="setting-label">отчёт недели</div><div class="setting-value" onclick="WeekReport.open()"><span>открыть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      </div>
+    </div>
     <div class="section-head" style="padding:0 16px"><h3>приложение</h3></div>
     <div style="padding:0 16px;margin-bottom:16px">
       <div class="card" style="padding:16px">
@@ -702,6 +839,8 @@ const ACCENTS={blue:'#4f8ef7',green:'#34c77b',red:'#f75c5c',purple:'#a78bfa',ora
 const App={
   currentTab:'home',
   init(){
+    Premium.init();
+    Reminders.init();
     let u=getUser();
     if(u){
       u=migrateUser(u);
@@ -735,7 +874,7 @@ const App={
   },
   switchTab(tab){
     this.currentTab=tab;
-    ['home','stats','course','profile','achievements','diary'].forEach(t=>{
+    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm'].forEach(t=>{
       const btn=document.getElementById('nav-'+t);
       const scr=document.getElementById('screen-'+t);
       if(btn) btn.classList.toggle('active',t===tab);
@@ -744,8 +883,15 @@ const App={
     if(tab==='stats') Stats.render();
     if(tab==='course') Course.render();
     if(tab==='profile') Profile.render();
+    if(tab==='profile') Reminders.load();
     if(tab==='achievements') Achievements.render();
     if(tab==='diary') Diary.render();
+    if(tab==='premium') Premium.refreshScreen();
+    if(tab==='schedule'){if(!Premium.isPro()){App.switchTab('premium');return;}Schedule.load();}
+    if(tab==='sides'){if(!Premium.isPro()){App.switchTab('premium');return;}SideEffects.render();}
+    if(tab==='photos'){if(!Premium.isPro()){App.switchTab('premium');return;}Photos.render();}
+    if(tab==='biorhythm'){if(!Premium.isPro()){App.switchTab('premium');return;}Biorhythm.render();}
+    if(tab==='report'){if(!Premium.isMax()){App.switchTab('premium');return;}WeekReport.render();}
   }
 };
 
@@ -835,6 +981,8 @@ const Home={
     // course day info
     const dn=this.dayNumber(u);
     document.getElementById('course-day-info').textContent=`день курса: ${dn}`;
+    SmartDay.render();
+    Heatmap.render();
   },
   renderWater(d,u){
     const wl=d.water||0,wpct=Math.min(100,Math.round((wl/u.water_goal)*100));
@@ -1543,6 +1691,10 @@ const Profile={
     document.getElementById('profile-avatar-el').innerHTML=avContent;
     document.getElementById('profile-name-el').textContent=u.name||'пользователь';
     const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
+    const psTxt=document.getElementById('premium-status-text');
+    if(psTxt){if(Premium.isMax()) psTxt.textContent='Макс · '+Premium.getExpiryText();else if(Premium.isPro()) psTxt.textContent='Про · '+Premium.getExpiryText();else psTxt.textContent='бесплатно → активировать';}
+    ['schedule-row','sides-row','photos-row','biorhythm-row'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display=Premium.isPro()?'flex':'none';});
+    const rr=document.getElementById('report-row');if(rr) rr.style.display=Premium.isMax()?'flex':'none';
     document.getElementById('profile-sub-el').textContent=`${u.gender==='male'?'♂':'♀'} · ${u.height}см · ${u.weight}кг${bmi?' · имт '+bmi:''}`;
     const streak=Home.calcStreak(),used=Home.usedCapsules(),limit=COURSE_LIMITS[u.course];
     document.getElementById('profile-stats-el').innerHTML=`
@@ -1648,6 +1800,509 @@ const Profile={
   }
 };
 
+
+
+// ══════════════════════════════════════════════════════
+// REMINDERS
+// ══════════════════════════════════════════════════════
+const Reminders = {
+  _timers: [],
+
+  load() {
+    const s = STATE.get('mlk_reminders') || {};
+    const el = id => document.getElementById(id);
+    if (el('remind-morning'))        el('remind-morning').value        = s.morningTime   || '08:00';
+    if (el('remind-morning-on'))     el('remind-morning-on').checked   = !!s.morningOn;
+    if (el('remind-evening'))        el('remind-evening').value        = s.eveningTime   || '19:00';
+    if (el('remind-evening-on'))     el('remind-evening-on').checked   = !!s.eveningOn;
+    if (el('remind-extra'))          el('remind-extra').value          = s.extraTime     || '13:00';
+    if (el('remind-extra-on'))       el('remind-extra-on').checked     = !!s.extraOn;
+    if (el('remind-missed'))         el('remind-missed').value         = s.missedTime    || '22:00';
+    if (el('remind-missed-on'))      el('remind-missed-on').checked    = !!s.missedOn;
+    if (el('remind-water-interval')) el('remind-water-interval').value = s.waterInterval || '0';
+    if (el('remind-water-on'))       el('remind-water-on').checked     = !!s.waterOn;
+    if (el('remind-evening-summary'))el('remind-evening-summary').value= s.summaryTime  || '21:00';
+    if (el('remind-summary-on'))     el('remind-summary-on').checked   = !!s.summaryOn;
+    // Show sync button if schedule is set (Pro)
+    const u = getUser();
+    const syncRow = el('remind-sync-row');
+    if (syncRow) syncRow.style.display = (Premium.isPro() && u && u.schedule) ? 'flex' : 'none';
+    this._updatePermissionRow();
+  },
+
+  save() {
+    const el = id => document.getElementById(id);
+    const s = {
+      morningTime:  el('remind-morning')         ? el('remind-morning').value        : '08:00',
+      morningOn:    el('remind-morning-on')       ? el('remind-morning-on').checked   : false,
+      eveningTime:  el('remind-evening')          ? el('remind-evening').value        : '19:00',
+      eveningOn:    el('remind-evening-on')       ? el('remind-evening-on').checked   : false,
+      extraTime:    el('remind-extra')             ? el('remind-extra').value          : '13:00',
+      extraOn:      el('remind-extra-on')         ? el('remind-extra-on').checked     : false,
+      missedTime:   el('remind-missed')            ? el('remind-missed').value         : '22:00',
+      missedOn:     el('remind-missed-on')         ? el('remind-missed-on').checked    : false,
+      waterInterval:el('remind-water-interval')   ? el('remind-water-interval').value : '0',
+      waterOn:      el('remind-water-on')         ? el('remind-water-on').checked     : false,
+      summaryTime:  el('remind-evening-summary')  ? el('remind-evening-summary').value: '21:00',
+      summaryOn:    el('remind-summary-on')       ? el('remind-summary-on').checked   : false,
+    };
+    STATE.set('mlk_reminders', s);
+    this._scheduleAll(s);
+    this._updatePermissionRow();
+  },
+
+  async requestPermission() {
+    if (!('Notification' in window)) {
+      this._showStatus('уведомления не поддерживаются в этом браузере');
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      this._showStatus('✓ уведомления разрешены');
+      const s = STATE.get('mlk_reminders') || {};
+      this._scheduleAll(s);
+    } else {
+      this._showStatus('уведомления заблокированы — разреши в настройках браузера');
+    }
+    this._updatePermissionRow();
+  },
+
+  _updatePermissionRow() {
+    const row    = document.getElementById('remind-permission-row');
+    const status = document.getElementById('remind-status');
+    if (!row) return;
+    if (!('Notification' in window)) {
+      row.style.display = 'none';
+      if (status) { status.style.display = 'block'; status.textContent = 'push-уведомления не поддерживаются в Safari iOS (добавь на экран Домой)'; }
+      return;
+    }
+    const perm = Notification.permission;
+    if (perm === 'default') {
+      row.style.display = 'block';
+      if (status) status.style.display = 'none';
+    } else if (perm === 'granted') {
+      row.style.display = 'none';
+      if (status) { status.style.display = 'block'; status.textContent = '✓ уведомления активны'; }
+    } else {
+      row.style.display = 'none';
+      if (status) { status.style.display = 'block'; status.textContent = 'уведомления заблокированы в настройках браузера'; }
+    }
+  },
+
+  _showStatus(text) {
+    const el = document.getElementById('remind-status');
+    if (!el) return;
+    el.style.display = 'block';
+    el.textContent = text;
+  },
+
+  _scheduleAll(s) {
+    // Clear old timers
+    this._timers.forEach(t => clearTimeout(t));
+    this._timers = [];
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+    const now   = new Date();
+    const today = d => { const t = new Date(); const [h,m] = d.split(':').map(Number); t.setHours(h,m,0,0); return t; };
+    const msUntil = t => { const diff = t - now; return diff > 0 ? diff : diff + 86400000; };
+
+    // Morning capsule
+    if (s.morningOn && s.morningTime) {
+      const t = this._timer(msUntil(today(s.morningTime)), () => {
+        this._notify('💊 утренняя капсула', 'время принять утреннюю капсулу!');
+      });
+      this._timers.push(t);
+    }
+
+    // Evening capsule
+    if (s.eveningOn && s.eveningTime) {
+      const t = this._timer(msUntil(today(s.eveningTime)), () => {
+        this._notify('💊 вечерняя капсула', 'время принять вечернюю капсулу!');
+      });
+      this._timers.push(t);
+    }
+
+    // Extra capsule
+    if (s.extraOn && s.extraTime) {
+      const t = this._timer(msUntil(today(s.extraTime)), () => {
+        this._notify('💊 доп. капсула', 'напоминание о дополнительной капсуле');
+      });
+      this._timers.push(t);
+    }
+
+    // Missed capsule check — fires at missedTime, only if capsules not taken
+    if (s.missedOn && s.missedTime) {
+      const t = this._timer(msUntil(today(s.missedTime)), () => {
+        const d = getTodayData();
+        if ((d.capsules || 0) === 0) {
+          this._notify('⚠️ капсула не принята', 'сегодня ты ещё не отмечала капсулу — не забудь!');
+        }
+      });
+      this._timers.push(t);
+    }
+
+    // Water reminders (repeating)
+    if (s.waterOn && parseInt(s.waterInterval) > 0) {
+      const intervalMs = parseInt(s.waterInterval) * 3600000;
+      const fireWater = () => {
+        const d = getTodayData();
+        const u = getUser();
+        if (!u || (d.water || 0) >= u.water_goal) return;
+        const left = Math.max(0, u.water_goal - (d.water || 0));
+        this._notify('💧 время пить воду', `выпито ${(d.water||0).toFixed(1)}л, осталось ${left.toFixed(1)}л`);
+        this._timers.push(this._timer(intervalMs, fireWater));
+      };
+      this._timers.push(this._timer(intervalMs, fireWater));
+    }
+
+    // Evening summary
+    if (s.summaryOn && s.summaryTime) {
+      const t = this._timer(msUntil(today(s.summaryTime)), () => {
+        const d = getTodayData();
+        const u = getUser();
+        const caps = d.capsules || 0;
+        const water = (d.water || 0).toFixed(1);
+        const msg = `капсул: ${caps}, вода: ${water}л` + (caps === 0 ? ' — не забудь капсулу!' : ' — молодец!');
+        this._notify('📊 итог дня', msg);
+      });
+      this._timers.push(t);
+    }
+  },
+
+  _timer(ms, fn) {
+    return setTimeout(fn, Math.min(ms, 2147483647));
+  },
+
+  _notify(title, body) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    try {
+      new Notification(title, { body, icon: '/icon-192.png', badge: '/icon-192.png', tag: title });
+    } catch(e) {}
+  },
+
+  syncFromSchedule() {
+    const u = getUser(); if (!u || !u.schedule) return;
+    const times = Schedule.calcCapsuleTimes();
+    if (!times) return;
+    const s = STATE.get('mlk_reminders') || {};
+    s.morningTime = times.morning;
+    s.eveningTime = times.evening;
+    STATE.set('mlk_reminders', s);
+    this.load();
+    this._scheduleAll(s);
+    // Visual feedback
+    const btn = document.querySelector('#remind-sync-row button');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ синхронизировано'; setTimeout(() => btn.textContent = orig, 2000); }
+  },
+
+  init() {
+    const s = STATE.get('mlk_reminders') || {};
+    if (Object.keys(s).length > 0) this._scheduleAll(s);
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// PREMIUM
+// ══════════════════════════════════════════════════════
+const PRO_HASHES=["1dda5d4652ae1a5a0c426fe63fd99284e156477a59f46544aea5a7572f5a326c", "102e16f057d60b845fb99c752cc618292c05bb699be0823003d4ad7760965606", "9d3c439b9f7527eb791e1109b4afb9a72dd4d554ff288b15965f53ee84de4595", "a90db3600f70198b921b14354a5652ca855d24e44c6a06417d3d6bb6301c01df", "909d71bb439546b9dcc2be8f0fe3e3d84f646c651d464abf172cf68fdbd1c2e9", "870c9ef0406f86670cd05fea4defe5dfd3c90be26b9ccc22fc23395dc3003bed", "69959100352dc61bae5ed8755e39cf9ade345882216d51b6db0056f00f9ed270", "93e211e034d6eaf3fc218b05a083327cb34250016cb0df8b1a6da32ef925c342", "97fd495d51f9309b99a360914a14e2d35410f8164fa8b8389b5e9d3be7f34244", "3d7c969c2edce5083e78cc3aa79cf400363c929371f1c758cce7fae38f1fb415", "d527af8e4e37a5208cd11f7ecc0ee8ed0e5844cb1ae2a23ab73447ea66eccd30", "67aadba65aea6a2c9d2ffa481b1e9385651beb342ccf80d50fd45760fcb60f1f", "27026400ee53be37c67ac7130a9dcdfb7464f86d3b4ecb67a7228e5faca52259", "17a2b701dfabf2e5362c7cd33aeeabae82b3c0059dc0ff875fbc1a35bf6f84c6", "0882ea4d0da50b3b3a5d4f1d22703dc495eb09ad2d4ac4d24a575515fd146d59", "b207399f6d4f27807be5eef9bb221a8216f4c5b3e263e7b8efc6cc4c2af41815", "106a61bd2f104aabf81dd14efda7c890e873b4a1202a4f85a8fbe56f981c8344", "faf6690d9406f417a94a5db565044e2db06c1b931ac3e671a9e96340219c8374", "7fdf2904bdcb1e6e03eaa2a8afea41941baae9bb525e9d85abf467a091c85f72", "dac3e3c5c33c7f4a9293e413240ee16549d3378f134d5b93e7c0c9decca2023e", "f32bc4c0922532782c1313f2f8f409e22cb3267f3ba2b7f1237acbd00c6ac2f4", "a3b8e5bcd9aefa6b5db3d8cd725be1c0d10fedb0886180cfd27dc7b00bda0e23", "d9b3b368b87cbda548a9357ece7885fcd80a0097ccdb600af8f46d07b35395e2", "e092cd3c77457f5bdc10cb39cce16a6ea6ad44ad8a176ad337b50e37b9d27d66", "a0b2e7517b3e55aed1e8a00c2428fe8f6000ef335ff9531990c5ed50cb6b53e8", "77fac809d827d07ed078d4e19a15f6f3329954320099454cc3b802b440bf5654", "40240a941335f2ac6965055b2db3ef213a1ab9b6dac0654aac7606bfb561e3d3", "5b6815e964f551f85d5488d77a177ed3197ffd2deb93ce1e6833544bb20c8870", "b44abe573a789305929c94f9fe1965850709f198b4ea6af65110d844d66a8fa6", "281411e3b95f5155387a3bc9d56951709f18206b320e5efd4f29863896fa5c04", "5aaf634620c11e4c768887c499c419dd04f359a8e6cc9b392d9aee0c308da007", "c88da67e42151ea95be738d70d8a795c0cd37d6b0e6d24605a79abd4ce7e2f94", "06fb837cd0a9c9c77e0927e81a6f41d518ebf25803c1f4af559bbf27134148fa", "fbd5cc02d88019b0a0bfe6318d47162baf8115c6b8af3b9c0395751a26b36c73", "3f9102177e19fcae4cb8f2c83a1e0ea26ddd86490cf3ba1abcc8be4c135fefe2", "f3548cbf8641dc60834946788804f47427fc8aa3787f2623356a5f4ca0cf264f", "f01dd910c1b178807d6c042a4b44cfde89396bcb1a94f629a1304ae2aedf8d87", "be86dbe5b397f3350faf4cb6f8a88ecca266302d4e8c1259d5dd419bd95435c6", "e92b76d0a7f79577a1d49d90503815a075aab34dcd36d93684846d0489d5c2e8", "8bd33adcc0f067d67ef43df9f6ca64bab002ceabb575687f500b282caa35e054", "0c849b3e4cba63c7f29feebe167e65cfba60886889959b245a06d97506782e0e", "0b2198259228f6d1c12209b992cddc27b6ebb195b1a48f92d6e5e245e9303ce9", "2bb16170b770d5ffa3d20a911c8ad865248f72926d3d66328bc55832c6fbe522", "1300beb5684e32ded01c33a4b591b661a85708db5c3cf35e20b07d10930e747f", "37a01108ff9de10b70a401fc7afa3b11e54c08fa0dbcc2c51161211f5e98c7e7", "e7cd1f6bc53726e7a8ae34a86b0ea5bc73c298063c6fc8a6ead48be7851c3b17", "9c7a4012d2ec7b3bfc10553de6b190c76b77e192158e7cfe3648352c8f2e051a", "a5fa2207dd9cb97d62842bf98844845d531f9753803eb249ff23c170d3ffea2d", "e8ada15beff2d97145a6d9c4b379496bbffcaa59648b808b316bb6f6fd1e653d", "fd9b4ecd19f7584cceb498c5d725c65d0b5126ab2b6d84445e4098cb13762db6"];
+const MAX_HASHES=["3f75024b5d4202892aa0170ed0aed34a2e9b58a5f06981aeb8baa205ff41d091", "92bb2e15799c399ffcd4e3bef440b749407ae1de144ad139b1f031d699a56c58", "dbb85281e656a2960a376548657b7ece44351dca68e2ee3db8e0ea416dd4c9d9", "cbea00e9bb55c9465c340610a068fc91b03c09af9cea93d538333e9e599bdf53", "731c79d8076b58699bcae061505cf22d6cb524a59ef6cc22ad619ce74df36918", "e03f23bda765c935050301b477b50ab5cd2e201de3332264b321f3ed6bdd084d", "9aaa03d23e3f55d3c1cdea4027c392d3203f9e99296451dec08ed0fedf75e8fb", "bbad4e0828b51d876780845d167ae010a0974f795c251c0458f62c2e00a3b51c", "1d76433109913b242b77a95cd9c1ccc13850c9c86cb37e624c56308993e26b91", "159abad4502e33d6143f678e30061e588186325d633ffb07a7ce716dcbe93584", "e64eebf807ae59cd153d458b344ec09f38d40b3de4c3063e274256160328133b", "3efea894fc95222947a6a94306d7b62b34a889deca00deda4488cf06831febe3", "82299ac619dc22f87f6a25e86e098b23a0379e333c610750a2bb84033ea79e12", "738fc066196ef0fd4c9fc040a6a2b618eb732b2eea5c62d6aea58b19458d3779", "1d9d3437d86da6f25a11e838e2511fb525b76bd72b043d002d05a911ba2ff82b", "afb842001666d8525f1eb64d4def8b57a13ec00d0b9d1c9b293e7b5b61601fa4", "2c8fd70e3a976017f3bff5f8c2dd2aecec2ec28629381783cec0c85aa3193d2a", "49c9a3bff9330bfa5d99d4a64f00d73ebae92af31fb83b6396077da3e774099e", "824fbce689d6eba708db8e9c04c1f51a92f38df5e2ffdeed9b261c7f8ff60f87", "a16460dc50ac230946aef1257a9c1f7fa8a9c42748f99336d08af2524e0370f4", "3b159e0f4c8bc92867fa8034448b6ec4b4e54d8c7fdde7c646aec80cb940e694", "dccc85ba7502ebe12b1d7392ca2bef9151fb62d505176582092300ceb1dbc917", "a2a776d8e4030caa0ea5bae30eb80fb74bdf65c79090bfe01afd57240a2ef21e", "08adf3ba40539a4100a8c3dd3a6ff3308c0fdaf52b1538f328562411dde12996", "3f6de34176d50d0021763a02e3a9afd00131a77eba35205c2da43333eef34a60", "dc0d2d47e06b39224956753c7404f64252c47780226c49049977f833f2924fd8", "58fac1c5f12178c4615952ecd342ba8e1601875194f86f4b5fc4b1cc51c039cc", "181843ce9f18f74e67dfcb22eebbec5503cc1df71c0c78ef697cdb610127fdef", "e536b34f79ed7290be137cfa3dc7861ddabc93b4edaa1730ae30901620eb693c", "0bf13e6722151e07cff1ad7f6cfc0720caea7fd2e30a76526c7fa64167f5754b"];
+
+const Premium={
+  _plan:null,_selectedPlan:'pro',
+  init(){
+    const s=STATE.get('mlk_premium');
+    if(s&&s.expires&&new Date(s.expires)>new Date()){this._plan=s.plan;}
+    else if(s){STATE.remove('mlk_premium');this._plan=null;}
+  },
+  isPro(){return this._plan==='pro'||this._plan==='max';},
+  isMax(){return this._plan==='max';},
+  selectPlan(p){this._selectedPlan=p;document.getElementById('plan-pro-card').classList.toggle('selected',p==='pro');document.getElementById('plan-max-card').classList.toggle('selected',p==='max');},
+  async _sha256(str){
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  },
+  async activateCode(){
+    const code=document.getElementById('promo-code-input').value.trim().toUpperCase();
+    const res=document.getElementById('promo-result');
+    if(!code||code.length<6){res.style.color='#f75c5c';res.textContent='введи корректный код';return;}
+    const used=STATE.get('mlk_used_codes')||[];
+    if(used.includes(code)){res.style.color='#f75c5c';res.textContent='этот код уже был использован';return;}
+    res.style.color='var(--muted)';res.textContent='проверяем…';
+    const hash=await this._sha256(code);
+    let plan=null;
+    if(MAX_HASHES.includes(hash)) plan='max';
+    else if(PRO_HASHES.includes(hash)) plan='pro';
+    if(!plan){res.style.color='#f75c5c';res.textContent='код не найден';return;}
+    used.push(code);STATE.set('mlk_used_codes',used);
+    this._activate(plan,code);
+    res.style.color='#34c77b';res.textContent='✓ активировано! план: '+(plan==='max'?'Макс':'Про');
+    setTimeout(()=>this.refreshScreen(),800);
+  },
+  _activate(plan,code){
+    const exp=new Date();exp.setDate(exp.getDate()+30);
+    STATE.set('mlk_premium',{plan,code,expires:exp.toISOString()});
+    this._plan=plan;
+    if(App.currentTab==='profile') Profile.render();
+    if(App.currentTab==='home') Home.render();
+  },
+  showCodeInput(){
+    document.getElementById('premium-buy-btn').style.display='none';
+    document.getElementById('premium-code-btn').style.display='none';
+    document.getElementById('premium-code-block').style.display='block';
+    setTimeout(()=>{const i=document.getElementById('promo-code-input');if(i) i.focus();},100);
+  },
+  hideCodeInput(){
+    document.getElementById('premium-buy-btn').style.display='flex';
+    document.getElementById('premium-code-btn').style.display='flex';
+    document.getElementById('premium-code-block').style.display='none';
+    document.getElementById('promo-result').textContent='';
+  },
+  refreshScreen(){
+    const activeEl=document.getElementById('premium-status-active');
+    const buyBtn=document.getElementById('premium-buy-btn');
+    const codeBtn=document.getElementById('premium-code-btn');
+    if(!activeEl) return;
+    if(this.isPro()){
+      activeEl.style.display='block';
+      activeEl.innerHTML=`<div class="card" style="padding:18px;margin-bottom:14px;text-align:center;background:linear-gradient(135deg,var(--accent-soft),transparent);border:1px solid var(--accent)">
+        <div style="font-size:28px;margin-bottom:6px">${this.isMax()?'👑':'⭐'}</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:4px">${this.isMax()?'Макс':'Про'} активен</div>
+        <div style="font-size:13px;color:var(--muted)">${this.getExpiryText()}</div>
+      </div>`;
+      if(buyBtn) buyBtn.style.display='none';
+      if(codeBtn) codeBtn.style.display='none';
+    } else {
+      activeEl.style.display='none';
+      if(buyBtn) buyBtn.style.display='flex';
+      if(codeBtn) codeBtn.style.display='flex';
+    }
+  },
+  getExpiryText(){
+    const s=STATE.get('mlk_premium');if(!s||!s.expires) return '';
+    const diff=Math.ceil((new Date(s.expires)-new Date())/864e5);
+    return `активен ещё ${diff} ${diff===1?'день':diff<5?'дня':'дней'}`;
+  },
+  gate(name,req){
+    const ok=req==='pro'?this.isPro():this.isMax();if(ok) return '';
+    const price=req==='pro'?'99₽':'199₽';const pname=req==='pro'?'Про':'Макс';
+    return `<div style="text-align:center;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:12px" class="card">
+      <div style="font-size:42px">⭐</div><h3 style="font-size:18px;font-weight:700">${name}</h3>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;max-width:260px">доступно в плане <strong>${pname} (${price}/мес)</strong></p>
+      <button class="btn-premium" style="width:auto;padding:10px 24px;border-radius:50px" onclick="App.switchTab('premium')">получить доступ</button>
+    </div>`;
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// SCHEDULE
+// ══════════════════════════════════════════════════════
+const Schedule={
+  save(){
+    const s={sleep:document.getElementById('sch-sleep').value,wake:document.getElementById('sch-wake').value,workStart:document.getElementById('sch-work-start').value,workEnd:document.getElementById('sch-work-end').value,meal1:document.getElementById('sch-meal1').value,meal2:document.getElementById('sch-meal2').value,meal3:document.getElementById('sch-meal3').value};
+    const u=getUser();if(!u) return;u.schedule=s;saveUser(u);this.renderResult();
+  },
+  load(){
+    const u=getUser();if(!u) return;const s=u.schedule||{};
+    const def={sleep:'23:00',wake:'07:00',workStart:'09:00',workEnd:'18:00',meal1:'08:00',meal2:'13:00',meal3:'19:00'};
+    const map={'sleep':'sch-sleep','wake':'sch-wake','workStart':'sch-work-start','workEnd':'sch-work-end','meal1':'sch-meal1','meal2':'sch-meal2','meal3':'sch-meal3'};
+    Object.entries(map).forEach(([k,id])=>{const el=document.getElementById(id);if(el) el.value=s[k]||def[k];});
+    this.renderResult();
+  },
+  toMins(t){const[h,m]=(t||'00:00').split(':').map(Number);return h*60+m;},
+  fromMins(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');},
+  calcCapsuleTimes(){
+    const u=getUser();if(!u) return null;
+    const s=u.schedule||{sleep:'23:00',wake:'07:00',meal1:'08:00',meal3:'19:00'};
+    const meal1=this.toMins(s.meal1);const meal3=this.toMins(s.meal3);const sleepM=this.toMins(s.sleep);
+    const morning=this.fromMins(meal1-40);
+    const eveningIdeal=this.toMins(s.meal3)-40;
+    const latestEvening=((sleepM-8*60)+1440)%1440;
+    const finalEvening=eveningIdeal<=latestEvening?eveningIdeal:latestEvening;
+    return{morning,evening:this.fromMins(finalEvening),bedtime:s.sleep};
+  },
+  renderResult(){
+    const el=document.getElementById('capsule-schedule-result');if(!el) return;
+    const t=this.calcCapsuleTimes();if(!t) return;
+    el.innerHTML=`<div class="capsule-time-card"><h3>☀️ утренняя капсула</h3><div class="time-big">${t.morning}</div><div style="font-size:13px;color:var(--muted)">за 40 минут до завтрака</div></div><div class="capsule-time-card"><h3>🌙 вечерняя капсула</h3><div class="time-big">${t.evening}</div><div style="font-size:13px;color:var(--muted)">за 8 часов до отбоя (${t.bedtime})</div></div>`;
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// SIDE EFFECTS
+// ══════════════════════════════════════════════════════
+const SideEffects={
+  sides:['nausea','heart','anxiety','dry','sleep','head'],
+  labels:{nausea:'тошнота',heart:'сердцебиение',anxiety:'тревожность',dry:'сухость',sleep:'сон',head:'голова'},
+  render(){
+    const d=getTodayData();const saved=d.sides||{};
+    this.sides.forEach(s=>{
+      const w=document.getElementById('side-'+s);if(!w) return;
+      w.innerHTML=[0,1,2,3].map(i=>`<button class="intensity-btn${(saved[s]||0)===i&&i>0?' active':''}" onclick="SideEffects.set('${s}',${i})">${i===0?'—':i}</button>`).join('');
+    });
+    this.renderHistory();
+  },
+  set(key,val){const d=getTodayData();if(!d.sides) d.sides={};d.sides[key]=val;saveTodayData(d);this.render();},
+  renderHistory(){
+    const el=document.getElementById('sides-history-list');if(!el) return;
+    const h=getHistory();
+    const days=Object.entries(h).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14).filter(([,d])=>d.sides&&Object.values(d.sides).some(v=>v>0));
+    if(!days.length){el.innerHTML='<div class="card" style="padding:18px;text-align:center;color:var(--muted)">нет записей</div>';return;}
+    el.innerHTML='<div class="card" style="padding:0 16px;margin-bottom:14px">'+days.map(([k,d])=>{
+      const active=Object.entries(d.sides||{}).filter(([,v])=>v>0).map(([key,v])=>`${this.labels[key]||key} (${v})`).join(', ');
+      return `<div class="report-metric"><span style="font-size:13px">${k.slice(5).replace('-','.')}</span><span style="font-size:12px;color:var(--muted);max-width:200px;text-align:right">${active}</span></div>`;
+    }).join('')+'</div>';
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// PHOTOS
+// ══════════════════════════════════════════════════════
+const Photos={
+  _picking:null,
+  pick(slot){this._picking=slot;document.getElementById('photo-file-input').click();},
+  handleFile(e){
+    const file=e.target.files[0];if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');const maxW=400;const scale=Math.min(1,maxW/img.width);
+        canvas.width=img.width*scale;canvas.height=img.height*scale;
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        const data=canvas.toDataURL('image/jpeg',0.6);
+        const photos=STATE.get('mlk_photos')||{};
+        if(this._picking==='start'||this._picking==='now'){photos[this._picking]=data;}
+        else{if(!photos.gallery) photos.gallery=[];photos.gallery.unshift({date:new Date().toISOString().slice(0,10),src:data});if(photos.gallery.length>20) photos.gallery=photos.gallery.slice(0,20);}
+        STATE.set('mlk_photos',photos);this.render();
+      };img.src=ev.target.result;
+    };reader.readAsDataURL(file);e.target.value='';
+  },
+  render(){
+    const photos=STATE.get('mlk_photos')||{};
+    const start=document.getElementById('photo-start');const now=document.getElementById('photo-now');
+    if(start){if(photos.start) start.innerHTML=`<img src="${photos.start}"><div onclick="Photos.pick('start')" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:4px 8px;border-radius:50px;z-index:1">заменить</div>`;else start.innerHTML='<div style="font-size:28px">📷</div><div style="font-size:12px;color:var(--muted)">добавить</div>';}
+    if(now){if(photos.now) now.innerHTML=`<img src="${photos.now}"><div onclick="Photos.pick('now')" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:4px 8px;border-radius:50px;z-index:1">заменить</div>`;else now.innerHTML='<div style="font-size:28px">📷</div><div style="font-size:12px;color:var(--muted)">добавить</div>';}
+    const grid=document.getElementById('photos-grid');
+    if(grid){const gallery=photos.gallery||[];grid.innerHTML=`<div class="photo-slot" onclick="Photos.pick('gallery')" style="aspect-ratio:1"><div style="font-size:24px">+</div><div style="font-size:11px;color:var(--muted)">добавить</div></div>`+gallery.map(p=>`<div class="photo-slot" style="aspect-ratio:1"><img src="${p.src}"><div style="position:absolute;bottom:4px;left:4px;font-size:9px;color:#fff;background:rgba(0,0,0,.5);padding:2px 5px;border-radius:4px">${p.date.slice(5).replace('-','.')}</div></div>`).join('');}
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// BIORHYTHM
+// ══════════════════════════════════════════════════════
+const Biorhythm={
+  render(){
+    const h=getHistory();const dayNames=['вс','пн','вт','ср','чт','пт','сб'];
+    const byDay=Array(7).fill(null).map(()=>[]);
+    Object.entries(h).forEach(([k,d])=>{const w=d.weights&&d.weights.length?d.weights[d.weights.length-1].v:d.weight;if(!w) return;byDay[new Date(k).getDay()].push(w);});
+    const avgs=byDay.map(arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null);
+    const canvas=document.getElementById('chart-biorhythm');if(!canvas) return;
+    const dpr=window.devicePixelRatio||1;const W=canvas.parentElement.clientWidth-36;const H=180;
+    canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+    const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+    const hasData=avgs.filter(Boolean);
+    if(!hasData.length){ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText('недостаточно данных',W/2,H/2);return;}
+    const mn=Math.min(...hasData)-0.5,mx=Math.max(...hasData)+0.5;
+    const pad={t:14,r:14,b:32,l:42};const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    const gridC=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';const textC=isDark?'rgba(255,255,255,.32)':'rgba(0,0,0,.32)';
+    const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<=3;i++){const y=pad.t+ch*(1-i/3);ctx.strokeStyle=gridC;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+    const xs=avgs.map((_,i)=>pad.l+i*(cw/6));const ys=avgs.map(v=>v===null?null:pad.t+ch*(1-(v-mn)/(mx-mn)));
+    ctx.strokeStyle=accent;ctx.lineWidth=2.5;ctx.beginPath();let first=true;
+    ys.forEach((y,i)=>{if(y===null){first=true;return;}const x=xs[i];if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);});ctx.stroke();
+    ys.forEach((y,i)=>{if(y===null) return;ctx.fillStyle=accent;ctx.beginPath();ctx.arc(xs[i],y,4,0,Math.PI*2);ctx.fill();const v=avgs[i];ctx.fillStyle=textC;ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(v.toFixed(1),xs[i],y-9);});
+    ctx.fillStyle=textC;ctx.font='11px system-ui';ctx.textAlign='center';dayNames.forEach((n,i)=>ctx.fillText(n,xs[i],H-8));
+    const el=document.getElementById('biorhythm-insight');if(!el) return;
+    const valid=avgs.map((v,i)=>({v,i,n:dayNames[i]})).filter(x=>x.v!==null);
+    if(valid.length<3){el.innerHTML='<div style="font-size:13px;color:var(--muted)">записывай вес каждый день — биоритм станет виден через 2–3 недели</div>';return;}
+    const heavy=valid.reduce((a,b)=>a.v>b.v?a:b);const light=valid.reduce((a,b)=>a.v<b.v?a:b);
+    el.innerHTML=`<div style="font-size:13px;line-height:1.7">📈 тяжёлый день — <strong>${heavy.n}</strong> (${heavy.v.toFixed(1)} кг)<br>📉 лёгкий — <strong>${light.n}</strong> (${light.v.toFixed(1)} кг)<br><span style="color:var(--muted)">разница ${(heavy.v-light.v).toFixed(1)} кг — не паникуй в ${heavy.n}.</span></div>`;
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// WEEK REPORT
+// ══════════════════════════════════════════════════════
+const WeekReport={
+  open(){App.switchTab('report');this.render();},
+  render(){
+    const el=document.getElementById('week-report-content');if(!el) return;
+    const u=getUser();if(!u) return;const h=getHistory();
+    const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().slice(0,10);days.push({k,data:h[k]||{}});}
+    const capsTotal=days.reduce((s,d)=>s+(d.data.capsules||0),0);
+    const waterAvg=(days.reduce((s,d)=>s+(d.data.water||0),0)/7).toFixed(1);
+    const kcalAvg=Math.round(days.reduce((s,d)=>s+(d.data.kcal||0),0)/7);
+    const stepsAvg=Math.round(days.reduce((s,d)=>s+(d.data.steps||0),0)/7);
+    const wDays=days.map(d=>d.data.weights&&d.data.weights.length?d.data.weights[d.data.weights.length-1].v:d.data.weight).filter(Boolean);
+    const wDelta=wDays.length>=2?(wDays[0]-wDays[wDays.length-1]):null;
+    const activeDays=days.filter(d=>d.data.capsules>0||d.data.kcal>0).length;
+    const insights=[];
+    if(+waterAvg>=u.water_goal) insights.push(`водный баланс отличный — ${waterAvg}л в среднем`);else insights.push(`воды мало — ${waterAvg}л при норме ${u.water_goal}л`);
+    if(wDelta!==null&&wDelta>0.1) insights.push(`за неделю −${wDelta.toFixed(1)} кг — отличный темп`);
+    else if(wDelta!==null&&wDelta<-0.1) insights.push(`вес вырос на ${Math.abs(wDelta).toFixed(1)} кг — проверь питание`);
+    if(activeDays<5) insights.push(`активных дней ${activeDays} из 7 — старайся не пропускать`);
+    const weekStr=`${new Date(days[0].k).toLocaleDateString('ru',{day:'numeric',month:'short'})} — ${new Date(days[6].k).toLocaleDateString('ru',{day:'numeric',month:'short'})}`;
+    el.innerHTML=`<div style="padding:16px 16px 0">
+      <div class="card" style="padding:18px;margin-bottom:14px;text-align:center;background:linear-gradient(135deg,var(--accent-soft),transparent)"><div style="font-size:13px;color:var(--muted);margin-bottom:4px">${weekStr}</div><div style="font-size:22px;font-weight:800">итоги недели</div></div>
+      <div class="report-section"><div class="report-metric"><span style="font-size:13px;color:var(--muted)">капсул за неделю</span><span style="font-size:16px;font-weight:700;color:var(--accent)">${capsTotal}</span></div><div class="report-metric"><span style="font-size:13px;color:var(--muted)">вода (среднее)</span><span style="font-size:16px;font-weight:700">${waterAvg} л</span></div><div class="report-metric"><span style="font-size:13px;color:var(--muted)">калории (среднее)</span><span style="font-size:16px;font-weight:700">${kcalAvg} ккал</span></div><div class="report-metric"><span style="font-size:13px;color:var(--muted)">активных дней</span><span style="font-size:16px;font-weight:700">${activeDays} из 7</span></div>${wDelta!==null?`<div class="report-metric"><span style="font-size:13px;color:var(--muted)">изменение веса</span><span style="font-size:16px;font-weight:700;color:${wDelta>0?'#34c77b':'#f75c5c'}">${wDelta>0?'−':'+'}${Math.abs(wDelta).toFixed(1)} кг</span></div>`:''}</div>
+      ${insights.length?`<div class="report-section"><div style="font-size:13px;font-weight:700;margin-bottom:10px">инсайты</div>${insights.map(i=>`<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px;line-height:1.5"><span>•</span><span>${i}</span></div>`).join('')}</div>`:''}
+      <div style="margin-bottom:14px"><button class="btn btn-ghost" onclick="WeekReport.share()">📤 поделиться с куратором</button></div>
+    </div>`;
+  },
+  share(){
+    const u=getUser();if(!u) return;const h=getHistory();
+    const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);days.push({k:dt.toISOString().slice(0,10),data:h[dt.toISOString().slice(0,10)]||{}});}
+    const caps=days.reduce((s,d)=>s+(d.data.capsules||0),0);
+    const water=(days.reduce((s,d)=>s+(d.data.water||0),0)/7).toFixed(1);
+    const wDays=days.map(d=>d.data.weights&&d.data.weights.length?d.data.weights[d.data.weights.length-1].v:d.data.weight).filter(Boolean);
+    const wDelta=wDays.length>=2?(wDays[0]-wDays[wDays.length-1]):null;
+    const text=`📊 отчёт mlklavmeste\n${u.name||'пользователь'} · ${new Date().toLocaleDateString('ru')}\n\n💊 капсул: ${caps}\n💧 вода: ${water} л/день\n${wDelta!==null?`⚖️ вес: ${wDelta>0?'−':'+'}${Math.abs(wDelta).toFixed(1)} кг\n`:''}\nтреккер: mlklavmeste`;
+    if(navigator.share) navigator.share({text}).catch(()=>navigator.clipboard.writeText(text).then(()=>alert('скопировано!')));
+    else navigator.clipboard.writeText(text).then(()=>alert('скопировано! вставь куратору'));
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// SMART DAY
+// ══════════════════════════════════════════════════════
+const SmartDay={
+  render(){
+    const el=document.getElementById('smart-day-card');if(!el) return;
+    if(!Premium.isPro()){el.style.display='none';return;}
+    el.style.display='block';
+    const u=getUser();if(!u) return;const d=getTodayData();const h=getHistory();const hr=new Date().getHours();
+    const tips=[];
+    const times=Schedule.calcCapsuleTimes();
+    if(times){if(hr<parseInt(times.morning)) tips.push(`💊 утренняя капсула — в ${times.morning}`);else if(hr<parseInt(times.evening)) tips.push(`💊 вечерняя капсула — в ${times.evening}`);}
+    const wLeft=Math.max(0,u.water_goal-(d.water||0));if(wLeft>0.1) tips.push(`💧 воды осталось: ${wLeft.toFixed(1)} л`);
+    const ydt=new Date();ydt.setDate(ydt.getDate()-1);const yd=h[ydt.toISOString().slice(0,10)]||{};
+    if((yd.water||0)<u.water_goal*0.7) tips.push('⚠️ вчера было мало воды — сегодня наверстай');
+    const streak=Home.calcStreak();if(streak>2&&hr>20&&(d.capsules||0)===0) tips.push(`🔥 серия ${streak} дн под угрозой — отметь капсулу`);
+    if(!tips.length) tips.push('✅ всё идёт по плану — продолжай!');
+    el.innerHTML=`<div class="card" style="padding:18px;background:linear-gradient(135deg,var(--accent-soft),transparent);border-color:var(--accent)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="font-size:20px">🧠</div><div style="font-size:15px;font-weight:700">умный день</div><div class="premium-badge" style="margin-left:auto;font-size:10px">ПРО</div></div>${tips.map(t=>`<div style="font-size:13px;line-height:1.6;margin-bottom:4px">${t}</div>`).join('')}</div>`;
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// HEATMAP
+// ══════════════════════════════════════════════════════
+const Heatmap={
+  render(){
+    const wrap=document.getElementById('heatmap-section');if(!wrap) return;
+    if(!Premium.isPro()){wrap.style.display='none';return;}
+    wrap.style.display='block';
+    const h=getHistory();const u=getUser();if(!u) return;
+    const grid=document.getElementById('heatmap-grid');if(!grid) return;
+    const cells=[];
+    for(let i=29;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().slice(0,10);const d=h[k]||{};
+      const score=(d.capsules>0?1:0)+((d.water||0)>=u.water_goal?1:0)+((d.steps||0)>=(u.steps_goal||8000)?1:0)+(d.kcal>0?1:0);
+      const lvl=score===0?0:score<=1?1:score<=2?2:score<=3?3:4;
+      cells.push(`<div class="heatmap-cell lvl${lvl}" title="${k}: ${score}/4"></div>`);}
+    grid.innerHTML=cells.join('');
+  }
+};
 
 // ══════════════════════════════════════════════════════
 // ACHIEVEMENTS
@@ -1813,12 +2468,27 @@ const Install={
     const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone=window.navigator.standalone;
     if(isIos&&!isStandalone&&!STATE.get('mlk_ios_dismissed')){
-      setTimeout(()=>{const h=document.getElementById('ios-hint');if(h)h.style.display='block';},1200);
+      setTimeout(()=>{
+        // Only show after onboarding is complete
+        const onboard=document.getElementById('screen-onboard');
+        const isOnboarding=onboard&&onboard.classList.contains('active');
+        const reg=document.getElementById('screen-reg');
+        const isReg=reg&&reg.classList.contains('active');
+        if(isOnboarding||isReg) return;
+        const h=document.getElementById('ios-hint');if(h)h.style.display='block';
+      },1200);
     }
     const iosClose=document.getElementById('ios-hint-close');
     if(iosClose) iosClose.onclick=()=>{STATE.set('mlk_ios_dismissed',true);document.getElementById('ios-hint').style.display='none';};
   },
   showBanner(){const b=document.getElementById('install-banner');if(b) b.classList.add('show');},
+  _tryShowIosHint(){
+    const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone=window.navigator.standalone;
+    if(isIos&&!isStandalone&&!STATE.get('mlk_ios_dismissed')){
+      const h=document.getElementById('ios-hint');if(h) h.style.display='block';
+    }
+  },
   async install(){
     if(!this._prompt) return;
     this._prompt.prompt();
@@ -1844,6 +2514,143 @@ const Install={
 App.init();
 Install.init();
 </script>
+
+
+<!-- PREMIUM -->
+<div id="screen-premium" class="screen">
+  <div class="home-header status-pad">
+    <h2>премиум</h2>
+    <button onclick="App.switchTab('profile')" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:4px">✕</button>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div style="text-align:center;padding:10px 0 20px">
+      <div style="font-size:42px;margin-bottom:8px">⭐</div>
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px">mlklavmeste premium</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6">разблокируй продвинутые инструменты<br>для максимального результата</div>
+    </div>
+    <div class="plan-card" id="plan-pro-card" onclick="Premium.selectPlan('pro')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="plan-price">99₽</div><div class="plan-name">Про · в месяц</div></div>
+        <div class="premium-badge">ПРО</div>
+      </div>
+      <div class="plan-features">
+        <div class="plan-feature">Умный день — утренний план с временем капсул</div>
+        <div class="plan-feature">Биоритм веса по дням недели</div>
+        <div class="plan-feature">Тепловая карта активности 30 дней</div>
+        <div class="plan-feature">Фото-прогресс — сравнение начало/сейчас</div>
+        <div class="plan-feature">Журнал побочных эффектов</div>
+        <div class="plan-feature">Индекс талия/бёдра</div>
+      </div>
+    </div>
+    <div class="plan-card" id="plan-max-card" onclick="Premium.selectPlan('max')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="plan-price" style="background:linear-gradient(135deg,#f7c948,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">199₽</div><div class="plan-name">Макс · в месяц</div></div>
+        <div class="premium-badge" style="background:linear-gradient(135deg,#a78bfa,#4f8ef7)">МАКС</div>
+      </div>
+      <div class="plan-features">
+        <div class="plan-feature">Всё из Про</div>
+        <div class="plan-feature">Разбор недели с инсайтами</div>
+        <div class="plan-feature">Отчёт для куратора одной кнопкой</div>
+        <div class="plan-feature">Корреляция капсул и веса</div>
+        <div class="plan-feature">Сравнение недель между собой</div>
+        <div class="plan-feature">Прогноз даты достижения цели</div>
+      </div>
+    </div>
+    <div id="premium-status-active" style="display:none"></div>
+    <a href="https://t.me/m/URKVPf0lZGNh" target="_blank" class="btn-premium" id="premium-buy-btn" style="margin-bottom:11px">💳 купить подписку</a>
+    <button class="btn btn-ghost" id="premium-code-btn" onclick="Premium.showCodeInput()" style="margin-bottom:14px">🔑 ввести код активации</button>
+    <div id="premium-code-block" style="display:none;margin-bottom:14px">
+      <div class="card" style="padding:18px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px">код активации</div>
+        <input type="text" id="promo-code-input" placeholder="PRO-XXXX-XXXX" style="margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;font-size:14px" oninput="this.value=this.value.toUpperCase()">
+        <button class="btn btn-primary" onclick="Premium.activateCode()">активировать</button>
+        <div id="promo-result" style="font-size:13px;margin-top:10px;min-height:18px;text-align:center"></div>
+        <button onclick="Premium.hideCodeInput()" style="background:none;border:none;color:var(--muted);font-size:13px;margin-top:8px;cursor:pointer;width:100%">отмена</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;padding:0 20px 20px;line-height:1.6">подписка действует 30 дней с момента активации.<br>код привязывается к устройству.</div>
+  </div>
+</div>
+
+<!-- SCHEDULE -->
+<div id="screen-schedule" class="screen">
+  <div class="home-header status-pad"><h2>мой режим дня</h2></div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="section-head"><h3>сон</h3></div>
+    <div class="card" style="padding:16px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div class="input-group" style="margin:0"><label>отбой</label><input type="time" id="sch-sleep" class="time-input" value="23:00" onchange="Schedule.save()"></div>
+        <div class="input-group" style="margin:0"><label>подъём</label><input type="time" id="sch-wake" class="time-input" value="07:00" onchange="Schedule.save()"></div>
+      </div>
+    </div>
+    <div class="section-head"><h3>работа / учёба</h3></div>
+    <div class="card" style="padding:16px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div class="input-group" style="margin:0"><label>начало</label><input type="time" id="sch-work-start" class="time-input" value="09:00" onchange="Schedule.save()"></div>
+        <div class="input-group" style="margin:0"><label>конец</label><input type="time" id="sch-work-end" class="time-input" value="18:00" onchange="Schedule.save()"></div>
+      </div>
+    </div>
+    <div class="section-head"><h3>приёмы пищи</h3></div>
+    <div class="card" style="padding:16px;margin-bottom:14px">
+      <div class="input-group"><label>завтрак</label><input type="time" id="sch-meal1" class="time-input" value="08:00" onchange="Schedule.save()"></div>
+      <div class="input-group"><label>обед</label><input type="time" id="sch-meal2" class="time-input" value="13:00" onchange="Schedule.save()"></div>
+      <div class="input-group" style="margin:0"><label>ужин</label><input type="time" id="sch-meal3" class="time-input" value="19:00" onchange="Schedule.save()"></div>
+    </div>
+    <div class="section-head"><h3>рекомендуемое время капсул</h3></div>
+    <div id="capsule-schedule-result"></div>
+    <button class="btn btn-primary" style="margin-bottom:14px" onclick="Schedule.save();Schedule.renderResult()">пересчитать</button>
+  </div>
+</div>
+
+<!-- SIDE EFFECTS -->
+<div id="screen-sides" class="screen">
+  <div class="home-header status-pad"><h2>побочные эффекты</h2></div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="section-head"><h3>сегодня</h3></div>
+    <div class="card" style="padding:0 16px;margin-bottom:14px">
+      <div class="side-row"><span style="font-size:14px;font-weight:500">тошнота</span><div class="intensity-btns" id="side-nausea"></div></div>
+      <div class="side-row"><span style="font-size:14px;font-weight:500">сердцебиение</span><div class="intensity-btns" id="side-heart"></div></div>
+      <div class="side-row"><span style="font-size:14px;font-weight:500">тревожность</span><div class="intensity-btns" id="side-anxiety"></div></div>
+      <div class="side-row"><span style="font-size:14px;font-weight:500">сухость во рту</span><div class="intensity-btns" id="side-dry"></div></div>
+      <div class="side-row"><span style="font-size:14px;font-weight:500">нарушение сна</span><div class="intensity-btns" id="side-sleep"></div></div>
+      <div class="side-row"><span style="font-size:14px;font-weight:500">головная боль</span><div class="intensity-btns" id="side-head"></div></div>
+    </div>
+    <div class="section-head"><h3>история</h3></div>
+    <div id="sides-history-list"></div>
+  </div>
+</div>
+
+<!-- PHOTOS -->
+<div id="screen-photos" class="screen">
+  <div class="home-header status-pad"><h2>фото-прогресс</h2></div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="section-head"><h3>сравнение</h3></div>
+    <div class="photo-compare">
+      <div><div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">начало</div><div class="photo-slot" id="photo-start" onclick="Photos.pick('start')"><div style="font-size:28px">📷</div><div style="font-size:12px;color:var(--muted)">добавить</div></div></div>
+      <div><div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px">сейчас</div><div class="photo-slot" id="photo-now" onclick="Photos.pick('now')"><div style="font-size:28px">📷</div><div style="font-size:12px;color:var(--muted)">добавить</div></div></div>
+    </div>
+    <div class="section-head"><h3>все фото</h3></div>
+    <div id="photos-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px"></div>
+    <input type="file" id="photo-file-input" accept="image/*" style="display:none" onchange="Photos.handleFile(event)">
+  </div>
+</div>
+
+<!-- WEEK REPORT -->
+<div id="screen-report" class="screen">
+  <div class="home-header status-pad"><h2>отчёт недели</h2></div>
+  <div class="scroll" style="padding-top:4px" id="week-report-content"></div>
+</div>
+
+<!-- BIORHYTHM -->
+<div id="screen-biorhythm" class="screen">
+  <div class="home-header status-pad"><h2>биоритм веса</h2></div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="section-head"><h3>средний вес по дням недели</h3></div>
+    <div class="chart-wrap card" style="margin-bottom:14px"><canvas id="chart-biorhythm" height="180"></canvas></div>
+    <div class="card" style="padding:18px;margin-bottom:14px" id="biorhythm-insight"></div>
+    <div class="card" style="padding:18px;margin-bottom:14px"><div style="font-size:13px;color:var(--muted);line-height:1.7">у каждого есть свой биоритм веса — дни когда весы показывают больше или меньше из-за задержки воды, режима сна и питания. зная свой паттерн, ты не будешь паниковать в «тяжёлые» дни.</div></div>
+  </div>
+</div>
 
 <!-- PWA INSTALL BANNER -->
 <div id="install-banner" style="position:fixed;top:0;left:0;right:0;background:var(--accent);color:#fff;z-index:500;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 12px;display:flex;align-items:center;gap:10px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 20px var(--accent-glow)">
