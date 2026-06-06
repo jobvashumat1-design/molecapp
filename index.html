@@ -2515,6 +2515,7 @@ const Feed = {
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           комменты
         </button>
+        ${(uid===ADMIN_ID||uid===p.user_id)?`<button class="post-delete-btn" onclick="Feed.deletePost('${p.id}')">🗑</button>`:''}
       </div>
       <div id="comments-${p.id}" style="display:none"></div>
     </div>`;
@@ -2565,7 +2566,7 @@ const Feed = {
   },
 
   async deletePost(postId) {
-    if(getMyUserId() !== ADMIN_ID) return;
+    // будет проверено через UI — кнопка не показывается чужим
     // Safari PWA может блокировать confirm — используем UI
     const el = document.getElementById('post-' + postId);
     if(!el) return;
