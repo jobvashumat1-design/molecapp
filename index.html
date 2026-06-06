@@ -355,7 +355,7 @@ textarea:focus{border-color:var(--accent)}
 
 
 <!-- AUTH SCREEN -->
-<div id="screen-auth" class="screen active" style="z-index:200">
+<div id="screen-auth" class="screen" style="z-index:200;display:none">
   <div class="auth-screen">
     <div class="auth-logo">mlklavmeste</div>
     <div class="auth-sub">войди или создай аккаунт<br>чтобы начать</div>
@@ -370,6 +370,7 @@ textarea:focus{border-color:var(--accent)}
       <div class="auth-error" id="auth-error"></div>
       <button class="btn btn-primary" onclick="Auth.submit()" id="auth-submit-btn">войти</button>
       <div class="auth-hint" id="auth-hint">забыл пароль — увы, восстановление не предусмотрено.<br>запиши пароль в надёжном месте.</div>
+      <button onclick="Auth.continueWithoutAccount()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:8px;font-family:var(--font);text-decoration:underline">продолжить без аккаунта →</button>
     </div>
   </div>
 </div>
@@ -2975,25 +2976,27 @@ const Auth = {
   },
 
   _afterLogin(uid, username) {
-    // Set username in user profile
     const u = getUser();
-    if(u) {
-      u.username = username;
-      saveUser(u);
-    }
-    // Hide auth screen
+    if(u) { u.username = username; saveUser(u); }
     const authEl = document.getElementById('screen-auth');
     if(authEl) { authEl.style.display = 'none'; authEl.classList.remove('active'); }
-    // Check if onboarding needed
     App.init();
   },
 
   checkSession() {
+    // Вариант 1: есть сохранённая auth-сессия
     const auth = STATE.get('mlk_auth');
     if(auth && auth.uid) {
       STATE.set('mlk_uid', auth.uid);
       return true;
     }
+    // Вариант 2: нет пароля но есть данные пользователя (старый аккаунт)
+    // — пускаем сразу, баннер попросит установить пароль
+    const u = getUser();
+    if(u && u.name) {
+      return true;
+    }
+    // Вариант 3: нет ничего — показать экран авторизации
     return false;
   },
 
@@ -3018,6 +3021,19 @@ const Auth = {
     }
   },
 
+  continueWithoutAccount() {
+    // Создать временный uid и войти без пароля
+    let uid = STATE.get('mlk_uid');
+    if(!uid) {
+      uid = 'U' + Math.random().toString(36).slice(2,8).toUpperCase();
+      STATE.set('mlk_uid', uid);
+    }
+    const authEl = document.getElementById('screen-auth');
+    if(authEl) { authEl.style.display = 'none'; authEl.classList.remove('active'); }
+    App.init();
+    // Баннер попросит установить пароль через 3 сек
+  },
+
   dismissBanner() {
     const banner = document.getElementById('password-banner');
     if(banner) banner.style.display = 'none';
@@ -3031,13 +3047,17 @@ const Auth = {
     const banner = document.getElementById('password-banner');
     if(banner) banner.style.display = 'none';
     const modal = document.getElementById('set-password-modal');
-    if(modal) modal.style.display = 'flex';
-    // Prefill username if set
+    if(modal) { modal.style.display = 'block'; modal.scrollTop = 0; }
     const u = getUser();
     if(u && u.username) {
       const inp = document.getElementById('set-pw-username');
       if(inp) inp.value = u.username;
     }
+    setTimeout(() => {
+      const inp = document.getElementById('set-pw-username');
+      if(inp && !inp.value) inp.focus();
+      else { const inp2 = document.getElementById('set-pw-password'); if(inp2) inp2.focus(); }
+    }, 100);
   },
 
   hideSetPassword() {
@@ -3688,11 +3708,15 @@ const Install={
 
 // Check auth session
 if(Auth.checkSession()) {
-  document.getElementById('screen-auth').style.display = 'none';
-  document.getElementById('screen-auth').classList.remove('active');
+  // Есть данные — сразу в приложение
+  const authEl = document.getElementById('screen-auth');
+  if(authEl) { authEl.style.display = 'none'; authEl.classList.remove('active'); }
   App.init();
+} else {
+  // Нет данных — показать экран входа/регистрации
+  const authEl = document.getElementById('screen-auth');
+  if(authEl) { authEl.style.display = 'flex'; authEl.classList.add('active'); }
 }
-// else — auth screen already shown
 Install.init();
 </script>
 
@@ -3993,17 +4017,20 @@ Install.init();
   </div>
 </div>
 
-<!-- SET PASSWORD MODAL -->
-<div id="set-password-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center">
-  <div style="background:var(--card);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:430px">
-    <div style="font-size:18px;font-weight:800;margin-bottom:6px">🔐 создать пароль</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">выбери username и пароль — потом сможешь войти с любого устройства</div>
-    <input type="text" id="set-pw-username" placeholder="username (латиница, цифры, _ .)" style="margin-bottom:10px;text-transform:lowercase" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_.]/g,'')">
-    <input type="password" id="set-pw-password" placeholder="пароль (минимум 4 символа)" style="margin-bottom:10px">
-    <input type="password" id="set-pw-password2" placeholder="повтори пароль" style="margin-bottom:10px">
-    <div id="set-pw-error" style="color:#f75c5c;font-size:13px;min-height:18px;margin-bottom:10px"></div>
-    <button class="btn btn-primary" onclick="Auth.submitSetPassword()" style="margin-bottom:10px">сохранить</button>
-    <button onclick="Auth.hideSetPassword()" style="background:none;border:none;color:var(--muted);font-size:13px;width:100%;cursor:pointer;padding:4px;font-family:var(--font)">отмена</button>
+<!-- SET PASSWORD SCREEN -->
+<div id="set-password-modal" style="display:none;position:fixed;inset:0;z-index:800;background:var(--bg);overflow-y:auto">
+  <div style="max-width:430px;margin:0 auto;padding:60px 24px 40px;min-height:100vh;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-size:36px;margin-bottom:12px;text-align:center">🔐</div>
+    <div style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin-bottom:8px;text-align:center">создать пароль</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:32px;text-align:center;line-height:1.7">выбери username и пароль —<br>потом сможешь войти с любого устройства</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input type="text" id="set-pw-username" placeholder="username (латиница, цифры, _ .)" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_.]/g,'')">
+      <input type="password" id="set-pw-password" placeholder="пароль (минимум 4 символа)">
+      <input type="password" id="set-pw-password2" placeholder="повтори пароль">
+      <div id="set-pw-error" style="color:#f75c5c;font-size:13px;min-height:18px;text-align:center"></div>
+      <button class="btn btn-primary" onclick="Auth.submitSetPassword()">сохранить</button>
+      <button onclick="Auth.hideSetPassword()" style="background:none;border:none;color:var(--muted);font-size:14px;width:100%;cursor:pointer;padding:12px;font-family:var(--font)">отмена</button>
+    </div>
   </div>
 </div>
 
