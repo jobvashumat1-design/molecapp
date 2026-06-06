@@ -995,6 +995,32 @@ const COURSE_LIMITS={plus:40,premium:46,turbo:60};
 const COURSE_NAMES={plus:'plus',premium:'premium',turbo:'turbo ozempic'};
 const ACCENTS={blue:'#4f8ef7',green:'#34c77b',red:'#f75c5c',purple:'#a78bfa',orange:'#fb923c',teal:'#2dd4bf'};
 
+// ── Корона премиума ──────────────────────────────────────
+// plan: 'pro'|'max'|null, accent: цвет из ACCENTS
+// Возвращает HTML-строку с короной (пустая строка если нет премиума)
+const CROWN_GRADIENTS = {
+  blue:   ['#4f8ef7','#a78bfa'],
+  green:  ['#34c77b','#2dd4bf'],
+  red:    ['#f75c5c','#fb923c'],
+  purple: ['#a78bfa','#4f8ef7'],
+  orange: ['#fb923c','#f7c948'],
+  teal:   ['#2dd4bf','#4f8ef7'],
+};
+function getPremiumCrown(plan, accent) {
+  if(!plan || (plan !== 'pro' && plan !== 'max')) return '';
+  const [c1, c2] = CROWN_GRADIENTS[accent] || CROWN_GRADIENTS.blue;
+  const id = 'cg_' + (accent||'blue') + '_' + plan;
+  // Макс = золотая корона, Про = обычная акцентная
+  const [g1, g2] = plan === 'max' ? ['#f7c948', '#fb923c'] : [c1, c2];
+  return `<svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-left:3px;flex-shrink:0" title="${plan==='max'?'Макс':'Про'} премиум">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="14" y2="13" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="${g1}"/><stop offset="100%" stop-color="${g2}"/>
+    </linearGradient></defs>
+    <path d="M1 10L2.5 4L5.5 7L7 2L8.5 7L11.5 4L13 10H1Z" fill="url(#${id})" stroke="url(#${id})" stroke-width="0.5" stroke-linejoin="round"/>
+    <rect x="1" y="10.5" width="12" height="1.5" rx="0.75" fill="url(#${id})"/>
+  </svg>`;
+}
+
 // ══════════════════════════════════════════════════════
 // APP
 // ══════════════════════════════════════════════════════
@@ -1875,7 +1901,7 @@ const Profile={
     }
     const setAvatarPhoto=document.getElementById('set-avatar-photo');
     if(setAvatarPhoto) setAvatarPhoto.textContent=u.avatar_url?'изменить фото':'загрузить фото';
-    document.getElementById('profile-name-el').textContent=u.name||'пользователь';
+    document.getElementById('profile-name-el').innerHTML = (u.name||'пользователь') + getPremiumCrown(Premium.isMax()?'max':Premium.isPro()?'pro':null, u.accent||'blue');
     const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
     const authEl=document.getElementById('profile-auth-username');
     const auth=STATE.get('mlk_auth');
@@ -2352,7 +2378,7 @@ const UserProfile = {
       <div style="padding:0 16px">
         <div class="user-profile-header card">
           <div class="user-profile-avatar" style="overflow:hidden">${profile.avatar_url?`<img src="${profile.avatar_url}" style="width:72px;height:72px;object-fit:cover;border-radius:50%;display:block">`:profile.avatar_emoji||profile.name?.[0]?.toUpperCase()||'👤'}</div>
-          <div class="user-profile-name">${profile.name||'пользователь'}${getUserBadge(profile.id, profile.username||'')}</div>
+          <div class="user-profile-name">${profile.name||'пользователь'}${getUserBadge(profile.id, profile.username||'')}${getPremiumCrown(profile.premium_plan||null, profile.premium_accent||'blue')}</div>
           ${profile.username?`<div class="user-profile-username">@${profile.username}</div>`:''}
           ${profile.course?`<div style="font-size:12px;color:var(--muted);margin-top:4px">курс: ${profile.course}</div>`:''}
           <div style="margin-top:12px">${friendBtn}</div>
@@ -2434,11 +2460,13 @@ function getMyUserId() {
 async function syncProfile() {
   const u = getUser(); if(!u) return;
   const uid = getMyUserId();
+  const premPlan = Premium.isPro() ? (Premium.isMax() ? 'max' : 'pro') : null;
+  const premAccent = u.accent || 'blue';
   await supaFetch('profiles', {
     method: 'POST',
     prefer: 'resolution=merge-duplicates',
     headers: { 'Prefer': 'resolution=merge-duplicates' },
-    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'', avatar_url: u.avatar_url||'' }
+    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'', avatar_url: u.avatar_url||'', premium_plan: premPlan, premium_accent: premAccent }
   });
   // Sync stats
   const h = getHistory();
@@ -2529,6 +2557,8 @@ const Feed = {
       user_emoji: u.avatar_emoji || '',
       user_username: u.username || '',
       user_avatar_url: u.avatar_url || '',
+      user_premium: Premium.isPro() ? (Premium.isMax() ? 'max' : 'pro') : null,
+      user_accent: u.accent || 'blue',
       text: txt,
       image_url: this._photo || null,
       likes: []
@@ -2564,22 +2594,42 @@ const Feed = {
     const pinned=filtered.find(p=>p.id===pinnedId);
     const rest=filtered.filter(p=>p.id!==pinnedId);
     const sorted=pinned?[pinned,...rest]:filtered;
-    el.innerHTML=sorted.map((p,i)=>this._renderPost(p,i===0&&!!pinned)).join('');
+
+    // Загружаем профили для актуальных данных о короне
+    const userIds = [...new Set(sorted.map(p=>p.user_id))];
+    let profileMap = {};
+    try {
+      const profiles = await supaFetch('profiles?id=in.(' + userIds.join(',') + ')');
+      (profiles||[]).forEach(p => { profileMap[p.id] = p; });
+    } catch(e) {}
+
+    el.innerHTML=sorted.map((p,i)=>this._renderPost(p,i===0&&!!pinned,profileMap)).join('');
   },
 
-  _renderPost(p, isPinned=false) {
+  _renderPost(p, isPinned=false, profileMap={}) {
     const uid = getMyUserId();
     const liked = (p.likes||[]).includes(uid);
     const time = new Date(p.created_at).toLocaleDateString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    // Берём актуальные данные о короне из профиля (если есть), иначе из поста
+    const prof = profileMap[p.user_id] || {};
+    const crownPlan = prof.premium_plan || p.user_premium || null;
+    const crownAccent = prof.premium_accent || p.user_accent || 'blue';
+    const crown = getPremiumCrown(crownPlan, crownAccent);
     const statsHtml = p.stats ? `<div class="stats-mini-grid">
       <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.capsules||0}</div><div class="stats-mini-label">капсулы</div></div>
       <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.water||0}л</div><div class="stats-mini-label">вода</div></div>
       <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.weight||'—'}</div><div class="stats-mini-label">кг</div></div>
     </div>` : '';
+    const isOwn = uid === p.user_id;
+    const deleteBtn = isOwn ? `<button class="post-delete-btn" onclick="Feed.deletePost('${p.id}')" title="удалить">×</button>` : '';
     return `<div class="feed-post" id="post-${p.id}">
-      <div class="post-header">
-        <div class="post-avatar">${p.user_emoji||p.user_name?.[0]?.toUpperCase()||'👤'}</div>
-        <div class="post-meta"><div class="post-author">${p.user_name||'пользователь'}</div><div class="post-time">${time}</div></div>
+      <div class="post-header" onclick="UserProfile.open('${p.user_id}')" style="cursor:pointer">
+        <div class="post-avatar" style="overflow:hidden;position:relative">${p.user_avatar_url?`<img src="${p.user_avatar_url}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;display:block">`:p.user_emoji||p.user_name?.[0]?.toUpperCase()||'👤'}</div>
+        <div class="post-meta">
+          <div class="post-author" style="display:flex;align-items:center;gap:2px">${p.user_name||'пользователь'}${getUserBadge(p.user_id,p.user_username||'')}${crown}</div>
+          <div class="post-time">${isPinned?'📌 закреплено · ':''} ${time}</div>
+        </div>
+        ${deleteBtn}
       </div>
       ${p.text?`<div class="post-text">${p.text}</div>`:''}
       ${p.image_url?`<img class="post-img" src="${p.image_url}" loading="lazy">`:''}
@@ -2620,10 +2670,16 @@ const Feed = {
     const u = getUser();
     const uid = getMyUserId();
     wrap.innerHTML = `<div class="comments-wrap">
-      ${(comments||[]).map(c=>`<div class="comment-item">
-        <div class="post-avatar" style="width:28px;height:28px;font-size:14px">${c.user_name?.[0]?.toUpperCase()||'?'}</div>
-        <div class="comment-bubble"><div class="comment-author">${c.user_name}</div><div class="comment-text">${c.text}</div></div>
-      </div>`).join('')}
+      ${(comments||[]).map(c=>{
+        const cCrown = getPremiumCrown(c.user_premium||null, c.user_accent||'blue');
+        return `<div class="comment-item">
+          <div class="post-avatar" style="width:28px;height:28px;font-size:14px">${c.user_name?.[0]?.toUpperCase()||'?'}</div>
+          <div class="comment-bubble">
+            <div class="comment-author" style="display:flex;align-items:center;gap:2px">${c.user_name}${cCrown}</div>
+            <div class="comment-text">${c.text}</div>
+          </div>
+        </div>`;
+      }).join('')}
       <div class="comment-input-row">
         <input class="comment-input" id="comment-input-${postId}" placeholder="написать комментарий..." onkeydown="if(event.key==='Enter')Feed.sendComment('${postId}')">
         <button class="friend-btn primary" onclick="Feed.sendComment('${postId}')">→</button>
@@ -2637,7 +2693,10 @@ const Feed = {
     const u = getUser();
     await supaFetch('comments', { method: 'POST', body: {
       post_id: postId, user_id: getMyUserId(), user_name: u?.name||'пользователь',
-      user_username: u?.username||'', text
+      user_username: u?.username||'',
+      user_premium: Premium.isPro() ? (Premium.isMax() ? 'max' : 'pro') : null,
+      user_accent: u?.accent||'blue',
+      text
     }});
     input.value = '';
     this.toggleComments(postId);
@@ -3239,6 +3298,8 @@ const Premium={
     this._plan=plan;
     if(App.currentTab==='profile') Profile.render();
     if(App.currentTab==='home') Home.render();
+    // Синхронизируем корону в Supabase
+    setTimeout(syncProfile, 300);
   },
   showCodeInput(){
     document.getElementById('premium-buy-btn').style.display='none';
