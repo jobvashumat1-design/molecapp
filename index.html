@@ -711,6 +711,7 @@ textarea:focus{border-color:var(--accent)}
         <div class="card" style="padding:0 16px">
           <div class="setting-row"><div class="setting-label">все пользователи</div><div class="setting-value" onclick="Admin.openUsers()"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
           <div class="setting-row"><div class="setting-label">объявление в ленту</div><div class="setting-value" onclick="Admin.makeAnnouncement()"><span style="color:var(--accent)">создать</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          <div class="setting-row"><div class="setting-label">удалить пост по ID</div><div class="setting-value" onclick="Admin.deleteById()"><span style="color:#f75c5c">удалить</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
           <div class="setting-row"><div class="setting-label">закрепить пост (ID)</div><div class="setting-value" onclick="Admin.pinPost()"><span style="color:var(--accent)">закрепить</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         </div>
       </div>
@@ -2515,7 +2516,7 @@ const Feed = {
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           комменты
         </button>
-        ${(uid===ADMIN_ID||uid===p.user_id)?`<button class="post-delete-btn" onclick="Feed.deletePost('${p.id}')">🗑</button>`:''}
+        ${uid===ADMIN_ID?`<button class="post-action-btn" style="font-size:10px;color:var(--muted);margin-left:auto" onclick="Feed.copyPostId('${p.id}')" title="скопировать ID">ID</button>`:''}
       </div>
       <div id="comments-${p.id}" style="display:none"></div>
     </div>`;
@@ -2587,6 +2588,19 @@ const Feed = {
     await supaFetch('posts?id=eq.' + postId, { method: 'DELETE' });
     const el = document.getElementById('post-' + postId);
     if(el) { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(), 300); }
+  },
+
+  copyPostId(postId) {
+    navigator.clipboard.writeText(postId)
+      .then(() => {
+        // Показать тост
+        const toast = document.createElement('div');
+        toast.textContent = 'ID скопирован';
+        toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:8px 18px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+      })
+      .catch(() => alert('ID поста: ' + postId));
   },
 
   showSearch() {
@@ -2787,10 +2801,23 @@ const Admin = {
   },
 
   pinPost() {
-    const id=prompt('ID поста (из адреса или консоли):');if(!id) return;
+    const id=prompt('ID поста (скопируй кнопкой ID в ленте):');if(!id) return;
     STATE.set('mlk_pinned_post',id.trim());
     alert('✓ закреплено');
     if(App.currentTab==='feed') Feed.load();
+  },
+
+  async deleteById() {
+    const id = prompt('ID поста для удаления:'); if(!id) return;
+    const trimmed = id.trim();
+    await supaFetch('comments?post_id=eq.' + trimmed, { method: 'DELETE' });
+    const res = await supaFetch('posts?id=eq.' + trimmed, { method: 'DELETE' });
+    const toast = document.createElement('div');
+    toast.textContent = res !== null ? '✓ пост удалён' : 'ошибка — проверь ID';
+    toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:8px 18px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+    if(App.currentTab === 'feed') Feed.load();
   },
 
   async makeAnnouncement() {
