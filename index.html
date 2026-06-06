@@ -171,6 +171,46 @@ input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
 
 
 
+
+/* SOCIAL */
+.feed-post{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+.post-header{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
+.post-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--accent)}
+.post-meta{flex:1;min-width:0}
+.post-author{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post-time{font-size:11px;color:var(--muted);margin-top:1px}
+.post-text{padding:10px 14px;font-size:14px;line-height:1.6;color:var(--text)}
+.post-img{width:100%;max-height:320px;object-fit:cover;display:block}
+.post-actions{display:flex;align-items:center;gap:16px;padding:10px 14px 14px}
+.post-action-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;padding:4px 0;font-family:var(--font);transition:color .15s}
+.post-action-btn.liked{color:var(--accent)}
+.post-action-btn:active{transform:scale(.93)}
+.post-compose{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.compose-row{display:flex;align-items:flex-start;gap:10px}
+.compose-input{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:var(--font);resize:none;line-height:1.6;min-height:40px;padding-top:4px}
+.compose-actions{display:flex;align-items:center;gap:8px;margin-top:10px;border-top:1px solid var(--card-border);padding-top:10px}
+.compose-img-preview{width:60px;height:60px;border-radius:8px;object-fit:cover;margin-top:8px}
+.friend-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px;margin-bottom:11px;display:flex;align-items:center;gap:12px}
+.friend-avatar{width:44px;height:44px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid var(--accent)}
+.friend-info{flex:1;min-width:0}
+.friend-name{font-size:15px;font-weight:700}
+.friend-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.friend-btn{padding:7px 14px;border-radius:50px;font-size:12px;font-weight:700;border:1px solid var(--card-border);background:var(--card);color:var(--text);cursor:pointer;font-family:var(--font);transition:.15s;white-space:nowrap}
+.friend-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.friend-btn.pending{color:var(--muted)}
+.comments-wrap{border-top:1px solid var(--card-border);padding:10px 14px}
+.comment-item{display:flex;gap:8px;margin-bottom:8px}
+.comment-bubble{background:var(--bg);border-radius:12px;padding:8px 12px;flex:1}
+.comment-author{font-size:12px;font-weight:700;margin-bottom:2px}
+.comment-text{font-size:13px;color:var(--text);line-height:1.5}
+.comment-input-row{display:flex;gap:8px;margin-top:6px}
+.comment-input{flex:1;background:var(--bg);border:1px solid var(--card-border);border-radius:50px;padding:8px 14px;font-size:13px;color:var(--text);outline:none;font-family:var(--font)}
+.stats-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stats-mini-card{background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center}
+.stats-mini-val{font-size:18px;font-weight:800;color:var(--accent)}
+.stats-mini-label{font-size:10px;color:var(--muted);margin-top:2px}
+.user-code-badge{background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--accent);cursor:pointer;text-align:center;margin-bottom:11px}
+
 /* PREMIUM */
 .premium-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#f7c948,#fb923c);color:#000;font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px;letter-spacing:.3px}
 .btn-premium{background:linear-gradient(135deg,#f7c948,#fb923c);color:#000;font-weight:800;box-shadow:0 4px 20px rgba(247,201,72,.35);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:var(--radius-sm);border:none;font-size:16px;cursor:pointer;transition:all .2s;font-family:var(--font);text-decoration:none}
@@ -713,16 +753,16 @@ textarea:focus{border-color:var(--accent)}
 <!-- NAVBAR -->
 <nav class="navbar" id="main-nav" style="display:none">
   <button class="nav-btn active" id="nav-home" onclick="App.switchTab('home')">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>главная</span>
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>дом</span>
   </button>
-  <button class="nav-btn" id="nav-stats" onclick="App.switchTab('stats')">
-    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>стат</span>
+  <button class="nav-btn" id="nav-feed" onclick="App.switchTab('feed')">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>лента</span>
+  </button>
+  <button class="nav-btn" id="nav-friends" onclick="App.switchTab('friends')">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>друзья</span>
   </button>
   <button class="nav-btn" id="nav-diary" onclick="App.switchTab('diary')">
     <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>дневник</span>
-  </button>
-  <button class="nav-btn" id="nav-achievements" onclick="App.switchTab('achievements')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg><span>медали</span>
   </button>
   <button class="nav-btn" id="nav-profile" onclick="App.switchTab('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>я</span>
@@ -847,6 +887,7 @@ const App={
       this.applyTheme(u.theme||'dark',u.accent||'blue');
       if(u.custom_accent) setTimeout(()=>Profile.setCustomAccent(u.custom_accent),0);
       this.showApp();
+      setTimeout(syncProfile, 2000);
     } else {
       this.applyTheme('dark','blue');
       document.getElementById('onboard-tagline').textContent=TAGLINES[Math.floor(Math.random()*TAGLINES.length)];
@@ -874,7 +915,7 @@ const App={
   },
   switchTab(tab){
     this.currentTab=tab;
-    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm'].forEach(t=>{
+    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile'].forEach(t=>{
       const btn=document.getElementById('nav-'+t);
       const scr=document.getElementById('screen-'+t);
       if(btn) btn.classList.toggle('active',t===tab);
@@ -886,6 +927,8 @@ const App={
     if(tab==='profile') Reminders.load();
     if(tab==='achievements') Achievements.render();
     if(tab==='diary') Diary.render();
+    if(tab==='feed'){Feed.init();Feed.load();}
+    if(tab==='friends'){Friends.init();Friends.load();}
     if(tab==='premium') Premium.refreshScreen();
     if(tab==='schedule'){if(!Premium.isPro()){App.switchTab('premium');return;}Schedule.load();}
     if(tab==='sides'){if(!Premium.isPro()){App.switchTab('premium');return;}SideEffects.render();}
@@ -2001,6 +2044,384 @@ const Reminders = {
   }
 };
 
+
+// ══════════════════════════════════════════════════════
+// SUPABASE CLIENT
+// ══════════════════════════════════════════════════════
+const SUPA_URL = 'https://tiosxjaebjrhdqrpthsy.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpb3N4amFlYmpyaGRxcnB0aHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDcxNjIsImV4cCI6MjA5NjI4MzE2Mn0.7yYtomQpYcxyTHvOuRgz6amFQ1W69076AIbbundw6yM';
+
+async function supaFetch(path, opts={}) {
+  const r = await fetch(SUPA_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || '',
+      ...opts.headers
+    },
+    method: opts.method || 'GET',
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if(!r.ok && r.status !== 204) {
+    const e = await r.text();
+    console.error('Supabase error:', e);
+    return null;
+  }
+  if(r.status === 204) return {};
+  return r.json();
+}
+
+// ══════════════════════════════════════════════════════
+// USER ID — генерируем один раз, храним в localStorage
+// ══════════════════════════════════════════════════════
+function getMyUserId() {
+  let id = STATE.get('mlk_uid');
+  if(!id) {
+    id = 'U' + Math.random().toString(36).slice(2,8).toUpperCase();
+    STATE.set('mlk_uid', id);
+  }
+  return id;
+}
+
+async function syncProfile() {
+  const u = getUser(); if(!u) return;
+  const uid = getMyUserId();
+  await supaFetch('profiles?id=eq.' + uid, {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates',
+    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'' }
+  });
+  // Sync stats
+  const h = getHistory();
+  const today = getTodayData();
+  await supaFetch('stats?user_id=eq.' + uid, {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates',
+    body: { user_id: uid, data: { weight: u.weight, course: u.course, history: h, today }, updated_at: new Date().toISOString() }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// FEED
+// ══════════════════════════════════════════════════════
+const Feed = {
+  _photo: null,
+  _attachStats: false,
+  _inited: false,
+
+  init() {
+    const u = getUser(); if(!u) return;
+    const av = document.getElementById('feed-my-avatar');
+    if(av) av.textContent = u.avatar_emoji || u.name?.[0]?.toUpperCase() || '👤';
+    syncProfile();
+  },
+
+  onComposeInput() {
+    const txt = document.getElementById('compose-text').value.trim();
+    const btn = document.getElementById('compose-send-btn');
+    if(!btn) return;
+    const hasContent = txt.length > 0 || this._photo;
+    btn.style.opacity = hasContent ? '1' : '.4';
+    btn.style.pointerEvents = hasContent ? 'auto' : 'none';
+  },
+
+  pickPhoto() {
+    document.getElementById('feed-photo-input').click();
+  },
+
+  handlePhoto(e) {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 800; const scale = Math.min(1, maxW/img.width);
+        canvas.width = img.width*scale; canvas.height = img.height*scale;
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        this._photo = canvas.toDataURL('image/jpeg', 0.75);
+        const prev = document.getElementById('compose-img-preview');
+        if(prev) { prev.src = this._photo; prev.style.display = 'block'; }
+        this.onComposeInput();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  },
+
+  attachStats() {
+    this._attachStats = !this._attachStats;
+    const btn = document.querySelector('[onclick="Feed.attachStats()"]');
+    if(btn) btn.style.color = this._attachStats ? 'var(--accent)' : 'var(--muted)';
+    if(this._attachStats) {
+      const txt = document.getElementById('compose-text');
+      if(txt && !txt.value) txt.value = '';
+    }
+    this.onComposeInput();
+  },
+
+  async publish() {
+    const txt = document.getElementById('compose-text').value.trim();
+    if(!txt && !this._photo) return;
+    const u = getUser(); if(!u) return;
+    const uid = getMyUserId();
+    const btn = document.getElementById('compose-send-btn');
+    if(btn) { btn.textContent = '...'; btn.style.pointerEvents = 'none'; }
+
+    let statsSnippet = null;
+    if(this._attachStats) {
+      const d = getTodayData();
+      statsSnippet = { water: d.water||0, kcal: d.kcal||0, steps: d.steps||0, capsules: d.capsules||0, weight: u.weight };
+    }
+
+    const post = {
+      user_id: uid,
+      user_name: u.name || 'пользователь',
+      user_emoji: u.avatar_emoji || '',
+      text: txt,
+      image_url: this._photo || null,
+      stats: statsSnippet,
+      likes: []
+    };
+
+    await supaFetch('posts', { method: 'POST', prefer: 'return=minimal', body: post });
+
+    document.getElementById('compose-text').value = '';
+    this._photo = null; this._attachStats = false;
+    const prev = document.getElementById('compose-img-preview');
+    if(prev) { prev.style.display = 'none'; }
+    if(btn) { btn.textContent = 'опубликовать'; }
+    this.onComposeInput();
+    this.load();
+  },
+
+  async load() {
+    const el = document.getElementById('feed-list'); if(!el) return;
+    el.innerHTML = '<div class="empty" style="padding:40px 0">загрузка...</div>';
+    const posts = await supaFetch('posts?order=created_at.desc&limit=30');
+    if(!posts || !posts.length) {
+      el.innerHTML = '<div class="empty" style="padding:40px 0">постов пока нет — будь первым!</div>';
+      return;
+    }
+    el.innerHTML = posts.map(p => this._renderPost(p)).join('');
+  },
+
+  _renderPost(p) {
+    const uid = getMyUserId();
+    const liked = (p.likes||[]).includes(uid);
+    const time = new Date(p.created_at).toLocaleDateString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const statsHtml = p.stats ? `<div class="stats-mini-grid">
+      <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.capsules||0}</div><div class="stats-mini-label">капсулы</div></div>
+      <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.water||0}л</div><div class="stats-mini-label">вода</div></div>
+      <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.weight||'—'}</div><div class="stats-mini-label">кг</div></div>
+    </div>` : '';
+    return `<div class="feed-post" id="post-${p.id}">
+      <div class="post-header">
+        <div class="post-avatar">${p.user_emoji||p.user_name?.[0]?.toUpperCase()||'👤'}</div>
+        <div class="post-meta"><div class="post-author">${p.user_name||'пользователь'}</div><div class="post-time">${time}</div></div>
+      </div>
+      ${p.text?`<div class="post-text">${p.text}</div>`:''}
+      ${p.image_url?`<img class="post-img" src="${p.image_url}" loading="lazy">`:''}
+      ${statsHtml?`<div style="padding:0 14px 10px">${statsHtml}</div>`:''}
+      <div class="post-actions">
+        <button class="post-action-btn${liked?' liked':''}" onclick="Feed.toggleLike('${p.id}')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="${liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          ${(p.likes||[]).length}
+        </button>
+        <button class="post-action-btn" onclick="Feed.toggleComments('${p.id}')">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          комменты
+        </button>
+      </div>
+      <div id="comments-${p.id}" style="display:none"></div>
+    </div>`;
+  },
+
+  async toggleLike(postId) {
+    const uid = getMyUserId();
+    const posts = await supaFetch('posts?id=eq.' + postId);
+    if(!posts||!posts.length) return;
+    const post = posts[0];
+    let likes = post.likes || [];
+    if(likes.includes(uid)) likes = likes.filter(x=>x!==uid);
+    else likes.push(uid);
+    await supaFetch('posts?id=eq.' + postId, { method: 'PATCH', body: { likes } });
+    this.load();
+  },
+
+  async toggleComments(postId) {
+    const wrap = document.getElementById('comments-' + postId); if(!wrap) return;
+    if(wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    wrap.innerHTML = '<div style="padding:10px 14px;color:var(--muted);font-size:13px">загрузка...</div>';
+    const comments = await supaFetch('comments?post_id=eq.' + postId + '&order=created_at.asc');
+    const u = getUser();
+    const uid = getMyUserId();
+    wrap.innerHTML = `<div class="comments-wrap">
+      ${(comments||[]).map(c=>`<div class="comment-item">
+        <div class="post-avatar" style="width:28px;height:28px;font-size:14px">${c.user_name?.[0]?.toUpperCase()||'?'}</div>
+        <div class="comment-bubble"><div class="comment-author">${c.user_name}</div><div class="comment-text">${c.text}</div></div>
+      </div>`).join('')}
+      <div class="comment-input-row">
+        <input class="comment-input" id="comment-input-${postId}" placeholder="написать комментарий..." onkeydown="if(event.key==='Enter')Feed.sendComment('${postId}')">
+        <button class="friend-btn primary" onclick="Feed.sendComment('${postId}')">→</button>
+      </div>
+    </div>`;
+  },
+
+  async sendComment(postId) {
+    const input = document.getElementById('comment-input-' + postId); if(!input) return;
+    const text = input.value.trim(); if(!text) return;
+    const u = getUser();
+    await supaFetch('comments', { method: 'POST', prefer: 'return=minimal', body: {
+      post_id: postId, user_id: getMyUserId(), user_name: u?.name||'пользователь', text
+    }});
+    input.value = '';
+    this.toggleComments(postId);
+    setTimeout(()=>this.toggleComments(postId), 100);
+  },
+
+  showSearch() {
+    const q = prompt('поиск по ленте:'); if(!q) return;
+    // simple client-side filter
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// FRIENDS
+// ══════════════════════════════════════════════════════
+const Friends = {
+  _inited: false,
+
+  init() {
+    const uid = getMyUserId();
+    const el = document.getElementById('my-user-code');
+    if(el) el.textContent = uid + ' (нажми чтобы скопировать)';
+    syncProfile();
+  },
+
+  copyCode() {
+    const uid = getMyUserId();
+    navigator.clipboard.writeText(uid).then(()=>alert('код скопирован: ' + uid)).catch(()=>alert('твой код: ' + uid));
+  },
+
+  showAdd() {
+    const block = document.getElementById('friends-add-block');
+    if(block) block.style.display = block.style.display==='none'?'block':'none';
+  },
+
+  async addByCode() {
+    const code = document.getElementById('friend-code-input').value.trim().toUpperCase();
+    const res = document.getElementById('friend-add-result');
+    if(!code||code.length<4) { res.style.color='#f75c5c'; res.textContent='введи код'; return; }
+    const uid = getMyUserId();
+    if(code === uid) { res.style.color='#f75c5c'; res.textContent='это твой собственный код'; return; }
+    res.style.color='var(--muted)'; res.textContent='ищем...';
+    const profiles = await supaFetch('profiles?id=eq.' + code);
+    if(!profiles||!profiles.length) { res.style.color='#f75c5c'; res.textContent='пользователь не найден'; return; }
+    const friend = profiles[0];
+    // Check already friends
+    const existing = await supaFetch('friends?user_id=eq.' + uid + '&friend_id=eq.' + code);
+    if(existing&&existing.length) { res.style.color='#f75c5c'; res.textContent='уже в друзьях или заявка отправлена'; return; }
+    await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: code, status:'pending' }});
+    res.style.color='#34c77b'; res.textContent='✓ заявка отправлена ' + (friend.name||code);
+    document.getElementById('friend-code-input').value = '';
+    setTimeout(()=>this.load(), 500);
+  },
+
+  async load() {
+    const uid = getMyUserId();
+    // Load incoming requests
+    const requests = await supaFetch('friends?friend_id=eq.' + uid + '&status=eq.pending');
+    const reqSection = document.getElementById('friends-requests-section');
+    const reqList = document.getElementById('friends-requests-list');
+    if(requests&&requests.length&&reqSection&&reqList) {
+      reqSection.style.display='block';
+      // Get profiles
+      const ids = requests.map(r=>r.user_id).join(',');
+      const profiles = await supaFetch('profiles?id=in.(' + ids + ')');
+      const profileMap = {};
+      (profiles||[]).forEach(p=>profileMap[p.id]=p);
+      reqList.innerHTML = requests.map(r=>{
+        const p = profileMap[r.user_id]||{};
+        return `<div class="friend-card">
+          <div class="friend-avatar">${p.avatar_emoji||p.name?.[0]?.toUpperCase()||'👤'}</div>
+          <div class="friend-info"><div class="friend-name">${p.name||r.user_id}</div><div class="friend-sub">хочет дружить</div></div>
+          <button class="friend-btn primary" onclick="Friends.accept('${r.id}','${r.user_id}')">принять</button>
+        </div>`;
+      }).join('');
+    } else if(reqSection) reqSection.style.display='none';
+
+    // Load confirmed friends (both directions)
+    const sentFriends = await supaFetch('friends?user_id=eq.' + uid + '&status=eq.accepted');
+    const recvFriends = await supaFetch('friends?friend_id=eq.' + uid + '&status=eq.accepted');
+    const allFriendIds = [...new Set([...(sentFriends||[]).map(f=>f.friend_id), ...(recvFriends||[]).map(f=>f.user_id)])];
+    const friendsList = document.getElementById('friends-list');
+    if(!allFriendIds.length) {
+      if(friendsList) friendsList.innerHTML='<div class="empty" style="padding:20px 0">друзей пока нет</div>';
+      return;
+    }
+    const profiles = await supaFetch('profiles?id=in.(' + allFriendIds.join(',') + ')');
+    if(friendsList) {
+      friendsList.innerHTML = (profiles||[]).map(p=>`<div class="friend-card" onclick="Friends.openProfile('${p.id}')">
+        <div class="friend-avatar">${p.avatar_emoji||p.name?.[0]?.toUpperCase()||'👤'}</div>
+        <div class="friend-info"><div class="friend-name">${p.name||p.id}</div><div class="friend-sub">${p.course||''} · смотреть статистику →</div></div>
+      </div>`).join('');
+    }
+  },
+
+  async accept(friendshipId, fromUserId) {
+    const uid = getMyUserId();
+    await supaFetch('friends?id=eq.' + friendshipId, { method:'PATCH', body:{ status:'accepted' }});
+    // Create reverse friendship too
+    await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: fromUserId, status:'accepted' }});
+    this.load();
+  },
+
+  async openProfile(friendId) {
+    App.switchTab('friend-profile');
+    const nameEl = document.getElementById('friend-profile-name');
+    const contentEl = document.getElementById('friend-profile-content');
+    if(contentEl) contentEl.innerHTML = '<div class="empty" style="padding:40px 0">загрузка...</div>';
+    const profiles = await supaFetch('profiles?id=eq.' + friendId);
+    const friend = profiles?.[0]||{};
+    if(nameEl) nameEl.textContent = friend.name || friendId;
+    const statsData = await supaFetch('stats?user_id=eq.' + friendId);
+    const stats = statsData?.[0]?.data||{};
+    const h = stats.history || {};
+    const days = Object.keys(h).sort().slice(-7);
+    const avgWater = days.length ? (days.reduce((s,k)=>s+(h[k].water||0),0)/days.length).toFixed(1) : '—';
+    const avgKcal = days.length ? Math.round(days.reduce((s,k)=>s+(h[k].kcal||0),0)/days.length) : '—';
+    const activeDays = Object.values(h).filter(d=>d.capsules>0).length;
+    if(contentEl) contentEl.innerHTML = `
+      <div style="padding:16px">
+        <div class="card" style="padding:20px;text-align:center;margin-bottom:14px;background:linear-gradient(135deg,var(--accent-soft),transparent)">
+          <div style="font-size:48px;margin-bottom:8px">${friend.avatar_emoji||'👤'}</div>
+          <div style="font-size:20px;font-weight:800">${friend.name||friendId}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px">курс: ${friend.course||'—'}</div>
+          ${stats.weight?`<div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:8px">${stats.weight} кг</div>`:''}</div>
+        <div class="section-head"><h3>статистика за 7 дней</h3></div>
+        <div class="stats-mini-grid" style="margin-bottom:14px">
+          <div class="stats-mini-card"><div class="stats-mini-val">${avgWater}л</div><div class="stats-mini-label">вода / день</div></div>
+          <div class="stats-mini-card"><div class="stats-mini-val">${avgKcal}</div><div class="stats-mini-label">ккал / день</div></div>
+          <div class="stats-mini-card"><div class="stats-mini-val">${activeDays}</div><div class="stats-mini-label">активных дней</div></div>
+        </div>
+        <div class="section-head"><h3>последние 7 дней</h3></div>
+        <div class="card" style="padding:0 16px;margin-bottom:14px">
+          ${days.reverse().map(k=>{
+            const d=h[k]||{};
+            return `<div class="report-metric">
+              <span style="font-size:13px">${k.slice(5).replace('-','.')}</span>
+              <span style="font-size:12px;color:var(--muted)">💊${d.capsules||0} 💧${d.water||0}л ${d.weight?`⚖️${d.weight}кг`:''}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+};
+
 // ══════════════════════════════════════════════════════
 // PREMIUM
 // ══════════════════════════════════════════════════════
@@ -2650,6 +3071,80 @@ Install.init();
     <div class="card" style="padding:18px;margin-bottom:14px" id="biorhythm-insight"></div>
     <div class="card" style="padding:18px;margin-bottom:14px"><div style="font-size:13px;color:var(--muted);line-height:1.7">у каждого есть свой биоритм веса — дни когда весы показывают больше или меньше из-за задержки воды, режима сна и питания. зная свой паттерн, ты не будешь паниковать в «тяжёлые» дни.</div></div>
   </div>
+</div>
+
+
+<!-- FEED -->
+<div id="screen-feed" class="screen">
+  <div class="home-header status-pad">
+    <h2>лента</h2>
+    <button onclick="Feed.showSearch()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px">🔍</button>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <!-- Compose -->
+    <div class="post-compose">
+      <div class="compose-row">
+        <div class="post-avatar" id="feed-my-avatar">👤</div>
+        <textarea class="compose-input" id="compose-text" placeholder="поделись своим прогрессом..." rows="2" oninput="Feed.onComposeInput()"></textarea>
+      </div>
+      <img id="compose-img-preview" class="compose-img-preview" style="display:none">
+      <div class="compose-actions">
+        <button onclick="Feed.pickPhoto()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0">📷</button>
+        <button onclick="Feed.attachStats()" style="background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;padding:0;color:var(--accent)">+ статистика</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary btn-sm" id="compose-send-btn" onclick="Feed.publish()" style="padding:8px 18px;border-radius:50px;opacity:.4;pointer-events:none">опубликовать</button>
+      </div>
+    </div>
+    <input type="file" id="feed-photo-input" accept="image/*" style="display:none" onchange="Feed.handlePhoto(event)">
+    <!-- Posts -->
+    <div id="feed-list"><div class="empty" style="padding:40px 0">загрузка ленты...</div></div>
+  </div>
+</div>
+
+<!-- FRIENDS -->
+<div id="screen-friends" class="screen">
+  <div class="home-header status-pad">
+    <h2>друзья</h2>
+    <button onclick="Friends.showAdd()" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;padding:4px">+ добавить</button>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <!-- My code -->
+    <div class="section-head"><h3>мой код</h3></div>
+    <div class="user-code-badge" id="my-user-code" onclick="Friends.copyCode()">загрузка...</div>
+    <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px">поделись кодом — друг добавит тебя</div>
+
+    <!-- Add by code -->
+    <div id="friends-add-block" style="display:none;margin-bottom:14px">
+      <div class="card" style="padding:18px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px">введи код друга</div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="friend-code-input" placeholder="USER-XXXX" style="flex:1;text-transform:uppercase;letter-spacing:1px" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-primary btn-sm" onclick="Friends.addByCode()" style="white-space:nowrap">найти</button>
+        </div>
+        <div id="friend-add-result" style="font-size:12px;margin-top:8px;min-height:16px"></div>
+      </div>
+    </div>
+
+    <!-- Incoming requests -->
+    <div id="friends-requests-section" style="display:none">
+      <div class="section-head"><h3>заявки</h3></div>
+      <div id="friends-requests-list"></div>
+    </div>
+
+    <!-- Friends list -->
+    <div class="section-head"><h3>мои друзья</h3></div>
+    <div id="friends-list"><div class="empty" style="padding:20px 0">друзей пока нет</div></div>
+  </div>
+</div>
+
+<!-- FRIEND PROFILE -->
+<div id="screen-friend-profile" class="screen">
+  <div class="home-header status-pad">
+    <button onclick="App.switchTab('friends')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px">←</button>
+    <h2 id="friend-profile-name">профиль</h2>
+    <div style="width:32px"></div>
+  </div>
+  <div class="scroll" style="padding-top:4px" id="friend-profile-content"></div>
 </div>
 
 <!-- PWA INSTALL BANNER -->
