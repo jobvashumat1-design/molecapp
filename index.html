@@ -43,8 +43,10 @@ html{height:100%;height:-webkit-fill-available;}body{height:100%;height:-webkit-
 .btn-ghost{background:var(--card);border:1px solid var(--card-border);color:var(--text)}.btn-ghost:active{transform:scale(.97)}
 .btn-danger{background:rgba(247,92,92,.12);border:1px solid rgba(247,92,92,.25);color:#f75c5c}
 .btn-sm{padding:9px 18px;width:auto;font-size:14px}
-input[type="text"],input[type="number"]{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:13px 15px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color .2s;font-family:var(--font)}
+input[type="text"],input[type="number"],input[type="password"]{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:13px 15px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color .2s;font-family:var(--font)}
+input[type="time"]{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:16px;color:var(--text);outline:none;font-family:var(--font)}
 input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px var(--card) inset!important;-webkit-text-fill-color:var(--text)!important;border-color:var(--accent)!important;caret-color:var(--text)}
 .input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
 .input-group label{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.3px}
 .progress-wrap{background:var(--card);border-radius:50px;overflow:hidden;height:8px;width:100%}
@@ -203,6 +205,42 @@ input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
 .user-profile-stat-label{font-size:11px;color:var(--muted);margin-top:2px}
 .user-profile-stat+.user-profile-stat{border-left:1px solid var(--card-border)}
 
+
+
+.password-banner{position:fixed;bottom:70px;left:16px;right:16px;max-width:398px;margin:0 auto;background:linear-gradient(135deg,#f7c948,#fb923c);border-radius:var(--radius);padding:14px 16px;z-index:500;box-shadow:0 4px 24px rgba(247,201,72,.4);animation:slide-up .3s ease}
+@keyframes slide-up{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.password-banner-title{font-size:14px;font-weight:800;color:#000;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.password-banner-text{font-size:12px;color:rgba(0,0,0,.7);line-height:1.5;margin-bottom:10px}
+.password-banner-btns{display:flex;gap:8px}
+.password-banner-btn{flex:1;padding:8px;border-radius:50px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.password-banner-btn.primary{background:#000;color:#fff}
+.password-banner-btn.ghost{background:rgba(0,0,0,.12);color:#000}
+
+/* AUTH */
+.auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:var(--bg)}
+.auth-logo{font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;color:var(--text)}
+.auth-sub{font-size:14px;color:var(--muted);margin-bottom:40px;text-align:center;line-height:1.6}
+.auth-tabs{display:flex;background:var(--card);border-radius:50px;padding:3px;margin-bottom:24px;width:100%;max-width:300px}
+.auth-tab{flex:1;padding:8px;border-radius:50px;border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--muted);transition:.2s}
+.auth-tab.active{background:var(--accent);color:#fff}
+.auth-form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
+.auth-error{color:#f75c5c;font-size:13px;text-align:center;min-height:18px}
+.auth-hint{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;margin-top:8px}
+/* REACTIONS */
+.reactions-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.reaction-chip{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:50px;background:var(--card);border:1px solid var(--card-border);font-size:12px;cursor:pointer;transition:.15s;user-select:none}
+.reaction-chip.mine{background:var(--accent-soft);border-color:var(--accent)}
+.reaction-chip:active{transform:scale(.92)}
+.reaction-count{font-size:11px;font-weight:600;color:var(--muted)}
+.emoji-picker-wrap{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.5)}
+.emoji-picker{background:var(--card);border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:430px;max-height:60vh;overflow-y:auto}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:12px}
+.emoji-btn{font-size:24px;padding:8px;border-radius:8px;border:none;background:none;cursor:pointer;text-align:center;transition:.15s}
+.emoji-btn:active{background:var(--accent-soft);transform:scale(.9)}
+.reply-bubble{margin-left:36px;margin-top:-4px;margin-bottom:8px;background:var(--bg);border-left:2px solid var(--accent);border-radius:0 8px 8px 0;padding:6px 10px}
+.reply-author{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.reply-text{font-size:12px;color:var(--muted);line-height:1.4}
+
 /* SOCIAL */
 .feed-post{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
 .post-header{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
@@ -270,7 +308,8 @@ input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
 .intensity-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--card-border);background:var(--card);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;color:var(--muted)}
 .intensity-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .time-input{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:16px;color:var(--text);width:100%;outline:none;transition:border-color .2s;font-family:var(--font)}
-.time-input:focus{border-color:var(--accent)}
+.time-input[type="time"]{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:16px;color:var(--text);outline:none;font-family:var(--font)}
+input:focus{border-color:var(--accent)}
 .capsule-time-card{background:linear-gradient(135deg,var(--accent-soft),transparent);border:1px solid var(--accent);border-radius:var(--radius);padding:18px;margin-bottom:11px}
 .capsule-time-card h3{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:4px}
 .capsule-time-card .time-big{font-size:32px;font-weight:800;letter-spacing:-.5px;margin:6px 0}
@@ -313,6 +352,27 @@ textarea:focus{border-color:var(--accent)}
 </style>
 </head>
 <body>
+
+
+<!-- AUTH SCREEN -->
+<div id="screen-auth" class="screen active" style="z-index:200">
+  <div class="auth-screen">
+    <div class="auth-logo">mlklavmeste</div>
+    <div class="auth-sub">войди или создай аккаунт<br>чтобы начать</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-login" onclick="Auth.switchTab('login')">войти</button>
+      <button class="auth-tab" id="auth-tab-reg" onclick="Auth.switchTab('reg')">создать</button>
+    </div>
+    <div class="auth-form">
+      <input type="text" id="auth-username" placeholder="username" style="text-transform:lowercase" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_.]/g,'')">
+      <input type="password" id="auth-password" placeholder="пароль" onkeydown="if(event.key==='Enter')Auth.submit()">
+      <input type="password" id="auth-password2" placeholder="повтори пароль" style="display:none" onkeydown="if(event.key==='Enter')Auth.submit()">
+      <div class="auth-error" id="auth-error"></div>
+      <button class="btn btn-primary" onclick="Auth.submit()" id="auth-submit-btn">войти</button>
+      <div class="auth-hint" id="auth-hint">забыл пароль — увы, восстановление не предусмотрено.<br>запиши пароль в надёжном месте.</div>
+    </div>
+  </div>
+</div>
 
 <!-- ONBOARDING -->
 <div id="screen-onboard" class="screen">
@@ -733,6 +793,14 @@ textarea:focus{border-color:var(--accent)}
         <div class="setting-row"><div class="setting-label">версия</div><div class="setting-value"><span id="app-version-display" style="color:var(--muted)">2.5.0</span></div></div>
         <div class="setting-row"><div class="setting-label">что нового</div><div class="setting-value" onclick="App.switchTab('changelog')"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">обновить приложение</div><div class="setting-value"><button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button></div></div>
+      </div>
+    </div>
+    <div class="section-head" style="padding:0 16px"><h3>аккаунт</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row"><div class="setting-label" style="color:var(--muted)">вошёл как</div><div class="setting-value"><span id="profile-auth-username" style="color:var(--accent);font-weight:700"></span></div></div>
+        <div class="setting-row" id="set-password-row"><div class="setting-label">установить пароль</div><div class="setting-value" onclick="Auth.showSetPassword()"><span style="color:var(--accent)">создать</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label" style="color:#f75c5c">выйти из аккаунта</div><div class="setting-value" onclick="Auth.logout()"><svg viewBox="0 0 24 24" fill="none" stroke="#f75c5c" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div></div>
       </div>
     </div>
     <div class="section-head" style="padding:0 16px"><h3>приложение</h3></div>
@@ -1808,6 +1876,11 @@ const Profile={
     if(setAvatarPhoto) setAvatarPhoto.textContent=u.avatar_url?'изменить фото':'загрузить фото';
     document.getElementById('profile-name-el').textContent=u.name||'пользователь';
     const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
+    const authEl=document.getElementById('profile-auth-username');
+    const auth=STATE.get('mlk_auth');
+    if(authEl){authEl.textContent=auth?'@'+auth.username:u.username?'@'+u.username:'без аккаунта';}
+    const setPwRow=document.getElementById('set-password-row');
+    if(setPwRow) setPwRow.style.display=auth?'none':'flex';
     const adminSec=document.getElementById('admin-panel-section');
     if(adminSec) adminSec.style.display=isAdmin()?'block':'none';
     const psTxt=document.getElementById('premium-status-text');
@@ -1927,7 +2000,7 @@ const Profile={
     document.getElementById('edit-modal').classList.add('open');
     setTimeout(()=>{const inp=document.getElementById('edit-input');if(inp) inp.focus();},350);
   },
-  saveField(){
+  async saveField(){
     const u=getUser();const f=this._editingField;
     if(f==='gender'){u.gender=document.getElementById('edit-gender-val').value;}
     else if(f==='course'){u.course=document.getElementById('edit-course-val').value;}
@@ -1937,8 +2010,11 @@ const Profile={
       else if(f==='avatar_emoji'){u.avatar_emoji=v.trim();}
       else if(f==='username'){
         const clean=v.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'');
+        if(clean.length<3){alert('username минимум 3 символа');return;}
+        // Check uniqueness
+        const existing=await supaFetch('profiles?username=eq.'+clean+'&id=neq.'+getMyUserId());
+        if(existing&&existing.length){alert('username @'+clean+' уже занят');return;}
         u.username=clean;
-        // Sync username to Supabase
         setTimeout(()=>syncProfile(),300);
       }
       else{
@@ -2558,12 +2634,69 @@ const Feed = {
     const input = document.getElementById('comment-input-' + postId); if(!input) return;
     const text = input.value.trim(); if(!text) return;
     const u = getUser();
-    await supaFetch('comments', { method: 'POST', prefer: 'return=minimal', body: {
-      post_id: postId, user_id: getMyUserId(), user_name: u?.name||'пользователь', text
+    await supaFetch('comments', { method: 'POST', body: {
+      post_id: postId, user_id: getMyUserId(), user_name: u?.name||'пользователь',
+      user_username: u?.username||'', text
     }});
     input.value = '';
     this.toggleComments(postId);
-    setTimeout(()=>this.toggleComments(postId), 100);
+    setTimeout(()=>this.toggleComments(postId), 150);
+  },
+
+  async toggleReaction(commentId, emoji, postId) {
+    const uid = getMyUserId();
+    // Check if already reacted
+    const existing = await supaFetch('comment_reactions?comment_id=eq.'+commentId+'&user_id=eq.'+uid+'&emoji=eq.'+encodeURIComponent(emoji));
+    if(existing && existing.length) {
+      await supaFetch('comment_reactions?id=eq.'+existing[0].id, { method: 'DELETE' });
+    } else {
+      await supaFetch('comment_reactions', { method: 'POST', body: { comment_id: commentId, user_id: uid, emoji }});
+    }
+    // Refresh comments
+    const wrap = document.querySelector('[id^="comments-"]');
+    if(postId) { this.toggleComments(postId); setTimeout(()=>this.toggleComments(postId), 150); }
+  },
+
+  showEmojiPicker(commentId, postId) {
+    const EMOJIS = ['❤️','😂','😮','😢','👍','🔥','💊','💧','💪','🎯','✨','🥗','😴','🤢','🤩','😅','👏','🙌','💎','🏆','⭐','🌟','🎉','🥰','😍','🤔','😭','😤','🌸','🦋'];
+    const overlay = document.createElement('div');
+    overlay.className = 'emoji-picker-wrap';
+    overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+    overlay.innerHTML = `<div class="emoji-picker">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">выбери реакцию</div>
+      <div class="emoji-grid">${EMOJIS.map(e=>`<button class="emoji-btn" onclick="Feed._pickEmoji('${commentId}','${e}','${postId}')">${e}</button>`).join('')}</div>
+    </div>`;
+    document.body.appendChild(overlay);
+  },
+
+  async _pickEmoji(commentId, emoji, postId) {
+    document.querySelector('.emoji-picker-wrap')?.remove();
+    await this.toggleReaction(commentId, emoji, postId);
+  },
+
+  showReply(commentId, authorName, postId) {
+    const el = document.getElementById('reply-input-'+commentId);
+    if(!el) return;
+    el.style.display = el.style.display==='none' ? 'block' : 'none';
+    if(el.style.display==='block') {
+      const inp = document.getElementById('reply-text-'+commentId);
+      if(inp) { inp.placeholder = 'ответить @'+authorName+'...'; inp.focus(); }
+    }
+  },
+
+  async sendReply(commentId, postId) {
+    const input = document.getElementById('reply-text-'+commentId); if(!input) return;
+    const text = input.value.trim(); if(!text) return;
+    const u = getUser();
+    await supaFetch('comment_replies', { method: 'POST', body: {
+      comment_id: commentId, user_id: getMyUserId(),
+      user_name: u?.name||'пользователь', user_username: u?.username||'', text
+    }});
+    input.value = '';
+    document.getElementById('reply-input-'+commentId).style.display = 'none';
+    // Refresh
+    this.toggleComments(postId);
+    setTimeout(()=>this.toggleComments(postId), 150);
   },
 
   async deletePost(postId) {
@@ -2756,6 +2889,216 @@ const Friends = {
   }
 };
 
+
+
+// ══════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════
+const Auth = {
+  _mode: 'login',
+
+  switchTab(mode) {
+    this._mode = mode;
+    document.getElementById('auth-tab-login').classList.toggle('active', mode==='login');
+    document.getElementById('auth-tab-reg').classList.toggle('active', mode==='reg');
+    document.getElementById('auth-submit-btn').textContent = mode==='login' ? 'войти' : 'создать аккаунт';
+    const p2 = document.getElementById('auth-password2');
+    if(p2) p2.style.display = mode==='reg' ? 'block' : 'none';
+    document.getElementById('auth-error').textContent = '';
+  },
+
+  async _sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  },
+
+  async submit() {
+    const username = document.getElementById('auth-username').value.trim().toLowerCase();
+    const password = document.getElementById('auth-password').value;
+    const errorEl = document.getElementById('auth-error');
+    const btn = document.getElementById('auth-submit-btn');
+
+    if(!username || username.length < 3) { errorEl.textContent = 'username минимум 3 символа'; return; }
+    if(!password || password.length < 4) { errorEl.textContent = 'пароль минимум 4 символа'; return; }
+
+    if(this._mode === 'reg') {
+      const p2 = document.getElementById('auth-password2').value;
+      if(password !== p2) { errorEl.textContent = 'пароли не совпадают'; return; }
+    }
+
+    btn.textContent = '...'; btn.disabled = true;
+    errorEl.textContent = '';
+
+    const passwordHash = await this._sha256(password + username + 'mlk_salt_2025');
+
+    if(this._mode === 'reg') {
+      // Check username taken
+      const existing = await supaFetch('accounts?username=eq.' + username);
+      if(existing && existing.length) {
+        errorEl.textContent = 'username уже занят';
+        btn.textContent = 'создать аккаунт'; btn.disabled = false;
+        return;
+      }
+      // Create account
+      const uid = 'U' + Math.random().toString(36).slice(2,8).toUpperCase();
+      const res = await supaFetch('accounts', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=minimal' },
+        body: { id: uid, username, password_hash: passwordHash }
+      });
+      if(res === null) {
+        errorEl.textContent = 'ошибка создания аккаунта';
+        btn.textContent = 'создать аккаунт'; btn.disabled = false;
+        return;
+      }
+      STATE.set('mlk_uid', uid);
+      STATE.set('mlk_auth', { uid, username, passwordHash });
+      this._afterLogin(uid, username);
+    } else {
+      // Login
+      const accounts = await supaFetch('accounts?username=eq.' + username);
+      if(!accounts || !accounts.length) {
+        errorEl.textContent = 'аккаунт не найден';
+        btn.textContent = 'войти'; btn.disabled = false;
+        return;
+      }
+      const account = accounts[0];
+      if(account.password_hash !== passwordHash) {
+        errorEl.textContent = 'неверный пароль';
+        btn.textContent = 'войти'; btn.disabled = false;
+        return;
+      }
+      STATE.set('mlk_uid', account.id);
+      STATE.set('mlk_auth', { uid: account.id, username, passwordHash });
+      this._afterLogin(account.id, username);
+    }
+  },
+
+  _afterLogin(uid, username) {
+    // Set username in user profile
+    const u = getUser();
+    if(u) {
+      u.username = username;
+      saveUser(u);
+    }
+    // Hide auth screen
+    const authEl = document.getElementById('screen-auth');
+    if(authEl) { authEl.style.display = 'none'; authEl.classList.remove('active'); }
+    // Check if onboarding needed
+    App.init();
+  },
+
+  checkSession() {
+    const auth = STATE.get('mlk_auth');
+    if(auth && auth.uid) {
+      STATE.set('mlk_uid', auth.uid);
+      return true;
+    }
+    return false;
+  },
+
+  logout() {
+    STATE.remove('mlk_auth');
+    STATE.remove('mlk_uid');
+    window.location.reload();
+  },
+
+  checkShowBanner() {
+    // Показать плашку если у пользователя нет пароля (нет записи в mlk_auth)
+    const auth = STATE.get('mlk_auth');
+    const dismissed = STATE.get('mlk_pw_banner_dismissed');
+    const u = getUser();
+    if(!u) return;
+    // Если нет auth-записи с паролем и не отклонил недавно
+    if(!auth && !dismissed) {
+      setTimeout(() => {
+        const banner = document.getElementById('password-banner');
+        if(banner) banner.style.display = 'block';
+      }, 3000); // показать через 3 сек после загрузки
+    }
+  },
+
+  dismissBanner() {
+    const banner = document.getElementById('password-banner');
+    if(banner) banner.style.display = 'none';
+    // Не показывать 3 дня
+    const until = new Date();
+    until.setDate(until.getDate() + 3);
+    STATE.set('mlk_pw_banner_dismissed', until.toISOString());
+  },
+
+  showSetPassword() {
+    const banner = document.getElementById('password-banner');
+    if(banner) banner.style.display = 'none';
+    const modal = document.getElementById('set-password-modal');
+    if(modal) modal.style.display = 'flex';
+    // Prefill username if set
+    const u = getUser();
+    if(u && u.username) {
+      const inp = document.getElementById('set-pw-username');
+      if(inp) inp.value = u.username;
+    }
+  },
+
+  hideSetPassword() {
+    const modal = document.getElementById('set-password-modal');
+    if(modal) modal.style.display = 'none';
+  },
+
+  async submitSetPassword() {
+    const username = document.getElementById('set-pw-username').value.trim().toLowerCase();
+    const password = document.getElementById('set-pw-password').value;
+    const password2 = document.getElementById('set-pw-password2').value;
+    const errorEl = document.getElementById('set-pw-error');
+    const btn = document.querySelector('#set-password-modal .btn-primary');
+
+    if(!username || username.length < 3) { errorEl.textContent = 'username минимум 3 символа'; return; }
+    if(!password || password.length < 4) { errorEl.textContent = 'пароль минимум 4 символа'; return; }
+    if(password !== password2) { errorEl.textContent = 'пароли не совпадают'; return; }
+
+    btn.textContent = '...'; btn.disabled = true;
+    errorEl.textContent = '';
+
+    // Check username
+    const uid = getMyUserId();
+    const existing = await supaFetch('accounts?username=eq.' + username);
+    if(existing && existing.length && existing[0].id !== uid) {
+      errorEl.textContent = 'username уже занят';
+      btn.textContent = 'сохранить'; btn.disabled = false;
+      return;
+    }
+
+    const passwordHash = await this._sha256(password + username + 'mlk_salt_2025');
+
+    // Upsert account
+    await supaFetch('accounts', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates' },
+      body: { id: uid, username, password_hash: passwordHash }
+    });
+
+    // Save auth session
+    STATE.set('mlk_auth', { uid, username, passwordHash });
+
+    // Update user profile
+    const u = getUser();
+    if(u) { u.username = username; saveUser(u); }
+    await syncProfile();
+
+    this.hideSetPassword();
+    STATE.remove('mlk_pw_banner_dismissed');
+
+    // Show success
+    const toast = document.createElement('div');
+    toast.textContent = '✓ пароль установлен! теперь можешь войти с любого устройства';
+    toast.style.cssText = 'position:fixed;bottom:90px;left:16px;right:16px;max-width:398px;margin:0 auto;background:var(--accent);color:#fff;padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;z-index:9999;text-align:center';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+
+    btn.textContent = 'сохранить'; btn.disabled = false;
+    if(App.currentTab === 'profile') Profile.render();
+  }
+};
 
 // ══════════════════════════════════════════════════════
 // ADMIN MODULE
@@ -3343,7 +3686,13 @@ const Install={
   }
 };
 
-App.init();
+// Check auth session
+if(Auth.checkSession()) {
+  document.getElementById('screen-auth').style.display = 'none';
+  document.getElementById('screen-auth').classList.remove('active');
+  App.init();
+}
+// else — auth screen already shown
 Install.init();
 </script>
 
@@ -3629,6 +3978,35 @@ Install.init();
   </button>
 </div>
 
+
+<!-- PASSWORD BANNER -->
+<div id="password-banner" style="display:none">
+  <div class="password-banner">
+    <div class="password-banner-title">🔐 установи пароль</div>
+    <div class="password-banner-text">
+      без пароля твой аккаунт привязан только к этому устройству. если потеряешь телефон или сотрёшь приложение — данные и доступ пропадут навсегда. пароль позволяет войти с любого устройства.
+    </div>
+    <div class="password-banner-btns">
+      <button class="password-banner-btn primary" onclick="Auth.showSetPassword()">установить пароль</button>
+      <button class="password-banner-btn ghost" onclick="Auth.dismissBanner()">позже</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET PASSWORD MODAL -->
+<div id="set-password-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center">
+  <div style="background:var(--card);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:430px">
+    <div style="font-size:18px;font-weight:800;margin-bottom:6px">🔐 создать пароль</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">выбери username и пароль — потом сможешь войти с любого устройства</div>
+    <input type="text" id="set-pw-username" placeholder="username (латиница, цифры, _ .)" style="margin-bottom:10px;text-transform:lowercase" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_.]/g,'')">
+    <input type="password" id="set-pw-password" placeholder="пароль (минимум 4 символа)" style="margin-bottom:10px">
+    <input type="password" id="set-pw-password2" placeholder="повтори пароль" style="margin-bottom:10px">
+    <div id="set-pw-error" style="color:#f75c5c;font-size:13px;min-height:18px;margin-bottom:10px"></div>
+    <button class="btn btn-primary" onclick="Auth.submitSetPassword()" style="margin-bottom:10px">сохранить</button>
+    <button onclick="Auth.hideSetPassword()" style="background:none;border:none;color:var(--muted);font-size:13px;width:100%;cursor:pointer;padding:4px;font-family:var(--font)">отмена</button>
+  </div>
+</div>
+
 <!-- PWA INSTALL BANNER -->
 <div id="install-banner" style="position:fixed;top:0;left:0;right:0;background:var(--accent);color:#fff;z-index:500;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 12px;display:flex;align-items:center;gap:10px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 20px var(--accent-glow)">
   <div style="flex:1"><div style="font-size:14px;font-weight:700">установить как приложение</div><div style="font-size:11px;opacity:.8;margin-top:2px">работает без интернета</div></div>
@@ -3636,9 +4014,11 @@ Install.init();
   <button id="ib-dismiss-btn" style="padding:8px 10px;border-radius:50px;border:none;background:rgba(255,255,255,.2);color:#fff;font-size:13px;cursor:pointer;font-family:var(--font)">✕</button>
 </div>
 <!-- iOS HINT -->
-<div id="ios-hint" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);left:16px;right:16px;background:var(--bg2);border:1px solid var(--card-border);border-radius:20px;padding:16px;z-index:400;box-shadow:var(--shadow)">
-  <button id="ios-hint-close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1">✕</button>
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:22px">📱</div><div style="font-size:15px;font-weight:700">добавить на экран</div></div>
+<div id="ios-hint" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 88px);left:16px;right:16px;background:var(--bg2);border:1px solid var(--card-border);border-radius:20px;padding:16px;z-index:9000;box-shadow:var(--shadow)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:10px"><div style="font-size:22px">📱</div><div style="font-size:15px;font-weight:700">добавить на экран</div></div>
+    <button id="ios-hint-close" style="background:var(--card);border:1px solid var(--card-border);border-radius:50px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;padding:6px 12px;font-family:var(--font);flex-shrink:0;z-index:9001;position:relative" onclick="document.getElementById('ios-hint').style.display='none';localStorage.setItem('mlk_ios_dismissed','1')">скрыть</button>
+  </div>
   <div style="font-size:13px;color:var(--muted);line-height:1.7">нажми <strong style="color:var(--text)">«Поделиться»</strong> внизу Safari,<br>затем <strong style="color:var(--text)">«На экран "Домой"»</strong></div>
 </div>
 </body>
