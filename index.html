@@ -705,6 +705,16 @@ textarea:focus{border-color:var(--accent)}
       </div>
     </div>
 
+    <div id="admin-panel-section" style="display:none">
+      <div class="section-head" style="padding:0 16px"><h3>👑 панель CEO</h3></div>
+      <div class="settings-group">
+        <div class="card" style="padding:0 16px">
+          <div class="setting-row"><div class="setting-label">все пользователи</div><div class="setting-value" onclick="Admin.openUsers()"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          <div class="setting-row"><div class="setting-label">объявление в ленту</div><div class="setting-value" onclick="Admin.makeAnnouncement()"><span style="color:var(--accent)">создать</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          <div class="setting-row"><div class="setting-label">закрепить пост (ID)</div><div class="setting-value" onclick="Admin.pinPost()"><span style="color:var(--accent)">закрепить</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        </div>
+      </div>
+    </div>
     <div class="section-head" style="padding:0 16px"><h3>премиум</h3></div>
     <div class="settings-group">
       <div class="card" style="padding:0 16px">
@@ -1797,6 +1807,8 @@ const Profile={
     if(setAvatarPhoto) setAvatarPhoto.textContent=u.avatar_url?'изменить фото':'загрузить фото';
     document.getElementById('profile-name-el').textContent=u.name||'пользователь';
     const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
+    const adminSec=document.getElementById('admin-panel-section');
+    if(adminSec) adminSec.style.display=isAdmin()?'block':'none';
     const psTxt=document.getElementById('premium-status-text');
     if(psTxt){if(Premium.isMax()) psTxt.textContent='Макс · '+Premium.getExpiryText();else if(Premium.isPro()) psTxt.textContent='Про · '+Premium.getExpiryText();else psTxt.textContent='бесплатно → активировать';}
     ['schedule-row','sides-row','photos-row','biorhythm-row'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display=Premium.isPro()?'flex':'none';});
@@ -2262,7 +2274,7 @@ const UserProfile = {
       <div style="padding:0 16px">
         <div class="user-profile-header card">
           <div class="user-profile-avatar">${profile.avatar_emoji||profile.name?.[0]?.toUpperCase()||'👤'}</div>
-          <div class="user-profile-name">${profile.name||'пользователь'}${profile.id===ADMIN_ID?' <span style="background:linear-gradient(135deg,#f7c948,#fb923c);border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;color:#000;letter-spacing:.3px;vertical-align:middle">CEO</span>':''}</div>
+          <div class="user-profile-name">${profile.name||'пользователь'}${getUserBadge(profile.id, profile.username||'')}</div>
           ${profile.username?`<div class="user-profile-username">@${profile.username}</div>`:''}
           ${profile.course?`<div style="font-size:12px;color:var(--muted);margin-top:4px">курс: ${profile.course}</div>`:''}
           <div style="margin-top:12px">${friendBtn}</div>
@@ -2290,6 +2302,14 @@ const UserProfile = {
 // ══════════════════════════════════════════════════════
 const SUPA_URL = 'https://tiosxjaebjrhdqrpthsy.supabase.co';
 const ADMIN_ID = 'UMW0615';
+const ADMIN_USERNAME = 'fartingchickenking78';
+function isAdmin() { return getMyUserId() === ADMIN_ID; }
+function getUserBadge(userId, username) {
+  if(userId === ADMIN_ID || username === ADMIN_USERNAME) {
+    return '<span style="background:linear-gradient(135deg,#f7c948,#fb923c);border-radius:50px;padding:1px 7px;font-size:9px;font-weight:900;color:#000;letter-spacing:.4px;vertical-align:middle;margin-left:3px">CEO</span>';
+  }
+  return '';
+}
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpb3N4amFlYmpyaGRxcnB0aHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDcxNjIsImV4cCI6MjA5NjI4MzE2Mn0.7yYtomQpYcxyTHvOuRgz6amFQ1W69076AIbbundw6yM';
 
 async function supaFetch(path, opts={}) {
@@ -2460,10 +2480,16 @@ const Feed = {
       el.innerHTML = '<div class="empty" style="padding:40px 0">постов пока нет — будь первым!</div>';
       return;
     }
-    el.innerHTML = posts.map(p => this._renderPost(p)).join('');
+    const blocked=STATE.get('mlk_blocked')||[];
+    const pinnedId=STATE.get('mlk_pinned_post');
+    const filtered=posts.filter(p=>!blocked.includes(p.user_id));
+    const pinned=filtered.find(p=>p.id===pinnedId);
+    const rest=filtered.filter(p=>p.id!==pinnedId);
+    const sorted=pinned?[pinned,...rest]:filtered;
+    el.innerHTML=sorted.map((p,i)=>this._renderPost(p,i===0&&!!pinned)).join('');
   },
 
-  _renderPost(p) {
+  _renderPost(p, isPinned=false) {
     const uid = getMyUserId();
     const liked = (p.likes||[]).includes(uid);
     const time = new Date(p.created_at).toLocaleDateString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
@@ -2712,6 +2738,70 @@ const Friends = {
           }).join('')}
         </div>
       </div>`;
+  }
+};
+
+
+// ══════════════════════════════════════════════════════
+// ADMIN MODULE
+// ══════════════════════════════════════════════════════
+const Admin = {
+  async openUsers() {
+    App.switchTab('user-profile');
+    const titleEl=document.getElementById('user-profile-title');
+    const contentEl=document.getElementById('user-profile-content');
+    if(titleEl) titleEl.textContent='все пользователи';
+    if(contentEl) contentEl.innerHTML='<div class="empty" style="padding:20px 0">загрузка...</div>';
+    const profiles=await supaFetch('profiles?order=created_at.desc&limit=200');
+    if(!profiles||!profiles.length){if(contentEl)contentEl.innerHTML='<div class="empty">нет пользователей</div>';return;}
+    if(contentEl) {
+      const rows = profiles.map(p => {
+        const av = p.avatar_url
+          ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0">`
+          : (p.avatar_emoji||p.name?.[0]?.toUpperCase()||'👤');
+        const blockBtn = p.id!==ADMIN_ID
+          ? `<button class="friend-btn" style="color:#f75c5c;border-color:#f75c5c;flex-shrink:0" onclick="event.stopPropagation();Admin.blockUser('${p.id}','${(p.name||p.id).replace(/'/g,'')}')">блок</button>`
+          : '';
+        return `<div class="friend-card" onclick="UserProfile.open('${p.id}')">
+          <div class="friend-avatar" style="overflow:hidden;position:relative">${av}</div>
+          <div class="friend-info">
+            <div class="friend-name">${p.name||'—'}${getUserBadge(p.id,p.username||'')}</div>
+            <div class="friend-sub">${p.username?'@'+p.username:p.id}</div>
+          </div>${blockBtn}
+        </div>`;
+      });
+      contentEl.innerHTML = `<div style="padding:16px"><div style="font-size:13px;color:var(--muted);margin-bottom:14px">всего: ${profiles.length} пользователей</div>${rows.join('')}</div>`;
+    }
+  },
+
+  async blockUser(userId, userName) {
+    if(userId===ADMIN_ID){alert('нельзя');return;}
+    const blocked=STATE.get('mlk_blocked')||[];
+    if(blocked.includes(userId)){alert(userName+' уже заблокирован');return;}
+    blocked.push(userId);
+    STATE.set('mlk_blocked',blocked);
+    await supaFetch('posts?user_id=eq.'+userId,{method:'DELETE'});
+    alert('✓ '+userName+' заблокирован');
+    if(App.currentTab==='feed') Feed.load();
+  },
+
+  pinPost() {
+    const id=prompt('ID поста (из адреса или консоли):');if(!id) return;
+    STATE.set('mlk_pinned_post',id.trim());
+    alert('✓ закреплено');
+    if(App.currentTab==='feed') Feed.load();
+  },
+
+  async makeAnnouncement() {
+    const text=prompt('текст объявления:');if(!text) return;
+    const u=getUser();
+    await supaFetch('posts',{method:'POST',body:{
+      user_id:ADMIN_ID,user_name:u?.name||'CEO',user_emoji:u?.avatar_emoji||'👑',
+      user_username:ADMIN_USERNAME,user_avatar_url:u?.avatar_url||'',
+      text:'📢 '+text,image_url:null,likes:[]
+    }});
+    App.switchTab('feed');
+    Feed.load();
   }
 };
 
