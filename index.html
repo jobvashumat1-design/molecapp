@@ -608,6 +608,7 @@ textarea:focus{border-color:var(--accent)}
     <div class="settings-group">
       <div class="card" style="padding:0 16px">
         <div class="setting-row"><div class="setting-label">имя</div><div class="setting-value" onclick="Profile.editField('name')"><span id="set-name">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">username</div><div class="setting-value" onclick="Profile.editField('username')"><span id="set-username" style="color:var(--accent)">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">рост (см)</div><div class="setting-value" onclick="Profile.editField('height')"><span id="set-height">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">вес (кг)</div><div class="setting-value" onclick="Profile.editField('weight')"><span id="set-weight">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">пол</div><div class="setting-value" onclick="Profile.editField('gender')"><span id="set-gender">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
@@ -699,6 +700,7 @@ textarea:focus{border-color:var(--accent)}
         <div class="setting-row"><div class="setting-label">тёмная тема</div><label class="toggle"><input type="checkbox" id="theme-toggle" onchange="Profile.toggleTheme()"><div class="toggle-track"></div></label></div>
         <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:4px"><div class="setting-label">цвет акцента</div><div class="accent-picker" id="accent-picker"></div></div>
         <div class="setting-row"><div class="setting-label">свой цвет</div><div class="setting-value"><input type="color" id="custom-color-picker" style="width:34px;height:28px;border-radius:8px;border:1px solid var(--card-border);background:var(--card);cursor:pointer;padding:2px" onchange="Profile.setCustomAccent(this.value)"></div></div>
+        <div class="setting-row"><div class="setting-label">фото профиля</div><div class="setting-value" onclick="Profile.pickAvatar()"><span id="set-avatar-photo" style="font-size:11px;color:var(--accent)">загрузить фото</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">аватарка (эмодзи)</div><div class="setting-value" onclick="Profile.editField('avatar_emoji')"><span id="set-avatar-emoji">👤</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
       </div>
     </div>
@@ -807,6 +809,7 @@ textarea:focus{border-color:var(--accent)}
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>я</span>
   </button>
 </nav>
+<input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="Profile.handleAvatarFile(event)">
 
 <!-- MODAL: FOOD (manual) -->
 <div class="modal-overlay" id="food-modal" onclick="UI.closeBgModal('food-modal')">
@@ -1050,7 +1053,11 @@ const Home={
     const hr=new Date().getHours();
     const greet=hr<12?'доброе утро':hr<18?'добрый день':'добрый вечер';
     document.getElementById('home-greeting').textContent=u.name?`${greet}, ${u.name}`:`${greet}!`;
-    document.getElementById('home-avatar').innerHTML=u.avatar_emoji?u.avatar_emoji:(u.name?u.name[0].toUpperCase():'👤');
+    const homeAv=document.getElementById('home-avatar');
+    if(homeAv){
+      if(u.avatar_url) homeAv.innerHTML=`<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0">`;
+      else homeAv.innerHTML=u.avatar_emoji?u.avatar_emoji:(u.name?u.name[0].toUpperCase():'👤');
+    }
     const streak=this.calcStreak();
     document.getElementById('streak-label').textContent=`серия: ${streak} ${this.pluralDays(streak)}`;
     // kcal
@@ -1781,7 +1788,13 @@ const Profile={
   render(){
     const u=getUser();if(!u) return;
     const avContent=u.avatar_emoji?u.avatar_emoji:(u.name?u.name[0].toUpperCase():'👤');
-    document.getElementById('profile-avatar-el').innerHTML=avContent;
+    const avEl=document.getElementById('profile-avatar-el');
+    if(avEl){
+      if(u.avatar_url) avEl.innerHTML=`<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0">`;
+      else avEl.innerHTML=avContent;
+    }
+    const setAvatarPhoto=document.getElementById('set-avatar-photo');
+    if(setAvatarPhoto) setAvatarPhoto.textContent=u.avatar_url?'изменить фото':'загрузить фото';
     document.getElementById('profile-name-el').textContent=u.name||'пользователь';
     const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
     const psTxt=document.getElementById('premium-status-text');
@@ -1795,6 +1808,7 @@ const Profile={
       <div class="pstat"><div class="pstat-val">${used}</div><div class="pstat-label">капсул</div></div>
       <div class="pstat"><div class="pstat-val">${limit-used}</div><div class="pstat-label">осталось</div></div>`;
     document.getElementById('set-name').textContent=u.name||'не указано';
+    const setUn=document.getElementById('set-username');if(setUn) setUn.textContent=u.username?'@'+u.username:'задать username';
     document.getElementById('set-height').textContent=u.height+'см';
     document.getElementById('set-weight').textContent=u.weight+'кг';
     document.getElementById('set-gender').textContent=u.gender==='male'?'мужчина':'женщина';
@@ -1827,6 +1841,35 @@ const Profile={
     root.style.setProperty('--accent-soft',`rgba(${r},${g},${b},.15)`);
     const u=getUser();u.custom_accent=hex;saveUser(u);
   },
+  pickAvatar(){
+    document.getElementById('avatar-file-input').click();
+  },
+  handleAvatarFile(e){
+    const file=e.target.files[0];if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        const size=200;
+        canvas.width=size;canvas.height=size;
+        const ctx=canvas.getContext('2d');
+        // Crop square from center
+        const min=Math.min(img.width,img.height);
+        const sx=(img.width-min)/2,sy=(img.height-min)/2;
+        ctx.drawImage(img,sx,sy,min,min,0,0,size,size);
+        const dataUrl=canvas.toDataURL('image/jpeg',0.7);
+        const u=getUser();if(!u) return;
+        u.avatar_url=dataUrl;
+        saveUser(u);
+        this.render();
+        setTimeout(()=>syncProfile(),300);
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value='';
+  },
   saveWaterBtns(){
     const u=getUser();if(!u) return;
     const v1=parseFloat(document.getElementById('water-btn1-val').value)||0.25;
@@ -1848,6 +1891,7 @@ const Profile={
       goal_weight:{title:'целевой вес (кг)',type:'number',val:u.goal_weight||'',placeholder:'65',min:30,max:300,step:0.1},
       steps_goal:{title:'шаги / день',type:'number',val:u.steps_goal||8000,placeholder:'8000',min:1000,max:50000},
       avatar_emoji:{title:'аватарка (эмодзи или символ)',type:'text',val:u.avatar_emoji||'',placeholder:'🌸'},
+      username:{title:'username (латиница, цифры, _ .)',type:'text',val:u.username||'',placeholder:'molec_anna'},
       course:{title:'выбери курс',type:'course'},
     };
     const cfg=configs[field];if(!cfg) return;
@@ -2218,7 +2262,7 @@ const UserProfile = {
       <div style="padding:0 16px">
         <div class="user-profile-header card">
           <div class="user-profile-avatar">${profile.avatar_emoji||profile.name?.[0]?.toUpperCase()||'👤'}</div>
-          <div class="user-profile-name">${profile.name||'пользователь'}${profile.id===ADMIN_ID?` <span class="owner-badge" style="width:18px;height:18px"><svg viewBox="0 0 24 24" width="11" height="11" stroke="#fff" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>`:''}</div>
+          <div class="user-profile-name">${profile.name||'пользователь'}${profile.id===ADMIN_ID?' <span style="background:linear-gradient(135deg,#f7c948,#fb923c);border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;color:#000;letter-spacing:.3px;vertical-align:middle">CEO</span>':''}</div>
           ${profile.username?`<div class="user-profile-username">@${profile.username}</div>`:''}
           ${profile.course?`<div style="font-size:12px;color:var(--muted);margin-top:4px">курс: ${profile.course}</div>`:''}
           <div style="margin-top:12px">${friendBtn}</div>
@@ -2249,24 +2293,32 @@ const ADMIN_ID = 'UMW0615';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpb3N4amFlYmpyaGRxcnB0aHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDcxNjIsImV4cCI6MjA5NjI4MzE2Mn0.7yYtomQpYcxyTHvOuRgz6amFQ1W69076AIbbundw6yM';
 
 async function supaFetch(path, opts={}) {
-  const r = await fetch(SUPA_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || '',
-      ...opts.headers
-    },
-    method: opts.method || 'GET',
-    body: opts.body ? JSON.stringify(opts.body) : undefined
-  });
-  if(!r.ok && r.status !== 204) {
-    const e = await r.text();
-    console.error('Supabase error:', r.status, e);
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json',
+  };
+  if(opts.prefer) headers['Prefer'] = opts.prefer;
+  if(opts.headers) Object.assign(headers, opts.headers);
+  try {
+    const r = await fetch(SUPA_URL + '/rest/v1/' + path, {
+      headers,
+      method: opts.method || 'GET',
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    if(!r.ok && r.status !== 204) {
+      const e = await r.text();
+      console.error('Supabase error:', r.status, path, e);
+      return null;
+    }
+    if(r.status === 204 || r.status === 201) {
+      try { return await r.json(); } catch { return {}; }
+    }
+    return r.json();
+  } catch(e) {
+    console.error('Supabase fetch failed:', e);
     return null;
   }
-  if(r.status === 204) return {};
-  return r.json();
 }
 
 // ══════════════════════════════════════════════════════
@@ -2284,17 +2336,18 @@ function getMyUserId() {
 async function syncProfile() {
   const u = getUser(); if(!u) return;
   const uid = getMyUserId();
-  await supaFetch('profiles?id=eq.' + uid, {
+  await supaFetch('profiles', {
     method: 'POST',
     prefer: 'resolution=merge-duplicates',
-    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'' }
+    headers: { 'Prefer': 'resolution=merge-duplicates' },
+    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'', avatar_url: u.avatar_url||'' }
   });
   // Sync stats
   const h = getHistory();
   const today = getTodayData();
-  await supaFetch('stats?user_id=eq.' + uid, {
+  await supaFetch('stats', {
     method: 'POST',
-    prefer: 'resolution=merge-duplicates',
+    headers: { 'Prefer': 'resolution=merge-duplicates' },
     body: { user_id: uid, data: { weight: u.weight, course: u.course, history: h, today }, updated_at: new Date().toISOString() }
   });
 }
@@ -2318,7 +2371,7 @@ const Feed = {
     const txt = document.getElementById('compose-text').value.trim();
     const btn = document.getElementById('compose-send-btn');
     if(!btn) return;
-    const hasContent = txt.length > 0 || this._photo;
+    const hasContent = txt.length > 0 || this._photo || this._attachStats;
     btn.style.opacity = hasContent ? '1' : '.4';
     btn.style.pointerEvents = hasContent ? 'auto' : 'none';
   },
@@ -2355,10 +2408,6 @@ const Feed = {
     this._attachStats = !this._attachStats;
     const btn = document.querySelector('[onclick="Feed.attachStats()"]');
     if(btn) btn.style.color = this._attachStats ? 'var(--accent)' : 'var(--muted)';
-    if(this._attachStats) {
-      const txt = document.getElementById('compose-text');
-      if(txt && !txt.value) txt.value = '';
-    }
     this.onComposeInput();
   },
 
@@ -2381,14 +2430,18 @@ const Feed = {
       user_name: u.name || 'пользователь',
       user_emoji: u.avatar_emoji || '',
       user_username: u.username || '',
+      user_avatar_url: u.avatar_url || '',
       text: txt,
       image_url: this._photo || null,
       likes: []
     };
     if(statsSnippet) post.stats = statsSnippet;
 
-    const postRes = await supaFetch('posts', { method: 'POST', prefer: 'return=representation', body: post });
-    if(!postRes) { if(btn) { btn.textContent = 'ошибка — попробуй ещё'; setTimeout(()=>{btn.textContent='опубликовать';btn.style.pointerEvents='auto';btn.style.opacity='1';},2000); } return; }
+    const postRes = await supaFetch('posts', { method: 'POST', body: post });
+    if(postRes === null) {
+      if(btn) { btn.textContent = 'ошибка — попробуй ещё'; setTimeout(()=>{btn.textContent='опубликовать';btn.style.pointerEvents='auto';btn.style.opacity='1';},2000); }
+      return;
+    }
 
     document.getElementById('compose-text').value = '';
     this._photo = null; this._attachStats = false;
@@ -2487,7 +2540,22 @@ const Feed = {
 
   async deletePost(postId) {
     if(getMyUserId() !== ADMIN_ID) return;
-    if(!confirm('удалить этот пост?')) return;
+    // Safari PWA может блокировать confirm — используем UI
+    const el = document.getElementById('post-' + postId);
+    if(!el) return;
+    // Показываем inline подтверждение
+    const actionsEl = el.querySelector('.post-actions');
+    if(actionsEl && !el.querySelector('.delete-confirm-row')) {
+      const confirmRow = document.createElement('div');
+      confirmRow.className = 'delete-confirm-row';
+      confirmRow.style.cssText = 'padding:8px 14px 12px;display:flex;gap:8px;align-items:center';
+      confirmRow.innerHTML = `<span style="font-size:13px;color:var(--muted);flex:1">удалить пост?</span>
+        <button onclick="Feed._confirmDelete('${postId}')" style="background:#f75c5c;color:#fff;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">удалить</button>
+        <button onclick="this.parentElement.remove()" style="background:var(--card);border:1px solid var(--card-border);border-radius:50px;padding:6px 14px;font-size:12px;cursor:pointer;color:var(--text)">отмена</button>`;
+      el.appendChild(confirmRow);
+    }
+  },
+  async _confirmDelete(postId) {
     await supaFetch('comments?post_id=eq.' + postId, { method: 'DELETE' });
     await supaFetch('posts?id=eq.' + postId, { method: 'DELETE' });
     const el = document.getElementById('post-' + postId);
@@ -2572,9 +2640,11 @@ const Friends = {
       }).join('');
     } else if(reqSection) reqSection.style.display='none';
 
-    // Load confirmed friends (both directions)
-    const sentFriends = await supaFetch('friends?user_id=eq.' + uid + '&status=eq.accepted');
-    const recvFriends = await supaFetch('friends?friend_id=eq.' + uid + '&status=eq.accepted');
+    // Load confirmed friends (both directions) — параллельно
+    const [sentFriends, recvFriends] = await Promise.all([
+      supaFetch('friends?user_id=eq.' + uid + '&status=eq.accepted'),
+      supaFetch('friends?friend_id=eq.' + uid + '&status=eq.accepted')
+    ]);
     const allFriendIds = [...new Set([...(sentFriends||[]).map(f=>f.friend_id), ...(recvFriends||[]).map(f=>f.user_id)])];
     const friendsList = document.getElementById('friends-list');
     if(!allFriendIds.length) {
