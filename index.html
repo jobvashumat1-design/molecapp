@@ -172,6 +172,23 @@ input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
 
 
 
+
+.owner-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#4f8ef7;border-radius:50%;margin-left:4px;flex-shrink:0}
+.owner-badge svg{width:10px;height:10px;stroke:#fff;stroke-width:3;fill:none}
+.post-delete-btn{margin-left:auto;background:none;border:none;color:#f75c5c;font-size:18px;cursor:pointer;padding:4px;opacity:.6;line-height:1}
+.post-delete-btn:active{opacity:1;transform:scale(.9)}
+
+
+/* UPDATE */
+.changelog-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--card-border)}
+.changelog-item:last-child{border-bottom:none}
+.changelog-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:5px}
+.changelog-text{font-size:13px;line-height:1.6;color:var(--text)}
+.changelog-version{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-bottom:8px;margin-top:14px}
+.update-btn-wrap{position:fixed;bottom:80px;right:16px;z-index:999;display:none}
+.update-floating-btn{background:var(--accent);color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 20px rgba(79,142,247,.4);display:flex;align-items:center;gap:6px;animation:pulse-btn 2s infinite}
+@keyframes pulse-btn{0%,100%{box-shadow:0 4px 20px rgba(79,142,247,.4)}50%{box-shadow:0 4px 30px rgba(79,142,247,.7)}}
+
 /* SOCIAL */
 .feed-post{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
 .post-header{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
@@ -683,6 +700,14 @@ textarea:focus{border-color:var(--accent)}
         <div class="setting-row" id="report-row" style="display:none"><div class="setting-label">отчёт недели</div><div class="setting-value" onclick="WeekReport.open()"><span>открыть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
       </div>
     </div>
+    <div class="section-head" style="padding:0 16px"><h3>обновление</h3></div>
+    <div class="settings-group">
+      <div class="card" style="padding:0 16px">
+        <div class="setting-row"><div class="setting-label">версия</div><div class="setting-value"><span id="app-version-display" style="color:var(--muted)">2.4.0</span></div></div>
+        <div class="setting-row"><div class="setting-label">что нового</div><div class="setting-value" onclick="App.switchTab('changelog')"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+        <div class="setting-row"><div class="setting-label">обновить приложение</div><div class="setting-value"><button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button></div></div>
+      </div>
+    </div>
     <div class="section-head" style="padding:0 16px"><h3>приложение</h3></div>
     <div style="padding:0 16px;margin-bottom:16px">
       <div class="card" style="padding:16px">
@@ -915,7 +940,7 @@ const App={
   },
   switchTab(tab){
     this.currentTab=tab;
-    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile'].forEach(t=>{
+    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile','changelog'].forEach(t=>{
       const btn=document.getElementById('nav-'+t);
       const scr=document.getElementById('screen-'+t);
       if(btn) btn.classList.toggle('active',t===tab);
@@ -2045,10 +2070,76 @@ const Reminders = {
 };
 
 
+
+// ══════════════════════════════════════════════════════
+// APP UPDATER
+// ══════════════════════════════════════════════════════
+const APP_VERSION = '2.4.0';
+
+const AppUpdater = {
+  init() {
+    // Check for service worker update
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => {
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if(newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                this._showUpdateBadge();
+              }
+            });
+          });
+          reg.update();
+        });
+      });
+      // Listen for controller change (new SW activated)
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+    }
+    // Check version in localStorage
+    const savedVersion = localStorage.getItem('mlk_app_version');
+    if(savedVersion && savedVersion !== APP_VERSION) {
+      this._showUpdateBadge();
+    }
+    localStorage.setItem('mlk_app_version', APP_VERSION);
+  },
+
+  _showUpdateBadge() {
+    const wrap = document.getElementById('update-floating-wrap');
+    if(wrap) wrap.style.display = 'block';
+  },
+
+  forceUpdate() {
+    // Unregister all service workers and clear caches
+    const doReload = () => {
+      caches.keys().then(keys => {
+        Promise.all(keys.map(k => caches.delete(k))).then(() => {
+          window.location.reload(true);
+        });
+      }).catch(() => window.location.reload(true));
+    };
+
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        if(regs.length) {
+          Promise.all(regs.map(r => r.unregister())).then(doReload);
+        } else {
+          doReload();
+        }
+      });
+    } else {
+      doReload();
+    }
+  }
+};
+
 // ══════════════════════════════════════════════════════
 // SUPABASE CLIENT
 // ══════════════════════════════════════════════════════
 const SUPA_URL = 'https://tiosxjaebjrhdqrpthsy.supabase.co';
+const ADMIN_ID = 'UMW0615';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpb3N4amFlYmpyaGRxcnB0aHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MDcxNjIsImV4cCI6MjA5NjI4MzE2Mn0.7yYtomQpYcxyTHvOuRgz6amFQ1W69076AIbbundw6yM';
 
 async function supaFetch(path, opts={}) {
@@ -2283,9 +2374,17 @@ const Feed = {
     setTimeout(()=>this.toggleComments(postId), 100);
   },
 
+  async deletePost(postId) {
+    if(getMyUserId() !== ADMIN_ID) return;
+    if(!confirm('удалить этот пост?')) return;
+    await supaFetch('comments?post_id=eq.' + postId, { method: 'DELETE' });
+    await supaFetch('posts?id=eq.' + postId, { method: 'DELETE' });
+    const el = document.getElementById('post-' + postId);
+    if(el) { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(), 300); }
+  },
+
   showSearch() {
     const q = prompt('поиск по ленте:'); if(!q) return;
-    // simple client-side filter
   }
 };
 
@@ -3145,6 +3244,59 @@ Install.init();
     <div style="width:32px"></div>
   </div>
   <div class="scroll" style="padding-top:4px" id="friend-profile-content"></div>
+</div>
+
+
+<!-- CHANGELOG -->
+<div id="screen-changelog" class="screen">
+  <div class="home-header status-pad">
+    <button onclick="App.switchTab('profile')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px">←</button>
+    <h2>что нового</h2>
+    <div style="width:32px"></div>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="card" style="padding:18px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div style="font-size:20px;font-weight:800">версия 2.4.0</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">последнее обновление</div>
+        </div>
+        <button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button>
+      </div>
+
+      <div class="changelog-version">v2.4.0 — социальные функции</div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">лента — публикуй посты с фото и статистикой</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">лайки и комментарии в реальном времени</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">друзья — добавляй по коду, смотри статистику</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">синхронизация данных через облако</div></div>
+
+      <div class="changelog-version">v2.3.0 — премиум</div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">подписка Про (99₽) и Макс (199₽) по одноразовым кодам</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">умный день — утренний план с временем капсул</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">биоритм веса, тепловая карта, фото-прогресс</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">разбор недели и отчёт для куратора</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">режим дня с расчётом времени капсул</div></div>
+
+      <div class="changelog-version">v2.2.0 — дневник и медали</div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">дневник самочувствия с тегами и заметками</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">замеры тела с графиком динамики</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">30 достижений-медалей</div></div>
+
+      <div class="changelog-version">v2.1.0 — настройки</div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">настраиваемые кнопки воды</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">свой цвет темы и эмодзи на аватарку</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">гибкие напоминания капсул</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">адаптация текстов под пол</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING UPDATE BUTTON -->
+<div class="update-btn-wrap" id="update-floating-wrap">
+  <button class="update-floating-btn" onclick="AppUpdater.forceUpdate()">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    обновить приложение
+  </button>
 </div>
 
 <!-- PWA INSTALL BANNER -->
