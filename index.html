@@ -189,6 +189,20 @@ input:focus{border-color:var(--accent)}input::placeholder{color:var(--muted)}
 .update-floating-btn{background:var(--accent);color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 20px rgba(79,142,247,.4);display:flex;align-items:center;gap:6px;animation:pulse-btn 2s infinite}
 @keyframes pulse-btn{0%,100%{box-shadow:0 4px 20px rgba(79,142,247,.4)}50%{box-shadow:0 4px 30px rgba(79,142,247,.7)}}
 
+
+.username-input-wrap{position:relative}
+.username-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:600;pointer-events:none}
+.username-field{padding-left:26px!important}
+.user-profile-header{text-align:center;padding:24px 16px 16px;background:linear-gradient(135deg,var(--accent-soft),transparent);margin-bottom:14px;border-radius:var(--radius)}
+.user-profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--accent-soft);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px}
+.user-profile-name{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.user-profile-username{font-size:14px;color:var(--muted);margin-top:3px}
+.user-profile-stats{display:flex;gap:0;margin-top:14px;border-top:1px solid var(--card-border);padding-top:14px}
+.user-profile-stat{flex:1;text-align:center}
+.user-profile-stat-val{font-size:18px;font-weight:800;color:var(--accent)}
+.user-profile-stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+.user-profile-stat+.user-profile-stat{border-left:1px solid var(--card-border)}
+
 /* SOCIAL */
 .feed-post{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
 .post-header{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
@@ -703,7 +717,7 @@ textarea:focus{border-color:var(--accent)}
     <div class="section-head" style="padding:0 16px"><h3>обновление</h3></div>
     <div class="settings-group">
       <div class="card" style="padding:0 16px">
-        <div class="setting-row"><div class="setting-label">версия</div><div class="setting-value"><span id="app-version-display" style="color:var(--muted)">2.4.0</span></div></div>
+        <div class="setting-row"><div class="setting-label">версия</div><div class="setting-value"><span id="app-version-display" style="color:var(--muted)">2.5.0</span></div></div>
         <div class="setting-row"><div class="setting-label">что нового</div><div class="setting-value" onclick="App.switchTab('changelog')"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">обновить приложение</div><div class="setting-value"><button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button></div></div>
       </div>
@@ -938,9 +952,20 @@ const App={
     this.switchTab('home');
     Home.render();
   },
+  _history:[],
+  goBack(){
+    if(this._history.length>1){
+      this._history.pop();
+      this.switchTab(this._history.pop());
+    } else {
+      this.switchTab('home');
+    }
+  },
   switchTab(tab){
+    this._history.push(tab);
+    if(this._history.length>10) this._history.shift();
     this.currentTab=tab;
-    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile','changelog'].forEach(t=>{
+    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile','changelog','user-profile'].forEach(t=>{
       const btn=document.getElementById('nav-'+t);
       const scr=document.getElementById('screen-'+t);
       if(btn) btn.classList.toggle('active',t===tab);
@@ -1851,7 +1876,14 @@ const Profile={
     else if(f==='course'){u.course=document.getElementById('edit-course-val').value;}
     else{
       let v=document.getElementById('edit-input').value;
-      if(f==='name'){u.name=v.trim();}else if(f==='avatar_emoji'){u.avatar_emoji=v.trim();}
+      if(f==='name'){u.name=v.trim();}
+      else if(f==='avatar_emoji'){u.avatar_emoji=v.trim();}
+      else if(f==='username'){
+        const clean=v.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'');
+        u.username=clean;
+        // Sync username to Supabase
+        setTimeout(()=>syncProfile(),300);
+      }
       else{
         v=parseFloat(v);
         const mins={height:100,weight:30,kcal_goal:900,water_goal:2,goal_weight:30,steps_goal:1000};
@@ -2074,7 +2106,7 @@ const Reminders = {
 // ══════════════════════════════════════════════════════
 // APP UPDATER
 // ══════════════════════════════════════════════════════
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.5.0';
 
 const AppUpdater = {
   init() {
@@ -2135,6 +2167,80 @@ const AppUpdater = {
   }
 };
 
+
+// ══════════════════════════════════════════════════════
+// USER PROFILE (кликабельный профиль любого юзера)
+// ══════════════════════════════════════════════════════
+const UserProfile = {
+  async open(userId) {
+    App.switchTab('user-profile');
+    const titleEl = document.getElementById('user-profile-title');
+    const contentEl = document.getElementById('user-profile-content');
+    if(contentEl) contentEl.innerHTML = '<div class="empty" style="padding:40px 0">загрузка...</div>';
+
+    const myUid = getMyUserId();
+    const [profiles, statsData, posts] = await Promise.all([
+      supaFetch('profiles?id=eq.' + userId),
+      supaFetch('stats?user_id=eq.' + userId),
+      supaFetch('posts?user_id=eq.' + userId + '&order=created_at.desc&limit=20')
+    ]);
+
+    const profile = profiles?.[0] || {};
+    const stats = statsData?.[0]?.data || {};
+    const h = stats.history || {};
+
+    if(titleEl) titleEl.textContent = profile.username ? '@'+profile.username : (profile.name||'профиль');
+
+    // Check friendship status
+    let friendStatus = null;
+    if(userId !== myUid) {
+      const fr = await supaFetch('friends?user_id=eq.'+myUid+'&friend_id=eq.'+userId);
+      if(fr&&fr.length) friendStatus = fr[0].status;
+      else {
+        const fr2 = await supaFetch('friends?user_id=eq.'+userId+'&friend_id=eq.'+myUid);
+        if(fr2&&fr2.length) friendStatus = fr2[0].status === 'accepted' ? 'accepted' : 'incoming';
+      }
+    }
+
+    // Stats
+    const days = Object.keys(h).sort().slice(-7);
+    const avgWater = days.length ? (days.reduce((s,k)=>s+(h[k].water||0),0)/days.length).toFixed(1) : '—';
+    const activeDays = Object.values(h).filter(d=>d.capsules>0).length;
+    const postCount = posts?.length || 0;
+
+    const friendBtn = userId === myUid ? '' :
+      friendStatus === 'accepted' ? '<button class="friend-btn" style="opacity:.5">в друзьях ✓</button>' :
+      friendStatus === 'pending' ? '<button class="friend-btn pending">заявка отправлена</button>' :
+      friendStatus === 'incoming' ? `<button class="friend-btn primary" onclick="Friends.acceptFromProfile('${userId}')">принять заявку</button>` :
+      `<button class="friend-btn primary" onclick="UserProfile.addFriend('${userId}')">+ добавить в друзья</button>`;
+
+    if(contentEl) contentEl.innerHTML = `
+      <div style="padding:0 16px">
+        <div class="user-profile-header card">
+          <div class="user-profile-avatar">${profile.avatar_emoji||profile.name?.[0]?.toUpperCase()||'👤'}</div>
+          <div class="user-profile-name">${profile.name||'пользователь'}${profile.id===ADMIN_ID?` <span class="owner-badge" style="width:18px;height:18px"><svg viewBox="0 0 24 24" width="11" height="11" stroke="#fff" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"/></svg></span>`:''}</div>
+          ${profile.username?`<div class="user-profile-username">@${profile.username}</div>`:''}
+          ${profile.course?`<div style="font-size:12px;color:var(--muted);margin-top:4px">курс: ${profile.course}</div>`:''}
+          <div style="margin-top:12px">${friendBtn}</div>
+          <div class="user-profile-stats">
+            <div class="user-profile-stat"><div class="user-profile-stat-val">${postCount}</div><div class="user-profile-stat-label">постов</div></div>
+            <div class="user-profile-stat"><div class="user-profile-stat-val">${activeDays}</div><div class="user-profile-stat-label">активных дней</div></div>
+            <div class="user-profile-stat"><div class="user-profile-stat-val">${avgWater}л</div><div class="user-profile-stat-label">вода / день</div></div>
+          </div>
+        </div>
+
+        <div class="section-head"><h3>посты</h3></div>
+        ${(posts||[]).length ? (posts||[]).map(p => Feed._renderPost(p)).join('') : '<div class="empty" style="padding:20px 0">постов пока нет</div>'}
+      </div>`;
+  },
+
+  async addFriend(userId) {
+    const uid = getMyUserId();
+    await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: userId, status:'pending' }});
+    this.open(userId); // refresh
+  }
+};
+
 // ══════════════════════════════════════════════════════
 // SUPABASE CLIENT
 // ══════════════════════════════════════════════════════
@@ -2156,7 +2262,7 @@ async function supaFetch(path, opts={}) {
   });
   if(!r.ok && r.status !== 204) {
     const e = await r.text();
-    console.error('Supabase error:', e);
+    console.error('Supabase error:', r.status, e);
     return null;
   }
   if(r.status === 204) return {};
@@ -2181,7 +2287,7 @@ async function syncProfile() {
   await supaFetch('profiles?id=eq.' + uid, {
     method: 'POST',
     prefer: 'resolution=merge-duplicates',
-    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'' }
+    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'' }
   });
   // Sync stats
   const h = getHistory();
@@ -2228,10 +2334,13 @@ const Feed = {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const maxW = 800; const scale = Math.min(1, maxW/img.width);
+        const maxW = 600; const scale = Math.min(1, maxW/img.width);
         canvas.width = img.width*scale; canvas.height = img.height*scale;
         canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-        this._photo = canvas.toDataURL('image/jpeg', 0.75);
+        // Compress aggressively — base64 stored in DB
+        const sizeKB = canvas.toDataURL('image/jpeg',0.75).length / 1024;
+        const quality = sizeKB > 200 ? 0.4 : sizeKB > 100 ? 0.55 : 0.7;
+        this._photo = canvas.toDataURL('image/jpeg', quality);
         const prev = document.getElementById('compose-img-preview');
         if(prev) { prev.src = this._photo; prev.style.display = 'block'; }
         this.onComposeInput();
@@ -2271,13 +2380,15 @@ const Feed = {
       user_id: uid,
       user_name: u.name || 'пользователь',
       user_emoji: u.avatar_emoji || '',
+      user_username: u.username || '',
       text: txt,
       image_url: this._photo || null,
-      stats: statsSnippet,
       likes: []
     };
+    if(statsSnippet) post.stats = statsSnippet;
 
-    await supaFetch('posts', { method: 'POST', prefer: 'return=minimal', body: post });
+    const postRes = await supaFetch('posts', { method: 'POST', prefer: 'return=representation', body: post });
+    if(!postRes) { if(btn) { btn.textContent = 'ошибка — попробуй ещё'; setTimeout(()=>{btn.textContent='опубликовать';btn.style.pointerEvents='auto';btn.style.opacity='1';},2000); } return; }
 
     document.getElementById('compose-text').value = '';
     this._photo = null; this._attachStats = false;
@@ -2397,13 +2508,17 @@ const Friends = {
   init() {
     const uid = getMyUserId();
     const el = document.getElementById('my-user-code');
-    if(el) el.textContent = uid + ' (нажми чтобы скопировать)';
+    const u = getUser();
+    const displayName = u&&u.username ? '@'+u.username : uid;
+    if(el) el.textContent = displayName + ' · нажми чтобы скопировать';
     syncProfile();
   },
 
   copyCode() {
     const uid = getMyUserId();
-    navigator.clipboard.writeText(uid).then(()=>alert('код скопирован: ' + uid)).catch(()=>alert('твой код: ' + uid));
+    const u = getUser();
+    const share = u&&u.username ? '@'+u.username : uid;
+    navigator.clipboard.writeText(share).then(()=>alert('скопировано: ' + share)).catch(()=>alert('твой username: ' + share));
   },
 
   showAdd() {
@@ -2418,14 +2533,18 @@ const Friends = {
     const uid = getMyUserId();
     if(code === uid) { res.style.color='#f75c5c'; res.textContent='это твой собственный код'; return; }
     res.style.color='var(--muted)'; res.textContent='ищем...';
-    const profiles = await supaFetch('profiles?id=eq.' + code);
+    // Search by username or uid
+    const byUsername = code.startsWith('@') ? code.slice(1) : code;
+    let profiles = await supaFetch('profiles?username=eq.' + byUsername.toLowerCase());
+    if(!profiles||!profiles.length) profiles = await supaFetch('profiles?id=eq.' + code.toUpperCase());
     if(!profiles||!profiles.length) { res.style.color='#f75c5c'; res.textContent='пользователь не найден'; return; }
     const friend = profiles[0];
-    // Check already friends
-    const existing = await supaFetch('friends?user_id=eq.' + uid + '&friend_id=eq.' + code);
+    const friendId = friend.id;
+    const existing = await supaFetch('friends?user_id=eq.' + uid + '&friend_id=eq.' + friendId);
     if(existing&&existing.length) { res.style.color='#f75c5c'; res.textContent='уже в друзьях или заявка отправлена'; return; }
-    await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: code, status:'pending' }});
-    res.style.color='#34c77b'; res.textContent='✓ заявка отправлена ' + (friend.name||code);
+    if(friendId === uid) { res.style.color='#f75c5c'; res.textContent='это твой собственный аккаунт'; return; }
+    await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: friendId, status:'pending' }});
+    res.style.color='#34c77b'; res.textContent='✓ заявка отправлена ' + (friend.name||(friend.username?'@'+friend.username:friendId));
     document.getElementById('friend-code-input').value = '';
     setTimeout(()=>this.load(), 500);
   },
@@ -2474,9 +2593,14 @@ const Friends = {
   async accept(friendshipId, fromUserId) {
     const uid = getMyUserId();
     await supaFetch('friends?id=eq.' + friendshipId, { method:'PATCH', body:{ status:'accepted' }});
-    // Create reverse friendship too
     await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: fromUserId, status:'accepted' }});
     this.load();
+  },
+  async acceptFromProfile(fromUserId) {
+    const uid = getMyUserId();
+    await supaFetch('friends?user_id=eq.'+fromUserId+'&friend_id=eq.'+uid, { method:'PATCH', body:{ status:'accepted' }});
+    await supaFetch('friends', { method:'POST', prefer:'return=minimal', body:{ user_id: uid, friend_id: fromUserId, status:'accepted' }});
+    UserProfile.open(fromUserId);
   },
 
   async openProfile(friendId) {
@@ -3217,7 +3341,7 @@ Install.init();
       <div class="card" style="padding:18px">
         <div style="font-size:14px;font-weight:600;margin-bottom:10px">введи код друга</div>
         <div style="display:flex;gap:8px">
-          <input type="text" id="friend-code-input" placeholder="USER-XXXX" style="flex:1;text-transform:uppercase;letter-spacing:1px" oninput="this.value=this.value.toUpperCase()">
+          <input type="text" id="friend-code-input" placeholder="@username или ID" style="flex:1;text-transform:uppercase;letter-spacing:1px" oninput="this.value=this.value.toUpperCase()">
           <button class="btn btn-primary btn-sm" onclick="Friends.addByCode()" style="white-space:nowrap">найти</button>
         </div>
         <div id="friend-add-result" style="font-size:12px;margin-top:8px;min-height:16px"></div>
@@ -3258,13 +3382,18 @@ Install.init();
     <div class="card" style="padding:18px;margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
-          <div style="font-size:20px;font-weight:800">версия 2.4.0</div>
+          <div style="font-size:20px;font-weight:800">версия 2.5.0</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">последнее обновление</div>
         </div>
         <button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button>
       </div>
 
-      <div class="changelog-version">v2.4.0 — социальные функции</div>
+      <div class="changelog-version">v2.5.0 — профили и username</div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">профиль пользователя — посты, статистика, кнопка добавить в друзья</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">username вместо кода — добавляй друзей по @username</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">клик по автору поста открывает его профиль</div></div>
+
+      <div class="changelog-version">v2.5.0 — социальные функции</div>
       <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">лента — публикуй посты с фото и статистикой</div></div>
       <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">лайки и комментарии в реальном времени</div></div>
       <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">друзья — добавляй по коду, смотри статистику</div></div>
@@ -3288,6 +3417,19 @@ Install.init();
       <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">гибкие напоминания капсул</div></div>
       <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">адаптация текстов под пол</div></div>
     </div>
+  </div>
+</div>
+
+
+<!-- USER PROFILE SCREEN -->
+<div id="screen-user-profile" class="screen">
+  <div class="home-header status-pad">
+    <button id="user-profile-back-btn" onclick="App.goBack()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px">←</button>
+    <h2 id="user-profile-title">профиль</h2>
+    <div style="width:32px"></div>
+  </div>
+  <div class="scroll" style="padding-top:4px" id="user-profile-content">
+    <div class="empty" style="padding:40px 0">загрузка...</div>
   </div>
 </div>
 
