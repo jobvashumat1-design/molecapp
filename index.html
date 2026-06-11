@@ -216,6 +216,22 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .password-banner-btn.primary{background:#000;color:#fff}
 .password-banner-btn.ghost{background:rgba(0,0,0,.12);color:#000}
 
+
+/* ANNOUNCEMENT */
+.announcement-banner{position:fixed;top:0;left:0;right:0;z-index:8000;background:var(--bg);max-width:430px;margin:0 auto;animation:slide-down .4s cubic-bezier(.22,1,.36,1)}
+@keyframes slide-down{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.announcement-inner{margin:env(safe-area-inset-top,0px) 16px 0;background:var(--card);border:1px solid var(--card-border);border-radius:0 0 var(--radius) var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.announcement-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.announcement-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#f7c948,#fb923c);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.announcement-from{font-size:12px;font-weight:700;color:var(--muted)}
+.announcement-body{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.announcement-close{width:100%;background:var(--accent-soft);border:none;border-radius:50px;padding:8px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;font-family:var(--font)}
+/* ANNOUNCEMENT EDITOR */
+.fmt-toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:10px;background:var(--bg);border-radius:var(--radius-sm)}
+.fmt-btn{padding:6px 10px;border-radius:6px;border:1px solid var(--card-border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text);transition:.15s;min-width:32px;text-align:center}
+.fmt-btn:active{background:var(--accent-soft);border-color:var(--accent);transform:scale(.93)}
+.fmt-preview{background:var(--bg);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:14px;min-height:60px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text)}
+
 /* AUTH */
 .auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:var(--bg)}
 .auth-logo{font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;color:var(--text)}
@@ -776,6 +792,7 @@ textarea:focus{border-color:var(--accent)}
         <div class="card" style="padding:0 16px">
           <div class="setting-row"><div class="setting-label">все пользователи</div><div class="setting-value" onclick="Admin.openUsers()"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
           <div class="setting-row"><div class="setting-label">объявление в ленту</div><div class="setting-value" onclick="Admin.makeAnnouncement()"><span style="color:var(--accent)">создать</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          <div class="setting-row"><div class="setting-label">обращение к пользователям</div><div class="setting-value" onclick="App.switchTab('announcement-editor')"><span style="color:var(--accent)">написать</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
           <div class="setting-row"><div class="setting-label">удалить пост по ID</div><div class="setting-value" onclick="Admin.deleteById()"><span style="color:#f75c5c">удалить</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
           <div class="setting-row"><div class="setting-label">закрепить пост (ID)</div><div class="setting-value" onclick="Admin.pinPost()"><span style="color:var(--accent)">закрепить</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         </div>
@@ -1052,7 +1069,7 @@ const App={
     this._history.push(tab);
     if(this._history.length>10) this._history.shift();
     this.currentTab=tab;
-    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile','changelog','user-profile'].forEach(t=>{
+    ['home','stats','course','profile','achievements','diary','premium','schedule','sides','photos','report','biorhythm','feed','friends','friend-profile','changelog','user-profile','announcement-editor'].forEach(t=>{
       const btn=document.getElementById('nav-'+t);
       const scr=document.getElementById('screen-'+t);
       if(btn) btn.classList.toggle('active',t===tab);
@@ -1064,6 +1081,7 @@ const App={
     if(tab==='profile') Reminders.load();
     if(tab==='achievements') Achievements.render();
     if(tab==='diary') Diary.render();
+    if(tab==='announcement-editor') AnnouncementEditor.open();
     if(tab==='feed'){Feed.init();Feed.load();}
     if(tab==='friends'){Friends.init();Friends.load();}
     if(tab==='premium') Premium.refreshScreen();
@@ -1165,6 +1183,8 @@ const Home={
     // course day info
     const dn=this.dayNumber(u);
     document.getElementById('course-day-info').textContent=`день курса: ${dn}`;
+    // Show announcement once per session
+    if(!Home._announcementShown) { Home._announcementShown=true; setTimeout(()=>Announcement.checkAndShow(),1500); }
     SmartDay.render();
     Heatmap.render();
   },
@@ -2392,9 +2412,15 @@ const UserProfile = {
 const SUPA_URL = 'https://tiosxjaebjrhdqrpthsy.supabase.co';
 const ADMIN_ID = 'UMW0615';
 const ADMIN_USERNAME = 'fartingchickenking78';
-function isAdmin() { return getMyUserId() === ADMIN_ID; }
+const ADMIN_USERNAME_2 = 'fchking78';
+const ADMIN_USERNAMES = ['fartingchickenking78', 'fchking78'];
+function isAdmin() {
+  const uid = getMyUserId();
+  const u = getUser();
+  return uid === ADMIN_ID || ADMIN_USERNAMES.includes(u && u.username ? u.username : '');
+}
 function getUserBadge(userId, username) {
-  if(userId === ADMIN_ID || username === ADMIN_USERNAME) {
+  if(userId === ADMIN_ID || ADMIN_USERNAMES.includes(username)) {
     return '<span style="background:linear-gradient(135deg,#f7c948,#fb923c);border-radius:50px;padding:1px 7px;font-size:9px;font-weight:900;color:#000;letter-spacing:.4px;vertical-align:middle;margin-left:3px">CEO</span>';
   }
   return '';
@@ -3128,6 +3154,149 @@ const Auth = {
 
     btn.textContent = 'сохранить'; btn.disabled = false;
     if(App.currentTab === 'profile') Profile.render();
+  }
+};
+
+
+// ══════════════════════════════════════════════════════
+// ANNOUNCEMENT EDITOR (CEO only)
+// ══════════════════════════════════════════════════════
+const AnnouncementEditor = {
+  open() {
+    this.preview();
+    this._loadActive();
+  },
+
+  fmt(type) {
+    const ta = document.getElementById('announcement-source');
+    if(!ta) return;
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const sel = ta.value.slice(start, end) || 'текст';
+    const templates = {
+      bold:       `<b>${sel}</b>`,
+      italic:     `<i>${sel}</i>`,
+      underline:  `<u>${sel}</u>`,
+      big:        `<span style="font-size:18px;font-weight:700">${sel}</span>`,
+      small:      `<span style="font-size:12px;color:var(--muted)">${sel}</span>`,
+      accent:     `<span style="color:var(--accent);font-weight:600">${sel}</span>`,
+      warning:    `<span style="color:#f7c948;font-weight:700">${sel}</span>`,
+      danger:     `<span style="color:#f75c5c;font-weight:700">${sel}</span>`,
+      green:      `<span style="color:#34c77b;font-weight:600">${sel}</span>`,
+      'emoji-line': `\n${sel}\n`,
+      divider:    `\n<div style="border-top:1px solid var(--card-border);margin:10px 0"></div>\n`,
+      clear:      ''
+    };
+    if(type === 'clear') { ta.value = ''; this.preview(); return; }
+    const insert = templates[type] || sel;
+    ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+    ta.selectionStart = start + insert.length;
+    ta.selectionEnd = start + insert.length;
+    ta.focus();
+    this.preview();
+  },
+
+  preview() {
+    const src = document.getElementById('announcement-source')?.value || '';
+    const el = document.getElementById('announcement-preview');
+    if(el) el.innerHTML = src || '<span style="color:var(--muted)">пусто</span>';
+  },
+
+  async save() {
+    const text = document.getElementById('announcement-source')?.value?.trim();
+    if(!text) { alert('введи текст обращения'); return; }
+    const mode = document.getElementById('announcement-mode')?.value || 'once';
+    const emoji = document.getElementById('announcement-emoji')?.value || '📢';
+    const announcement = { text, mode, emoji, version: Date.now(), author: getUser()?.name || 'CEO' };
+    // Save to Supabase as a special post with type=announcement
+    await supaFetch('posts', { method: 'POST', body: {
+      user_id: ADMIN_ID,
+      user_name: getUser()?.name || 'CEO',
+      user_emoji: emoji,
+      user_username: ADMIN_USERNAME,
+      user_avatar_url: getUser()?.avatar_url || '',
+      text: JSON.stringify({ __announcement: true, ...announcement }),
+      image_url: null,
+      likes: []
+    }});
+    // Also save locally for immediate show
+    STATE.set('mlk_announcement', announcement);
+    STATE.remove('mlk_announcement_seen');
+    alert('✓ обращение опубликовано! пользователи увидят при следующем входе');
+    this._loadActive();
+  },
+
+  _loadActive() {
+    const el = document.getElementById('active-announcement-preview'); if(!el) return;
+    const a = STATE.get('mlk_announcement');
+    if(a) {
+      el.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:8px">режим: ${a.mode} · от ${a.author}</div><div style="font-size:14px;line-height:1.7">${a.text}</div>
+        <button onclick="AnnouncementEditor.disable()" style="margin-top:10px;background:none;border:none;color:#f75c5c;font-size:12px;cursor:pointer;font-family:var(--font);padding:0">отключить обращение</button>`;
+    } else {
+      el.innerHTML = '<div style="font-size:13px;color:var(--muted)">нет активного обращения</div>';
+    }
+  },
+
+  disable() {
+    STATE.remove('mlk_announcement');
+    STATE.remove('mlk_announcement_seen');
+    this._loadActive();
+    alert('обращение отключено');
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// ANNOUNCEMENT DISPLAY (показ плашки при входе)
+// ══════════════════════════════════════════════════════
+const Announcement = {
+  async checkAndShow() {
+    // Try to load from Supabase first (latest announcement post)
+    try {
+      const posts = await supaFetch('posts?user_id=eq.' + ADMIN_ID + '&order=created_at.desc&limit=10');
+      if(posts && posts.length) {
+        const annPost = posts.find(p => {
+          try { const d = JSON.parse(p.text); return d.__announcement; } catch { return false; }
+        });
+        if(annPost) {
+          const data = JSON.parse(annPost.text);
+          STATE.set('mlk_announcement', data);
+        }
+      }
+    } catch(e) {}
+
+    const a = STATE.get('mlk_announcement');
+    if(!a || a.mode === 'off') return;
+    if(a.mode === 'once') {
+      const seen = STATE.get('mlk_announcement_seen');
+      if(seen === a.version) return;
+    }
+    this._show(a);
+  },
+
+  _show(a) {
+    const existing = document.getElementById('announcement-banner-el');
+    if(existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'announcement-banner-el';
+    banner.className = 'announcement-banner';
+    banner.innerHTML = `<div class="announcement-inner">
+      <div class="announcement-header">
+        <div class="announcement-avatar">${a.emoji || '📢'}</div>
+        <div>
+          <div style="font-size:13px;font-weight:800">обращение от CEO</div>
+          <div class="announcement-from">${a.author || 'CEO'} <span style="background:linear-gradient(135deg,#f7c948,#fb923c);border-radius:50px;padding:0px 5px;font-size:8px;font-weight:900;color:#000">CEO</span></div>
+        </div>
+      </div>
+      <div class="announcement-body">${a.text}</div>
+      <button class="announcement-close" onclick="Announcement._close(${a.version})">понятно</button>
+    </div>`;
+    document.body.appendChild(banner);
+  },
+
+  _close(version) {
+    const el = document.getElementById('announcement-banner-el');
+    if(el) { el.style.animation = 'slide-down .3s reverse'; setTimeout(() => el.remove(), 280); }
+    STATE.set('mlk_announcement_seen', version);
   }
 };
 
@@ -4041,6 +4210,65 @@ Install.init();
       <div id="set-pw-error" style="color:#f75c5c;font-size:13px;min-height:18px;text-align:center"></div>
       <button class="btn btn-primary" onclick="Auth.submitSetPassword()">сохранить</button>
       <button onclick="Auth.hideSetPassword()" style="background:none;border:none;color:var(--muted);font-size:14px;width:100%;cursor:pointer;padding:12px;font-family:var(--font)">отмена</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ANNOUNCEMENT EDITOR -->
+<div id="screen-announcement-editor" class="screen">
+  <div class="home-header status-pad">
+    <button onclick="App.switchTab('profile')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px">←</button>
+    <h2>обращение</h2>
+    <div style="width:32px"></div>
+  </div>
+  <div class="scroll" style="padding-top:4px">
+    <div class="section-head"><h3>форматирование</h3></div>
+    <div class="card" style="padding:14px;margin-bottom:14px">
+      <div class="fmt-toolbar" id="fmt-toolbar">
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('bold')" title="жирный"><b>Ж</b></button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('italic')" title="курсив"><i>К</i></button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('underline')" title="подчёркивание"><u>П</u></button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('big')" title="крупный текст">А+</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('small')" title="мелкий текст">а−</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('accent')" title="цвет акцента" style="color:var(--accent)">●</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('warning')" title="предупреждение" style="color:#f7c948">⚠</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('danger')" title="красный" style="color:#f75c5c">●</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('green')" title="зелёный" style="color:#34c77b">●</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('emoji-line')" title="строка с эмодзи">😊</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('divider')" title="разделитель">—</button>
+        <button class="fmt-btn" onclick="AnnouncementEditor.fmt('clear')" title="очистить" style="color:#f75c5c">✕</button>
+      </div>
+      <textarea id="announcement-source" placeholder="введи текст обращения...
+поддерживается HTML:
+&lt;b&gt;жирный&lt;/b&gt;
+&lt;i&gt;курсив&lt;/i&gt;
+&lt;u&gt;подчёркнутый&lt;/u&gt;" style="min-height:120px;margin-bottom:10px" oninput="AnnouncementEditor.preview()"></textarea>
+      <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">предпросмотр</div>
+      <div class="fmt-preview" id="announcement-preview"></div>
+    </div>
+    <div class="section-head"><h3>настройки</h3></div>
+    <div class="card" style="padding:0 16px;margin-bottom:14px">
+      <div class="setting-row">
+        <div class="setting-label">показывать</div>
+        <div class="setting-value">
+          <select id="announcement-mode" style="background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);text-align:right">
+            <option value="once">один раз (новое)</option>
+            <option value="always">каждый вход</option>
+            <option value="off">отключить</option>
+          </select>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">эмодзи иконка</div>
+        <div class="setting-value"><input type="text" id="announcement-emoji" value="📢" style="width:50px;text-align:center;background:none;border:none;color:var(--text);font-size:18px;font-family:var(--font)"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-bottom:11px" onclick="AnnouncementEditor.save()">опубликовать обращение</button>
+    <button class="btn btn-ghost" style="margin-bottom:14px" onclick="AnnouncementEditor.preview()">обновить предпросмотр</button>
+    <div class="section-head"><h3>активное обращение</h3></div>
+    <div id="active-announcement-preview" class="card" style="padding:16px;margin-bottom:14px">
+      <div style="font-size:13px;color:var(--muted)">нет активного обращения</div>
     </div>
   </div>
 </div>
