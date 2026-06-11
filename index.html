@@ -430,6 +430,10 @@ textarea:focus{border-color:var(--accent)}
           <div><h3 style="font-size:15px;font-weight:700">turbo ozempic</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">2 капсулы, усиленная формула</p></div>
           <div class="course-badge" style="background:#34c77b">60 капсул</div>
         </div>
+        <div onclick="Reg.selectCourse('mineral')" class="course-card" data-course="mineral">
+          <div><h3 style="font-size:15px;font-weight:700">mineral balance</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">1→2 капсулы · мягкое действие</p></div>
+          <div class="course-badge" style="background:#06b6d4">30 капсул</div>
+        </div>
         <button class="btn btn-primary" style="margin-top:4px;margin-bottom:80px" onclick="Reg.finish()">готово</button>
       </div>
     </div>
@@ -991,35 +995,9 @@ function migrateUser(u){
 function genderWord(u,femForm,mascForm){return (u&&u.gender==='male')?mascForm:femForm;}
 
 const TAGLINES=['каждый день — это шаг к новой версии тебя','дисциплина важнее мотивации','маленькие действия дают большой результат','ты уже начал путь'];
-const COURSE_LIMITS={plus:40,premium:46,turbo:60};
-const COURSE_NAMES={plus:'plus',premium:'premium',turbo:'turbo ozempic'};
+const COURSE_LIMITS={plus:40,premium:46,turbo:60,mineral:30};
+const COURSE_NAMES={plus:'plus',premium:'premium',turbo:'turbo ozempic',mineral:'mineral balance'};
 const ACCENTS={blue:'#4f8ef7',green:'#34c77b',red:'#f75c5c',purple:'#a78bfa',orange:'#fb923c',teal:'#2dd4bf'};
-
-// ── Корона премиума ──────────────────────────────────────
-// plan: 'pro'|'max'|null, accent: цвет из ACCENTS
-// Возвращает HTML-строку с короной (пустая строка если нет премиума)
-const CROWN_GRADIENTS = {
-  blue:   ['#4f8ef7','#a78bfa'],
-  green:  ['#34c77b','#2dd4bf'],
-  red:    ['#f75c5c','#fb923c'],
-  purple: ['#a78bfa','#4f8ef7'],
-  orange: ['#fb923c','#f7c948'],
-  teal:   ['#2dd4bf','#4f8ef7'],
-};
-function getPremiumCrown(plan, accent) {
-  if(!plan || (plan !== 'pro' && plan !== 'max')) return '';
-  const [c1, c2] = CROWN_GRADIENTS[accent] || CROWN_GRADIENTS.blue;
-  const id = 'cg_' + (accent||'blue') + '_' + plan;
-  // Макс = золотая корона, Про = обычная акцентная
-  const [g1, g2] = plan === 'max' ? ['#f7c948', '#fb923c'] : [c1, c2];
-  return `<svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-left:3px;flex-shrink:0" title="${plan==='max'?'Макс':'Про'} премиум">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="14" y2="13" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="${g1}"/><stop offset="100%" stop-color="${g2}"/>
-    </linearGradient></defs>
-    <path d="M1 10L2.5 4L5.5 7L7 2L8.5 7L11.5 4L13 10H1Z" fill="url(#${id})" stroke="url(#${id})" stroke-width="0.5" stroke-linejoin="round"/>
-    <rect x="1" y="10.5" width="12" height="1.5" rx="0.75" fill="url(#${id})"/>
-  </svg>`;
-}
 
 // ══════════════════════════════════════════════════════
 // APP
@@ -1879,6 +1857,13 @@ const Course={
         {n:3,t:'вечером',d:'до 3-го приёма за <strong>40 минут</strong>'},
         {n:4,t:'перед сном',d:'последняя за <strong>7–8 часов</strong> до сна'},
         {n:5,t:'при побочных',d:'убрать вечернюю капсулу'},
+      ],
+      mineral:[
+        {n:1,t:'неделя 1',d:'<strong>1 капсула</strong> утром натощак за 40 минут до завтрака'},
+        {n:2,t:'с недели 2',d:'при желании +1 капсула перед другим приёмом, также натощак'},
+        {n:3,t:'вода',d:'не менее <strong>2 литров</strong> в день — без этого эффект снижается'},
+        {n:4,t:'избегать',d:'кофе, алкоголь, острое, жареное, сладкое'},
+        {n:5,t:'дозировка',d:'не превышать рекомендуемую дозу самостоятельно'},
       ]
     };
     const list=map[c]||map.plus;
@@ -1901,7 +1886,7 @@ const Profile={
     }
     const setAvatarPhoto=document.getElementById('set-avatar-photo');
     if(setAvatarPhoto) setAvatarPhoto.textContent=u.avatar_url?'изменить фото':'загрузить фото';
-    document.getElementById('profile-name-el').innerHTML = (u.name||'пользователь') + getPremiumCrown(Premium.isMax()?'max':Premium.isPro()?'pro':null, u.accent||'blue');
+    document.getElementById('profile-name-el').textContent=u.name||'пользователь';
     const bmi=u.weight&&u.height?+(u.weight/((u.height/100)**2)).toFixed(1):null;
     const authEl=document.getElementById('profile-auth-username');
     const auth=STATE.get('mlk_auth');
@@ -2018,7 +2003,7 @@ const Profile={
         <div class="gender-card${u.gender==='female'?' selected':''}" onclick="this.parentElement.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');document.getElementById('edit-gender-val').value='female'"><div class="gender-icon">♀</div><div class="gender-label">женщина</div></div>
         </div><input type="hidden" id="edit-gender-val" value="${u.gender}">`;
     } else if(cfg.type==='course'){
-      body=['plus','premium','turbo'].map(c=>`
+      body=['plus','premium','turbo','mineral'].map(c=>`
         <div onclick="document.querySelectorAll('.edit-course-card').forEach(x=>x.classList.remove('selected'));this.classList.add('selected');document.getElementById('edit-course-val').value='${c}'" class="course-card edit-course-card${u.course===c?' selected':''}">
           <div><h3 style="font-size:14px;font-weight:700">${COURSE_NAMES[c]}</h3><p style="font-size:12px;color:var(--muted);margin-top:2px">${COURSE_LIMITS[c]} капсул</p></div>
         </div>`).join('')+`<input type="hidden" id="edit-course-val" value="${u.course}">`;
@@ -2378,7 +2363,7 @@ const UserProfile = {
       <div style="padding:0 16px">
         <div class="user-profile-header card">
           <div class="user-profile-avatar" style="overflow:hidden">${profile.avatar_url?`<img src="${profile.avatar_url}" style="width:72px;height:72px;object-fit:cover;border-radius:50%;display:block">`:profile.avatar_emoji||profile.name?.[0]?.toUpperCase()||'👤'}</div>
-          <div class="user-profile-name">${profile.name||'пользователь'}${getUserBadge(profile.id, profile.username||'')}${getPremiumCrown(profile.premium_plan||null, profile.premium_accent||'blue')}</div>
+          <div class="user-profile-name">${profile.name||'пользователь'}${getUserBadge(profile.id, profile.username||'')}</div>
           ${profile.username?`<div class="user-profile-username">@${profile.username}</div>`:''}
           ${profile.course?`<div style="font-size:12px;color:var(--muted);margin-top:4px">курс: ${profile.course}</div>`:''}
           <div style="margin-top:12px">${friendBtn}</div>
@@ -2460,13 +2445,11 @@ function getMyUserId() {
 async function syncProfile() {
   const u = getUser(); if(!u) return;
   const uid = getMyUserId();
-  const premPlan = Premium.isPro() ? (Premium.isMax() ? 'max' : 'pro') : null;
-  const premAccent = u.accent || 'blue';
   await supaFetch('profiles', {
     method: 'POST',
     prefer: 'resolution=merge-duplicates',
     headers: { 'Prefer': 'resolution=merge-duplicates' },
-    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'', avatar_url: u.avatar_url||'', premium_plan: premPlan, premium_accent: premAccent }
+    body: { id: uid, name: u.name||'пользователь', avatar_emoji: u.avatar_emoji||'', course: u.course||'', username: u.username||'', avatar_url: u.avatar_url||'' }
   });
   // Sync stats
   const h = getHistory();
@@ -2557,8 +2540,6 @@ const Feed = {
       user_emoji: u.avatar_emoji || '',
       user_username: u.username || '',
       user_avatar_url: u.avatar_url || '',
-      user_premium: Premium.isPro() ? (Premium.isMax() ? 'max' : 'pro') : null,
-      user_accent: u.accent || 'blue',
       text: txt,
       image_url: this._photo || null,
       likes: []
@@ -2594,42 +2575,22 @@ const Feed = {
     const pinned=filtered.find(p=>p.id===pinnedId);
     const rest=filtered.filter(p=>p.id!==pinnedId);
     const sorted=pinned?[pinned,...rest]:filtered;
-
-    // Загружаем профили для актуальных данных о короне
-    const userIds = [...new Set(sorted.map(p=>p.user_id))];
-    let profileMap = {};
-    try {
-      const profiles = await supaFetch('profiles?id=in.(' + userIds.join(',') + ')');
-      (profiles||[]).forEach(p => { profileMap[p.id] = p; });
-    } catch(e) {}
-
-    el.innerHTML=sorted.map((p,i)=>this._renderPost(p,i===0&&!!pinned,profileMap)).join('');
+    el.innerHTML=sorted.map((p,i)=>this._renderPost(p,i===0&&!!pinned)).join('');
   },
 
-  _renderPost(p, isPinned=false, profileMap={}) {
+  _renderPost(p, isPinned=false) {
     const uid = getMyUserId();
     const liked = (p.likes||[]).includes(uid);
     const time = new Date(p.created_at).toLocaleDateString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    // Берём актуальные данные о короне из профиля (если есть), иначе из поста
-    const prof = profileMap[p.user_id] || {};
-    const crownPlan = prof.premium_plan || p.user_premium || null;
-    const crownAccent = prof.premium_accent || p.user_accent || 'blue';
-    const crown = getPremiumCrown(crownPlan, crownAccent);
     const statsHtml = p.stats ? `<div class="stats-mini-grid">
       <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.capsules||0}</div><div class="stats-mini-label">капсулы</div></div>
       <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.water||0}л</div><div class="stats-mini-label">вода</div></div>
       <div class="stats-mini-card"><div class="stats-mini-val">${p.stats.weight||'—'}</div><div class="stats-mini-label">кг</div></div>
     </div>` : '';
-    const isOwn = uid === p.user_id;
-    const deleteBtn = isOwn ? `<button class="post-delete-btn" onclick="Feed.deletePost('${p.id}')" title="удалить">×</button>` : '';
     return `<div class="feed-post" id="post-${p.id}">
-      <div class="post-header" onclick="UserProfile.open('${p.user_id}')" style="cursor:pointer">
-        <div class="post-avatar" style="overflow:hidden;position:relative">${p.user_avatar_url?`<img src="${p.user_avatar_url}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;display:block">`:p.user_emoji||p.user_name?.[0]?.toUpperCase()||'👤'}</div>
-        <div class="post-meta">
-          <div class="post-author" style="display:flex;align-items:center;gap:2px">${p.user_name||'пользователь'}${getUserBadge(p.user_id,p.user_username||'')}${crown}</div>
-          <div class="post-time">${isPinned?'📌 закреплено · ':''} ${time}</div>
-        </div>
-        ${deleteBtn}
+      <div class="post-header">
+        <div class="post-avatar">${p.user_emoji||p.user_name?.[0]?.toUpperCase()||'👤'}</div>
+        <div class="post-meta"><div class="post-author">${p.user_name||'пользователь'}</div><div class="post-time">${time}</div></div>
       </div>
       ${p.text?`<div class="post-text">${p.text}</div>`:''}
       ${p.image_url?`<img class="post-img" src="${p.image_url}" loading="lazy">`:''}
@@ -2670,16 +2631,10 @@ const Feed = {
     const u = getUser();
     const uid = getMyUserId();
     wrap.innerHTML = `<div class="comments-wrap">
-      ${(comments||[]).map(c=>{
-        const cCrown = getPremiumCrown(c.user_premium||null, c.user_accent||'blue');
-        return `<div class="comment-item">
-          <div class="post-avatar" style="width:28px;height:28px;font-size:14px">${c.user_name?.[0]?.toUpperCase()||'?'}</div>
-          <div class="comment-bubble">
-            <div class="comment-author" style="display:flex;align-items:center;gap:2px">${c.user_name}${cCrown}</div>
-            <div class="comment-text">${c.text}</div>
-          </div>
-        </div>`;
-      }).join('')}
+      ${(comments||[]).map(c=>`<div class="comment-item">
+        <div class="post-avatar" style="width:28px;height:28px;font-size:14px">${c.user_name?.[0]?.toUpperCase()||'?'}</div>
+        <div class="comment-bubble"><div class="comment-author">${c.user_name}</div><div class="comment-text">${c.text}</div></div>
+      </div>`).join('')}
       <div class="comment-input-row">
         <input class="comment-input" id="comment-input-${postId}" placeholder="написать комментарий..." onkeydown="if(event.key==='Enter')Feed.sendComment('${postId}')">
         <button class="friend-btn primary" onclick="Feed.sendComment('${postId}')">→</button>
@@ -2693,10 +2648,7 @@ const Feed = {
     const u = getUser();
     await supaFetch('comments', { method: 'POST', body: {
       post_id: postId, user_id: getMyUserId(), user_name: u?.name||'пользователь',
-      user_username: u?.username||'',
-      user_premium: Premium.isPro() ? (Premium.isMax() ? 'max' : 'pro') : null,
-      user_accent: u?.accent||'blue',
-      text
+      user_username: u?.username||'', text
     }});
     input.value = '';
     this.toggleComments(postId);
@@ -3258,8 +3210,8 @@ const Admin = {
 // ══════════════════════════════════════════════════════
 // PREMIUM
 // ══════════════════════════════════════════════════════
-const PRO_HASHES=["1dda5d4652ae1a5a0c426fe63fd99284e156477a59f46544aea5a7572f5a326c", "102e16f057d60b845fb99c752cc618292c05bb699be0823003d4ad7760965606", "9d3c439b9f7527eb791e1109b4afb9a72dd4d554ff288b15965f53ee84de4595", "a90db3600f70198b921b14354a5652ca855d24e44c6a06417d3d6bb6301c01df", "909d71bb439546b9dcc2be8f0fe3e3d84f646c651d464abf172cf68fdbd1c2e9", "870c9ef0406f86670cd05fea4defe5dfd3c90be26b9ccc22fc23395dc3003bed", "69959100352dc61bae5ed8755e39cf9ade345882216d51b6db0056f00f9ed270", "93e211e034d6eaf3fc218b05a083327cb34250016cb0df8b1a6da32ef925c342", "97fd495d51f9309b99a360914a14e2d35410f8164fa8b8389b5e9d3be7f34244", "3d7c969c2edce5083e78cc3aa79cf400363c929371f1c758cce7fae38f1fb415", "d527af8e4e37a5208cd11f7ecc0ee8ed0e5844cb1ae2a23ab73447ea66eccd30", "67aadba65aea6a2c9d2ffa481b1e9385651beb342ccf80d50fd45760fcb60f1f", "27026400ee53be37c67ac7130a9dcdfb7464f86d3b4ecb67a7228e5faca52259", "17a2b701dfabf2e5362c7cd33aeeabae82b3c0059dc0ff875fbc1a35bf6f84c6", "0882ea4d0da50b3b3a5d4f1d22703dc495eb09ad2d4ac4d24a575515fd146d59", "b207399f6d4f27807be5eef9bb221a8216f4c5b3e263e7b8efc6cc4c2af41815", "106a61bd2f104aabf81dd14efda7c890e873b4a1202a4f85a8fbe56f981c8344", "faf6690d9406f417a94a5db565044e2db06c1b931ac3e671a9e96340219c8374", "7fdf2904bdcb1e6e03eaa2a8afea41941baae9bb525e9d85abf467a091c85f72", "dac3e3c5c33c7f4a9293e413240ee16549d3378f134d5b93e7c0c9decca2023e", "f32bc4c0922532782c1313f2f8f409e22cb3267f3ba2b7f1237acbd00c6ac2f4", "a3b8e5bcd9aefa6b5db3d8cd725be1c0d10fedb0886180cfd27dc7b00bda0e23", "d9b3b368b87cbda548a9357ece7885fcd80a0097ccdb600af8f46d07b35395e2", "e092cd3c77457f5bdc10cb39cce16a6ea6ad44ad8a176ad337b50e37b9d27d66", "a0b2e7517b3e55aed1e8a00c2428fe8f6000ef335ff9531990c5ed50cb6b53e8", "77fac809d827d07ed078d4e19a15f6f3329954320099454cc3b802b440bf5654", "40240a941335f2ac6965055b2db3ef213a1ab9b6dac0654aac7606bfb561e3d3", "5b6815e964f551f85d5488d77a177ed3197ffd2deb93ce1e6833544bb20c8870", "b44abe573a789305929c94f9fe1965850709f198b4ea6af65110d844d66a8fa6", "281411e3b95f5155387a3bc9d56951709f18206b320e5efd4f29863896fa5c04", "5aaf634620c11e4c768887c499c419dd04f359a8e6cc9b392d9aee0c308da007", "c88da67e42151ea95be738d70d8a795c0cd37d6b0e6d24605a79abd4ce7e2f94", "06fb837cd0a9c9c77e0927e81a6f41d518ebf25803c1f4af559bbf27134148fa", "fbd5cc02d88019b0a0bfe6318d47162baf8115c6b8af3b9c0395751a26b36c73", "3f9102177e19fcae4cb8f2c83a1e0ea26ddd86490cf3ba1abcc8be4c135fefe2", "f3548cbf8641dc60834946788804f47427fc8aa3787f2623356a5f4ca0cf264f", "f01dd910c1b178807d6c042a4b44cfde89396bcb1a94f629a1304ae2aedf8d87", "be86dbe5b397f3350faf4cb6f8a88ecca266302d4e8c1259d5dd419bd95435c6", "e92b76d0a7f79577a1d49d90503815a075aab34dcd36d93684846d0489d5c2e8", "8bd33adcc0f067d67ef43df9f6ca64bab002ceabb575687f500b282caa35e054", "0c849b3e4cba63c7f29feebe167e65cfba60886889959b245a06d97506782e0e", "0b2198259228f6d1c12209b992cddc27b6ebb195b1a48f92d6e5e245e9303ce9", "2bb16170b770d5ffa3d20a911c8ad865248f72926d3d66328bc55832c6fbe522", "1300beb5684e32ded01c33a4b591b661a85708db5c3cf35e20b07d10930e747f", "37a01108ff9de10b70a401fc7afa3b11e54c08fa0dbcc2c51161211f5e98c7e7", "e7cd1f6bc53726e7a8ae34a86b0ea5bc73c298063c6fc8a6ead48be7851c3b17", "9c7a4012d2ec7b3bfc10553de6b190c76b77e192158e7cfe3648352c8f2e051a", "a5fa2207dd9cb97d62842bf98844845d531f9753803eb249ff23c170d3ffea2d", "e8ada15beff2d97145a6d9c4b379496bbffcaa59648b808b316bb6f6fd1e653d", "fd9b4ecd19f7584cceb498c5d725c65d0b5126ab2b6d84445e4098cb13762db6"];
-const MAX_HASHES=["3f75024b5d4202892aa0170ed0aed34a2e9b58a5f06981aeb8baa205ff41d091", "92bb2e15799c399ffcd4e3bef440b749407ae1de144ad139b1f031d699a56c58", "dbb85281e656a2960a376548657b7ece44351dca68e2ee3db8e0ea416dd4c9d9", "cbea00e9bb55c9465c340610a068fc91b03c09af9cea93d538333e9e599bdf53", "731c79d8076b58699bcae061505cf22d6cb524a59ef6cc22ad619ce74df36918", "e03f23bda765c935050301b477b50ab5cd2e201de3332264b321f3ed6bdd084d", "9aaa03d23e3f55d3c1cdea4027c392d3203f9e99296451dec08ed0fedf75e8fb", "bbad4e0828b51d876780845d167ae010a0974f795c251c0458f62c2e00a3b51c", "1d76433109913b242b77a95cd9c1ccc13850c9c86cb37e624c56308993e26b91", "159abad4502e33d6143f678e30061e588186325d633ffb07a7ce716dcbe93584", "e64eebf807ae59cd153d458b344ec09f38d40b3de4c3063e274256160328133b", "3efea894fc95222947a6a94306d7b62b34a889deca00deda4488cf06831febe3", "82299ac619dc22f87f6a25e86e098b23a0379e333c610750a2bb84033ea79e12", "738fc066196ef0fd4c9fc040a6a2b618eb732b2eea5c62d6aea58b19458d3779", "1d9d3437d86da6f25a11e838e2511fb525b76bd72b043d002d05a911ba2ff82b", "afb842001666d8525f1eb64d4def8b57a13ec00d0b9d1c9b293e7b5b61601fa4", "2c8fd70e3a976017f3bff5f8c2dd2aecec2ec28629381783cec0c85aa3193d2a", "49c9a3bff9330bfa5d99d4a64f00d73ebae92af31fb83b6396077da3e774099e", "824fbce689d6eba708db8e9c04c1f51a92f38df5e2ffdeed9b261c7f8ff60f87", "a16460dc50ac230946aef1257a9c1f7fa8a9c42748f99336d08af2524e0370f4", "3b159e0f4c8bc92867fa8034448b6ec4b4e54d8c7fdde7c646aec80cb940e694", "dccc85ba7502ebe12b1d7392ca2bef9151fb62d505176582092300ceb1dbc917", "a2a776d8e4030caa0ea5bae30eb80fb74bdf65c79090bfe01afd57240a2ef21e", "08adf3ba40539a4100a8c3dd3a6ff3308c0fdaf52b1538f328562411dde12996", "3f6de34176d50d0021763a02e3a9afd00131a77eba35205c2da43333eef34a60", "dc0d2d47e06b39224956753c7404f64252c47780226c49049977f833f2924fd8", "58fac1c5f12178c4615952ecd342ba8e1601875194f86f4b5fc4b1cc51c039cc", "181843ce9f18f74e67dfcb22eebbec5503cc1df71c0c78ef697cdb610127fdef", "e536b34f79ed7290be137cfa3dc7861ddabc93b4edaa1730ae30901620eb693c", "0bf13e6722151e07cff1ad7f6cfc0720caea7fd2e30a76526c7fa64167f5754b"];
+const PRO_HASHES=["a98debbe17821b23080e8abd6b13d3596f978f88e16655511e41bfece3d7b932", "b9cbb1b306ff0e2ecba4317b7db534ccc23f54c4dd07a0c5d6c5287737c60463", "4193e9456e55973038db1e92582c33df330b8e76db7c41f4d589744f1c521d32", "da50937bb196ad2f3206e2c4a4a05b59a778ab1372e1060972c9f4bc10a167bc", "f07a6384df69f466521444cea778f5ac7a30d4b980e06a82ae73b25e5509d6bf", "a274cddb718edc9bda5629f3b3cee47e5a921ef9b8f63c95bd5ce2f69348a68b", "fb3088e79e364f2d272cf67f813ea3ff35dd451c656e1ea41ed246ee0c8a42a3", "11a20bba8044739909c6be1fcb60c6ce9921ca2f3749df1d540fdde164f3dc11", "f4cb698fc3af4e959eedc5cfd30dc96cb04b486bcc0b5329264ae657a17c238b", "cc4d8c87d90a5e3db4ef3f20078db9375e27536ac8be65864f98ae68745b91ca", "b44a275497aa7bcf9091e3844b22856c78f9f9309803e33240fe24e7a8273563", "f87418d40f9efd197b6b0bf0f2bed261e6c6c4cfa17e8abd4de2ba67188a4edb", "6bfadef4d4ec1f9086dc57b34875f0c98a56d6a875b89a0b7faf9b28d1b8690c", "4dea485f1b651849dc9cdf35dbb95c9567a2b4459fdb89389946396eb37ddd8e", "fe46acafb75f80ad128d9d70a7e04a6c7eac8a7329c683639d57f05b46aac73d", "da530e726257c387ab8fb808ad4c92b0d975166654ec701202922a429d157d1a", "d6889dc42171fb135b0841d9b12c04fb322160443709daa2fa29e737f8f9922a", "1026bbc519e97882ba63166f744da7cbf132f428c756df130dccacf225f47071", "44a9ba7c7bf4ba6894e7725b1d05b773a4e2aca32d752766a179fc7452634a6c", "5a920b01c2e40475cf57ea851f47000737a1816f718d644da3cfd3c1e975c9e9", "5fbe52e52489e6df3d94abf5b92b716bc22af2f8aa446ec0e1a5bd3ce86a1e14", "230f199221cb8162f2e405a731b531af39ed8054b0ed6f9d134d4348b890e8a6", "25632053f360c7cec250ea6df1ca5f8444597753d0ab123769f0272f2eaed2d9", "b2968ba74e1de9849fea163fb597684212ebc19bbfbc5c06b54135b0b87fed35", "16ab8a98929155a9b907e4853c98ce23d8d0ab619629d27f9f2a552f74af02a3", "706583942f33ad84cf3869012e9d51b999002277bd74b83c847dcca5e937ca72", "28d82ca32d64798dc37fb56e5f2d9418ceb4cb8100064c1bc1463ea295801be0", "4db195e3709003a677ce5d08de97653b5ed4c4df0ce1011b113c95c702c36608", "ed43ef14bac11ee581e813f90b045f872d8353204d29d91cb8195204f3a3b94b", "d1194415c2e2851147e50523a1ffab791943d3eec44871e95371e7f3d46e0fc0", "ae9a4fa504e9aec60314bbd233600671cddd39314b81c61871589042b0782ce8", "d24289f4c46fcb50b9e0c4c6094a265916e1067239235df153bb0344452e1194", "ad58f5a58beb7ba0d70f3e91dd5b01f42d7bbddde53551c39619fda5eac77fe4", "7f0f6e82e7eb0d50677900726bf5aefaa6f03a5165e3067b77957257ca3ac19b", "de34530c5c5263bb1e612af0ef1d4d247766c8ed409bb4881d2e3e47bb559c1a", "fb7398fbae1f700ed71990dc35b34cb32766609f08d869376f62540f0b5256d9", "708260a48e0f073bda21f19fade0c0f68aae0bf68289434eac604721fe9c6ea9", "3f3a815ced3987c81bf276376a9c20123fd47e51fd5326abc0df397c5120d5bf", "c2b433a976633413ac7ae1a4423eb70dc22b0bdd2a97ca25feb353f0e7cff25a", "81b9168d000542a7dbe8c74c6b5523c68bcad05dbe08b4478e6e31b168e08822", "9189c933152e423b11929564491281e453b1bdfd3216ee3dc16eb4befd2e9c57", "4464882ff8d00b6e4138e334862cb962aa5fd1de5dd734a04959d8bf95f007a2", "8d1cc271182c887b61bfbdb7eb03c911cebadca2d0ff3ee9e75c0454d0189b8e", "215f063788147d6f851d2492ac8f36526ca76e5522b0b84b6eb907b10565723e", "fea4d4a3817c50373f94d26dc4f04b550cfb9e1d2141c734382388d43f2b61de", "5ed51467b2f677142eb474aeaf5e002f0896a4cd84d6483bce834f8d06881515", "0f668aa07e2d38b930d2fe02498f7c63f634f4e833b1e941cbad0b1a8051c194", "b41161a3d478c2f4eac03e633b6792b545edcd408af26697ccf34fe7bc7a6815", "3aa06a0890ea2445dc2c66449edfd76a2ec26878b5ae3f885045f919acd0ed91", "33889507b246b2caa151d8fd23d6ac79fcec87a7d52a73ac639c633158619056", "0c7f0c222f060b7e724049a3d0ffb1616b9ae8dc1e70fd5454deca52db78baa1", "0ff3cf5efdcb2da5780097d32e88197a90b9b1df774b13f2a5e5ba5f98f8654c", "8d50ec0ededa13f3da82668223306f8612dc4e26a5b3e624fd5ec702a8193d53", "fc0059ff4df7793c45b16c9afce0acbb157d52f64564579d394a00f63fc67e5c", "ac865ec91399a5dd6f0142548191188d400325e3997b2d6fd4a6a9903aa8b533", "7b25c382db7493f351d231eff60b5e80ff70571302995adec05cc9ac41582571", "9b1c667ea352cb7931b6bacde679320cc20ccc3062d8b3169ecf7a195e40daae", "e84eb4c76d69a29ee8c6bbba08ad1a13093f68e6f1562c2bba1fc6b920d48498", "bbdc2fcddfff92d8aa41a8be2ca99383c47eb41e0ea3341a72dd67fea6993172", "e41e65eef51622d4501eedcc183d630dd2bba922325d1c4d0bf3d3b4e0ee4c08", "77870db0d9d66ee6b2d8e926ba14f3cfdf6aafc57895c2a853a09db2a2d3d10c", "0248dbff1af25d76a7eb1b3b036b236589936a86b770de4948b97ba900dc8d27", "31ea83f3a7331016f5a53a667ac0bb02f3564ef3680d15eb6096a9196768bdcf", "700240f5325ccf96142910c01f4b38854936057f9dea11ab0003bc0a8cc19356", "3adf6cbf5554e85116e177b1c84dda309e6298ebb3721e3a7ccd9106aba7d054", "8d76b341655b51a1eb21afa33f472fb3e81379ff1fc1e5a54ee7be45af0f7aa6", "0ab147b0a91f118ff355a46b951c9ea29b78f648fc014df6d3a57d1c5ebe3399", "76991667b2267e497eb6dffd3039c47c083f22f4215252e1d255055576721f7d", "93f05ac9972f5dbaae32af00bafe4ec62306157578cd8a0ff78c8760e4b1e5ed", "2fc2a8da7a133c2581acac80cee4f78e4ecd2a727e61e153a3a765119147635e", "3cd64acca4dfbc23838e7ea332e04b0979ce2fdfd660dbf8bb41af7ee6431321", "0556fbd6fede9900a4e0d1c1c4a72f20ffc17bad26879f558b18d4e899f0b44b", "0a1bcec5de49c9c696e9e810c92ef36b0b205196e42486245648e1dc3c1e6904", "2d0ae402cb96ec627b150da1a629c9d7e042f693ef166d2a6442b16b326579b2", "3211458579fce7e6da369a0dfce017f994c02ab58c72b2fe6b01f4382eaa2076", "3c11f95ee1fffd602f1e8c45411a845cb7fd622b3b4b37924d7a9f809a038346", "1fca4d5fd58eff9dd26652520c1eb78d268ff61c1eae678a8f3f5fdb17a5eb38", "573bfa86fc50427c3f1f1db128502c44f81e4d99ce3bc83cd511cb7edec77fb1", "a4a2b77a698d9a5fa7ae3a4140e29abc135713bcc54abde55825e29f2c2fd677", "d757ca0738771269e1f6c06ae733d7ff1de98a2635178b661c768eefa331b2eb", "470fc86315e56745e6de72b3d99a2acaf5b816c082595801c0726d7cf2baebd6", "709821cbe774b9353141c0970660b24defb9f8ebc3297fd53007538847ce3f14", "8caa7f484c4a02d6154b0287bf7b382bba77fb5d76d596e139fcd413b78a4474", "f08bb3a6e4f80f75fa4a5e22dec43c0bd0065572d866e21709569df4938f5664", "8031f576948a6a1f2f95d11ca86808c8ab2fa48e174cb25020007d961dbfd5ca", "f9dcf2f41fe2feaedf3c8d2bae3dc9fbfeb2757078b18e78e1f39b926b6a5281", "9dc4448e3f648db949e34b9a203e064b9694551457f56d0eca8a2486f5772981", "e5d1011975b1f2eb7bcd3c3f00c6223fbf478d592d1bf58f7707e4a585e4eba5", "c20e71cc766d44422ce23ed4080ea879d74a88cd28d809094a114a6122477076", "5c36406333dd2507391250e833e6608c2ea4094ed7d65ba1e6a5c68ce28bd038", "ee3ccb54bdb1cad95a7cb4a2a17f184fab523ab694443f11d603d8e54859dbf8", "774ee0a373a59ca3c008f7d694cd8b1ed2fca736937eb0ee263857265bca9098", "f9a01293ff42c98d82b303248eea7bbd4d2e2a0369c5c630066b0384095e4f56", "cdcfa4269f55950f322c265ac36e26570ca897deb2588e2799f0a4f4c2ed5104", "66605c019219ff8e1683a7d1ebeae3be28ec7779581dd99d2d5691e8b7aeb6f6", "90672442025f3041cac13c266422d5dfe5f3f140d99c424232782cdc9a09f5a2", "84e016d00b1ae79546d4b7b15caca75130e519150980a818edf16a54cc264b4c", "c2f4d369989f684b17a578003631b2408ba3d53a29d8060daa09084b5c20c39d", "5c3f72e17cb2ea204891982b7393732ed1787633c67f1a32073a4b3c795ec1db", "11302fd7c9d7e04656a7960ff10b4ce3a2721432188f3ef75825461eab531e10"];
+const MAX_HASHES=["5fd9aaed9c32fd260d49e6adfb23fbee93ceab61507419c5d8d9c1a7b56caaa3", "e00a74fa6f07b5c6356ea6eb2d16bf294e3fecb1ad8a46ec72a3913a0dcbdec0", "72715c1a0f28344bea25e1f1bf6c9d0c0a1f2ee69c0587c44dfc2d6298768690", "835e34abd5a77e634b7b8696fba05dcc5710e188bdc524eb9011a9a8dda5a919", "0a9ad97a4328525e7154f0b761449cde5fac74d49bf41f6a6752aef1d4f14a6c", "f8568beba80dbe08442503d6f6ecdb34ae29391ee05dab2f00e496c10087c9f7", "e8054d45bd7441989841c60365b5faa5ce3d8f85e43f779adc8188c0ad606acc", "e84f7c4c9eefe7e308272d655d5aee9d7d168dca941e6c5060b5faea026f316c", "d5019172729e078f368bad565956f39d2875b7ee3b0ef8196937db57bd58f170", "63e96cb72800f5a18f22b916821bd4895cc7501b384e4ec1258d50e5442a224f", "763a3b63c1dbe9e64b3f6c9154f86f42f2f221c1789dc625cab7cdc35f5d0ce7", "831e753bf9682a7df2f0cf784b3d4986fcf8d112b4cd2680492899d94b9cd277", "eeeb384b04ebd22bea0e3d537e7f7c3b598965abd7b051da60dae95fe01a86b8", "0c868240c77638a48ac9d9361a66c8772ffada989b96ce8fa884e9f11ce74b6e", "fbd0ba6c747990d3d83ca6cafd86d1f4f3b5ea041ce481ffa170b7e376f8d68f", "6ee5f1649ede4095cf02ab1eec537f7ac6cf99ec43b009fa3dc6126859051469", "b20c18c71a895e796ac47e1bbb54d879dfa95c77d29382caa37ab8899a719c65", "30da06f2692e079331c0a9cedc2f78c2200ffcf86b2bce1cb039a23433cb337e", "b124b0b9b91600caeefee3e4aa6c834624a2ab005f9c828c812b18b7ccba9782", "afc9fbb51fb5c55647ae6f7c24713454befca5ac7daae0ae148f3f0e238c1fec", "d5ad8842a173ddec6de0586b3f364072bbc7a6b591be98c85b0ff517c62453dd", "60bdb60b3581ab6a5310577bb2ec06aec7b2f1e675c82fc13fe1d6cf6dd1def3", "1eafa61d0abcd2b61ac6a5e1e14057ea83765c132b16c6b41bebe41f618570ad", "5ec23ce71a4e82d32d99939207b535bfd3072e735cb73b4de3eb88d12119a366", "3a99f570cd368fedaa6b5e777cac2f084a4851e32bd63fb13a13ecaa86a79cf0", "4c7674dd759b6ddb7589a367f0bb841e181983911665b3ca55669b749dcb36ec", "d0c1b48949f18fef694ea21cebe1be345a9373ccbdbfc6fc70c106b7bda6618d", "966b0f4384c21d5e08a4ae511349904426b039b08f22d156ff4f82e447560562", "7d40244e2ebfa7b4d8e673cb8503143ec31a49e02c87fe1854fd1bb109804c02", "c41a853ca419b728f62828c56f5c3c7669d1fdcb0b5c4c12d7901e0659b46544", "ba988314cc8d582246c5cfd1aff013d3f81f4b1a47bc5a4bdbbcffe88e56ab57", "2e89231e19da0e2f8f2c1823013ac8e7a1794568396f07014dc0ec7ecff010af", "080453f1611874affc8f46b156dcd418849df32953acf5a965e1cc58d0d4dc9d", "ed20045709484181fed1aad722091c7efa56cce7893f8a398ea63afdc3d7fef6", "aef42bd778358b152580fa5207f65d25f1faaa7a9b95cfbf956e7b92174d5781", "91431c467ad2db11a96c460fa28afb4e5f15c1e32283b6c7db58390baa4642c8", "702651d6751dadeaf223c96a4e086822c57bedf913f09ba0527a50ee6205a828", "ebfe33f1d9d4710f98de8cbda5545b77ee8e66ac3e42dbf45ecb9c2d25a22f74", "78bc9cf7bad0409a4111b2028691e1637f096858744649268ad543e00e1dabca", "34761c4b6e604491b98ba6ba38308ffd53d680b54e1c15f200f0d745d61823d0", "a954eb45bda68ad2fb5e08cd7cf6c82f6ab657401c3fb221dbbbc0ef30750260", "f1bd85553c662245d62181a2c8c6ca1027bbee6d0af74b44b34da90425189bd1", "d3c860285cba6d209f82adb5758fce42e1a2cdc8f7c8327131be42df9241cdd4", "e447b48a76b30c46690b4319253eb5b65ccffeba33e40bb522e85b780f6c3fa5", "a54a23566b48dea07cc5b2a84f74604b4a86a01e373afdbf5290160ed4ebc61f", "28442ec67e7851412ab326a83b340adaa94388859ce747c1ea17a5730a201066", "8398cf5bd22e123cae45b5afac78e3eab51fa7abafae622474d334b9ddc677d2", "adead9626317ca151c331652337f8574fef8b6b6c0dec1174125ca36fb337aa4", "dcee489623a1507c25897d253bbc3a5185e8c8a5758440a99a2f66fffc3dd33a", "e74a8815e0f95b630ae8241cf4e5ffd1cad84aa389c0e7b8c34c4d59fb7b25db", "24e973b125ad7e6e0404bc1ab4ef8d8cd919b0e6cd69415a84a2e90e4b768f1a", "26aca4534e1e07fcf087fa440e83606053eb7b6486e81bd98cf0013b57828c01", "65f7a87b773f0c741627a0337913bb4d5688d15a18e59c38dce5aa7922f0258e", "bfe79abf8d7649d9f76c5c347ded5232989769f89054d3d709286147b1a84dc4", "a37d9c463cc2a5eabfd9fcbf6105e46e9c06b94e3ac5bcd758eb69b18716827d", "694fd84e701563142a386739fcebdf06d31150b25c73fbadea0f2a7bd5d195e7", "654051ae84ce3c1f20209e4e92eb7a39a78633fc7373a985df6d9babb04c68c8", "6091845b40a460acd7f530abba304071315dc3f27d3fa93132eef2690a673d2b", "1a77ecbc3e754aeaae4ec0ec05a40c242de3280e2af3ca29a8025a3d3a891843", "3112e7120e1336ec4881c26d0c6b094720654013bb4897bb0657a2580a12c138", "00da39244e5296132f3ec685eb14064895f1e7b18194e0be85aed93502169c49", "5b8a209d28cf9715d18146cda38b6eb7d7dbe7027b506510d3136a8327e65669", "790e343a8373323235237b888ab5d3fd7e8469cb394b6bf24997450573a82654", "210f7efb7d1066f9d5b8764d1ecbd72e1eda0a948c9427ddd24af6a9ea1ae8b5", "5bf1885e7e0a31e170f065fd09bb4440ce70c058655656b24bd4c1e1cadcc854", "5a81cb369bb384367fc23c932dba137a4fca23852fa1c5177757ffe446cf90d1", "a009a0930a2f9491df5bb4d802c30f6a2895ad56a00a6c9e877fbb1dc3890f73", "4d37dbd8c8a5077146d65f26eea7f4c9bd956bdb648653e0adb7f94db0a90c8b", "c910ba8d4a9ba8372378e003676efadef753defdf8e92a022158303a23f8d244", "f4cb70b601ebb29adc96702d09fe273e9523f7d7147434cbffea1aba7b4bea77", "a747a2d2e9fb45bb2fca9bb24fb7c2a3b1443dc73a89055862ed25a56b70a5c0", "8014095c801eeb0fb31e94eed86596e71ba2fb2dceeab4fecb5b4bc01000a272", "f9e7378536083a8a1df3597e59f12d7bca8c159b08544c4d2a4858f36d846f0d", "666374860f1c3b26374e1b6b743d06e2b8a02a9d3393d682ea3b8140cc188fcb", "d71d28d7f4f8b632d3c737517cb2438ad772891308f4735aaec9fe8764556a1a", "e27c5d6a9ee7202eb63c408a9f814245084db4fd20f59733d1d5365bf16a258e", "0d9f2a20a2b0730dcb5e460454d168e0da1f91b5322969a7c15368882f1eb5cb", "6af5d9e192baedadca823ed15221a4426e95164bbbc1be9704dab26d309ea6fa", "70911dbb0f40a7080a37a12c481ea1f5555f92cfa4771b141d6ebc195c4071d6", "7a63e6763942ee4c28036a733da8f4755c534d2874c2e0535183dcdc352c408f", "c3ddb591eccb0502b75eca174f9e60e01040a3c3cc7d88bb8c4eb73637895c10", "943e245680bc958d5b4c29152fb26721b694ec703a8ce64a451c6501a528223a", "7ac88f0d865aabb4181c8a532ea08ae7236b822d6a084cd07dab86504eec916f", "a667d5450cb095af9e0ff6ab336c4ad2963f8be2486f6c093ffc1c70748d66ac", "55d312db772c6b335aa91bc4bc4f3004d5b49a33efbc62e14b34477f3a115812", "60e798d56393d83171717bc65fb018a35f23100c1975ffc82772139ffc13e181", "86ff772fb1f436825a12939096f465002b93ca28b60b68148ad70015f44e7078", "ecaa2839f49f75dcb7504b4b6a6dd25063f3a76d0c3063f8ef02fc16b11189f6", "4495894a2b85690f553dc0191cb97740d04db594b52c76902b6779f37afaf7f3", "dc257ed3b274f0a08b7eca966ce397792a76a25396eb053774b30e5cb7c85331", "ca9505a9845457e03c1b62a6d948b643f7ba03c92a2ecd2f9793a368e149e00b", "01930ba342348211be5ee6ad9e57afe6ea60e2975f22c626a1704d26ebadb55c", "0e57d1668a61485b51ff402bc9901d2923f7f1799e91639db534000b2496c4c5", "5f38248c7ed87d90d8c35c07c19732b9045f62523f264ad47590d81b333d2dad", "4d46619f85c8aae2f9354e30bc1eed3129a29afd0d7fcffd190d9d6474fb9c29", "a80c047933be4f1f3ddf68684614f02b60fc998e70920b04600ac4c3fd27e3b3", "031f7a70bbe0765eb37d5a073848e882d1ded38cb55d7368adb6f1073ca340cc", "7875aa19863441284bcb96f253c9e70e94a78f2a73fa596022f80f48b6968463", "91eb9257e7d91773bbfe12e192a0a4d7640966e01bd4da51b0257f516aa6ec21", "2cdc371aa8e0cc8ae9cf0fe19aaa0b5f01084d19282d586c4963be2fc8c8078d"];
 
 const Premium={
   _plan:null,_selectedPlan:'pro',
@@ -3298,8 +3250,6 @@ const Premium={
     this._plan=plan;
     if(App.currentTab==='profile') Profile.render();
     if(App.currentTab==='home') Home.render();
-    // Синхронизируем корону в Supabase
-    setTimeout(syncProfile, 300);
   },
   showCodeInput(){
     document.getElementById('premium-buy-btn').style.display='none';
