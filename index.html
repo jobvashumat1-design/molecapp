@@ -1042,7 +1042,8 @@ const STATE={
   set(k,v){localStorage.setItem(k,JSON.stringify(v))},
   remove(k){localStorage.removeItem(k)}
 };
-function todayKey(){return new Date().toISOString().slice(0,10)}
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function localDateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function getUser(){return STATE.get('mlk_user')}
 function saveUser(u){STATE.set('mlk_user',u)}
 function getHistory(){return STATE.get('mlk_history')||{}}
@@ -1370,7 +1371,7 @@ const Home={
   calcStreak(){
     const h=getHistory();let streak=0;const dt=new Date();
     for(let i=0;i<365;i++){
-      const k=dt.toISOString().slice(0,10);const day=h[k];
+      const k=dt.__localKey();const day=h[k];
       if(day&&(day.capsules>0||day.kcal>0)) streak++;
       else if(i>0) break;
       dt.setDate(dt.getDate()-1);
@@ -1595,7 +1596,7 @@ const Stats={
     const days=[];
     for(let i=6;i>=0;i--){
       const dt=new Date();dt.setDate(dt.getDate()-i);
-      const k=dt.toISOString().slice(0,10);
+      const k=dt.__localKey();
       days.push({k,label:['вс','пн','вт','ср','чт','пт','сб'][dt.getDay()],data:h[k]||{}});
     }
     this.renderTodaySnapshot(days[days.length-1].data,u);
@@ -1679,12 +1680,12 @@ const Stats={
     const intradayDelta=(todayFirst&&todayLast&&todayD.weights&&todayD.weights.length>1)?(todayFirst-todayLast):null;
     // yesterday
     const ydt=new Date();ydt.setDate(ydt.getDate()-1);
-    const yKey=ydt.toISOString().slice(0,10);
+    const yKey=ydt.__localKey();
     const ydW=dayW(h[yKey]||{});
     const vsYesterday=lastW&&ydW?(ydW-lastW):null;
     // 7-day
     const weekWs=[];
-    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().slice(0,10);const w=dayW(h[k]||{});if(w) weekWs.push(w);}
+    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.__localKey();const w=dayW(h[k]||{});if(w) weekWs.push(w);}
     const weekLost=weekWs.length>=2?(weekWs[0]-weekWs[weekWs.length-1]):null;
     const totalLost=firstW&&lastW?(firstW-lastW):null;
     const vsGoal=lastW&&u.goal_weight?(lastW-u.goal_weight):null;
@@ -3680,7 +3681,7 @@ const Photos={
         const data=canvas.toDataURL('image/jpeg',0.6);
         const photos=STATE.get('mlk_photos')||{};
         if(this._picking==='start'||this._picking==='now'){photos[this._picking]=data;}
-        else{if(!photos.gallery) photos.gallery=[];photos.gallery.unshift({date:new Date().toISOString().slice(0,10),src:data});if(photos.gallery.length>20) photos.gallery=photos.gallery.slice(0,20);}
+        else{if(!photos.gallery) photos.gallery=[];photos.gallery.unshift({date:new Date().__localKey(),src:data});if(photos.gallery.length>20) photos.gallery=photos.gallery.slice(0,20);}
         STATE.set('mlk_photos',photos);this.render();
       };img.src=ev.target.result;
     };reader.readAsDataURL(file);e.target.value='';
@@ -3738,7 +3739,7 @@ const WeekReport={
   render(){
     const el=document.getElementById('week-report-content');if(!el) return;
     const u=getUser();if(!u) return;const h=getHistory();
-    const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().slice(0,10);days.push({k,data:h[k]||{}});}
+    const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.__localKey();days.push({k,data:h[k]||{}});}
     const capsTotal=days.reduce((s,d)=>s+(d.data.capsules||0),0);
     const waterAvg=(days.reduce((s,d)=>s+(d.data.water||0),0)/7).toFixed(1);
     const kcalAvg=Math.round(days.reduce((s,d)=>s+(d.data.kcal||0),0)/7);
@@ -3761,7 +3762,7 @@ const WeekReport={
   },
   share(){
     const u=getUser();if(!u) return;const h=getHistory();
-    const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);days.push({k:dt.toISOString().slice(0,10),data:h[dt.toISOString().slice(0,10)]||{}});}
+    const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);days.push({k:dt.__localKey(),data:h[dt.__localKey()]||{}});}
     const caps=days.reduce((s,d)=>s+(d.data.capsules||0),0);
     const water=(days.reduce((s,d)=>s+(d.data.water||0),0)/7).toFixed(1);
     const wDays=days.map(d=>d.data.weights&&d.data.weights.length?d.data.weights[d.data.weights.length-1].v:d.data.weight).filter(Boolean);
@@ -3785,7 +3786,7 @@ const SmartDay={
     const times=Schedule.calcCapsuleTimes();
     if(times){if(hr<parseInt(times.morning)) tips.push(`💊 утренняя капсула — в ${times.morning}`);else if(hr<parseInt(times.evening)) tips.push(`💊 вечерняя капсула — в ${times.evening}`);}
     const wLeft=Math.max(0,u.water_goal-(d.water||0));if(wLeft>0.1) tips.push(`💧 воды осталось: ${wLeft.toFixed(1)} л`);
-    const ydt=new Date();ydt.setDate(ydt.getDate()-1);const yd=h[ydt.toISOString().slice(0,10)]||{};
+    const ydt=new Date();ydt.setDate(ydt.getDate()-1);const yd=h[ydt.__localKey()]||{};
     if((yd.water||0)<u.water_goal*0.7) tips.push('⚠️ вчера было мало воды — сегодня наверстай');
     const streak=Home.calcStreak();if(streak>2&&hr>20&&(d.capsules||0)===0) tips.push(`🔥 серия ${streak} дн под угрозой — отметь капсулу`);
     if(!tips.length) tips.push('✅ всё идёт по плану — продолжай!');
@@ -3804,7 +3805,7 @@ const Heatmap={
     const h=getHistory();const u=getUser();if(!u) return;
     const grid=document.getElementById('heatmap-grid');if(!grid) return;
     const cells=[];
-    for(let i=29;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().slice(0,10);const d=h[k]||{};
+    for(let i=29;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.__localKey();const d=h[k]||{};
       const score=(d.capsules>0?1:0)+((d.water||0)>=u.water_goal?1:0)+((d.steps||0)>=(u.steps_goal||8000)?1:0)+(d.kcal>0?1:0);
       const lvl=score===0?0:score<=1?1:score<=2?2:score<=3?3:4;
       cells.push(`<div class="heatmap-cell lvl${lvl}" title="${k}: ${score}/4"></div>`);}
