@@ -135,6 +135,21 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .food-kcal{font-size:14px;font-weight:600;color:var(--accent)}
 .food-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px;border-radius:7px;transition:.18s;display:flex}
 .food-delete:active{color:#f75c5c;transform:scale(.88)}
+/* food search & barcode */
+.food-search-row{display:flex;gap:8px;margin-bottom:10px}
+.food-search-row input{flex:1}
+.barcode-btn{flex-shrink:0;width:48px;height:48px;border-radius:var(--radius-sm);border:1px solid var(--card-border);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s}
+.barcode-btn:active{transform:scale(.93)}
+.barcode-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.food-results{max-height:180px;overflow-y:auto;margin-bottom:4px}
+.food-result{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--card);border:1px solid var(--card-border);margin-bottom:6px;cursor:pointer;transition:.18s}
+.food-result:active{transform:scale(.98);background:var(--accent-soft)}
+.food-result-name{font-size:13px;font-weight:500;line-height:1.35}
+.food-result-brand{font-size:11px;color:var(--muted);margin-top:2px}
+.food-result-kcal{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
+.food-search-status{font-size:12px;color:var(--muted);padding:6px 2px;text-align:center}
+#barcode-reader{width:100%;border-radius:var(--radius-sm);overflow:hidden;background:#000;min-height:240px}
+#barcode-reader video{border-radius:var(--radius-sm)}
 .empty{text-align:center;padding:28px 0;color:var(--muted)}
 .empty svg{width:36px;height:36px;margin:0 auto 10px;opacity:.35}
 .streak-badge{display:inline-flex;align-items:center;gap:5px;background:var(--accent-soft);color:var(--accent);padding:7px 14px;border-radius:50px;font-size:13px;font-weight:700}
@@ -932,14 +947,34 @@ textarea:focus{border-color:var(--accent)}
 </nav>
 <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="Profile.handleAvatarFile(event)">
 
-<!-- MODAL: FOOD (manual) -->
+<!-- MODAL: FOOD (manual + search + barcode) -->
 <div class="modal-overlay" id="food-modal" onclick="UI.closeBgModal('food-modal')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">добавить еду</div>
+    <div class="food-search-row">
+      <input type="text" id="food-search-input" placeholder="поиск продукта..." oninput="Tracker.searchFood(this.value)">
+      <button class="barcode-btn" onclick="UI.openBarcodeScanner()" title="сканировать штрихкод">
+        <svg viewBox="0 0 24 24"><path d="M3 7V4a1 1 0 0 1 1-1h3"/><path d="M17 3h3a1 1 0 0 1 1 1v3"/><path d="M21 17v3a1 1 0 0 1-1 1h-3"/><path d="M7 21H4a1 1 0 0 1-1-1v-3"/><line x1="7" y1="7" x2="7" y2="17"/><line x1="11" y1="7" x2="11" y2="17"/><line x1="14" y1="7" x2="14" y2="17"/><line x1="17" y1="7" x2="17" y2="17"/></svg>
+      </button>
+    </div>
+    <div id="food-search-status" class="food-search-status" style="display:none"></div>
+    <div id="food-search-results" class="food-results"></div>
     <div class="input-group"><label>название блюда</label><input type="text" id="food-name-input" placeholder="например: овсянка"></div>
+    <div class="input-group"><label>порция (г)</label><input type="number" id="food-grams-input" placeholder="100" min="1" max="3000" oninput="Tracker.recalcFoodKcal()"></div>
     <div class="input-group"><label>калории (ккал)</label><input type="number" id="food-kcal-input" placeholder="300" min="1" max="5000"></div>
     <button class="btn btn-primary" style="margin-top:6px" onclick="Tracker.addFood()">добавить</button>
+  </div>
+</div>
+
+<!-- MODAL: BARCODE SCANNER -->
+<div class="modal-overlay" id="barcode-modal" onclick="if(event.target===this) UI.closeBarcodeScanner()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">сканер штрихкода</div>
+    <div id="barcode-reader"></div>
+    <div id="barcode-status" class="food-search-status">наведи камеру на штрихкод продукта</div>
+    <button class="btn btn-ghost" style="margin-top:12px" onclick="UI.closeBarcodeScanner()">отмена</button>
   </div>
 </div>
 
@@ -990,6 +1025,7 @@ textarea:focus{border-color:var(--accent)}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 // ══════════════════════════════════════════════════════
 // STATE HELPERS — обратная совместимость со старыми данными
@@ -1399,7 +1435,7 @@ const Tracker={
     if(!d.food) d.food=[];
     d.food.push({name:n,kcal:k});d.kcal=(d.kcal||0)+k;
     saveTodayData(d);
-    document.getElementById('food-name-input').value='';document.getElementById('food-kcal-input').value='';
+    UI.resetFoodModal();
     UI.closeModal('food-modal');Home.render();
   },
   removeFood(idx){
@@ -1407,6 +1443,66 @@ const Tracker={
     if(!d.food||!d.food[idx]) return;
     d.kcal=Math.max(0,(d.kcal||0)-d.food[idx].kcal);d.food.splice(idx,1);
     saveTodayData(d);Home.render();
+  },
+  _foodKcal100:null,
+  _foodSearchTimer:null,
+  recalcFoodKcal(){
+    const grams=+document.getElementById('food-grams-input').value;
+    if(this._foodKcal100!=null && grams>0){
+      document.getElementById('food-kcal-input').value=Math.round(this._foodKcal100*grams/100);
+    }
+  },
+  searchFood(query){
+    clearTimeout(this._foodSearchTimer);
+    const statusEl=document.getElementById('food-search-status');
+    const resultsEl=document.getElementById('food-search-results');
+    query=query.trim();
+    if(query.length<2){statusEl.style.display='none';resultsEl.innerHTML='';return;}
+    statusEl.style.display='block';statusEl.textContent='ищу...';resultsEl.innerHTML='';
+    this._foodSearchTimer=setTimeout(()=>{
+      const url=`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=15&fields=product_name,product_name_ru,brands,nutriments`;
+      fetch(url).then(r=>r.json()).then(data=>{
+        const products=(data.products||[]).filter(p=>{
+          const name=p.product_name_ru||p.product_name;
+          const kcal=p.nutriments&&(p.nutriments['energy-kcal_100g']!=null?p.nutriments['energy-kcal_100g']:p.nutriments['energy-kcal']);
+          return name&&kcal!=null;
+        }).slice(0,8);
+        if(!products.length){statusEl.textContent='ничего не найдено';return;}
+        statusEl.style.display='none';
+        resultsEl.innerHTML=products.map(p=>{
+          const name=(p.product_name_ru||p.product_name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+          const kcal=Math.round(p.nutriments['energy-kcal_100g']!=null?p.nutriments['energy-kcal_100g']:p.nutriments['energy-kcal']);
+          const brand=p.brands?p.brands.split(',')[0].trim():'';
+          return `<div class="food-result" onclick="Tracker.selectFoodResult('${name}',${kcal})">
+            <div><div class="food-result-name">${(p.product_name_ru||p.product_name)}</div>${brand?`<div class="food-result-brand">${brand}</div>`:''}</div>
+            <div class="food-result-kcal">${kcal} ккал/100г</div>
+          </div>`;
+        }).join('');
+      }).catch(()=>{statusEl.textContent='ошибка сети, проверь интернет';});
+    },450);
+  },
+  selectFoodResult(name,kcal100){
+    this._foodKcal100=kcal100;
+    document.getElementById('food-name-input').value=name;
+    document.getElementById('food-grams-input').value=100;
+    document.getElementById('food-kcal-input').value=kcal100;
+    document.getElementById('food-search-results').innerHTML='';
+    document.getElementById('food-search-status').style.display='none';
+    document.getElementById('food-search-input').value='';
+  },
+  lookupBarcode(code){
+    const statusEl=document.getElementById('food-search-status');
+    statusEl.style.display='block';statusEl.textContent='ищу продукт по штрихкоду...';
+    document.getElementById('food-search-results').innerHTML='';
+    fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_ru,brands,nutriments`)
+      .then(r=>r.json()).then(data=>{
+        const p=data.product;
+        const kcal=p&&p.nutriments&&(p.nutriments['energy-kcal_100g']!=null?p.nutriments['energy-kcal_100g']:p.nutriments['energy-kcal']);
+        const name=p&&(p.product_name_ru||p.product_name);
+        if(data.status!==1||!name||kcal==null){statusEl.textContent='продукт не найден в базе';return;}
+        statusEl.style.display='none';
+        Tracker.selectFoodResult(name,Math.round(kcal));
+      }).catch(()=>{statusEl.textContent='ошибка сети, проверь интернет';});
   },
   addWater(amt){
     const u=getUser();if(!u) return;
@@ -3911,7 +4007,49 @@ const Diary={
 // UI HELPERS
 // ══════════════════════════════════════════════════════
 const UI={
-  openFoodModal(){document.getElementById('food-modal').classList.add('open');setTimeout(()=>document.getElementById('food-name-input').focus(),350);},
+  openFoodModal(){
+    UI.resetFoodModal();
+    document.getElementById('food-modal').classList.add('open');setTimeout(()=>document.getElementById('food-search-input').focus(),350);
+  },
+  resetFoodModal(){
+    document.getElementById('food-name-input').value='';
+    document.getElementById('food-kcal-input').value='';
+    document.getElementById('food-grams-input').value='';
+    document.getElementById('food-search-input').value='';
+    document.getElementById('food-search-results').innerHTML='';
+    document.getElementById('food-search-status').style.display='none';
+    Tracker._foodKcal100=null;
+  },
+  _barcodeScanner:null,
+  openBarcodeScanner(){
+    const modal=document.getElementById('barcode-modal');
+    const statusEl=document.getElementById('barcode-status');
+    modal.classList.add('open');
+    statusEl.textContent='наведи камеру на штрихкод продукта';
+    if(typeof Html5Qrcode==='undefined'){statusEl.textContent='сканер не загрузился, проверь интернет';return;}
+    UI._barcodeScanner=new Html5Qrcode('barcode-reader');
+    const config={fps:10,qrbox:{width:250,height:150},formatsToSupport:[
+      Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.CODE_128
+    ]};
+    UI._barcodeScanner.start({facingMode:'environment'},config,
+      (decodedText)=>{
+        UI.closeBarcodeScanner();
+        UI.openFoodModal();
+        Tracker.lookupBarcode(decodedText);
+      },
+      ()=>{}
+    ).catch(()=>{statusEl.textContent='нет доступа к камере';});
+  },
+  closeBarcodeScanner(){
+    const modal=document.getElementById('barcode-modal');
+    modal.classList.remove('open');
+    if(UI._barcodeScanner){
+      UI._barcodeScanner.stop().then(()=>UI._barcodeScanner.clear()).catch(()=>{});
+      UI._barcodeScanner=null;
+    }
+  },
   openCapsuleModal(){
     const u=getUser();if(!u) return;
     document.getElementById('course-day-input').value=Home.dayNumber(u);
