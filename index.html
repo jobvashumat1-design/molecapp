@@ -827,7 +827,7 @@ textarea:focus{border-color:var(--accent)}
     <div class="section-head" style="padding:0 16px"><h3>обновление</h3></div>
     <div class="settings-group">
       <div class="card" style="padding:0 16px">
-        <div class="setting-row"><div class="setting-label">версия</div><div class="setting-value"><span id="app-version-display" style="color:var(--muted)">2.5.0</span></div></div>
+        <div class="setting-row"><div class="setting-label">версия</div><div class="setting-value"><span id="app-version-display" style="color:var(--muted)">2.5.1</span></div></div>
         <div class="setting-row"><div class="setting-label">что нового</div><div class="setting-value" onclick="App.switchTab('changelog')"><span style="color:var(--accent)">смотреть</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
         <div class="setting-row"><div class="setting-label">обновить приложение</div><div class="setting-value"><button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button></div></div>
       </div>
@@ -973,8 +973,15 @@ textarea:focus{border-color:var(--accent)}
     <div class="modal-handle"></div>
     <div class="modal-title">сканер штрихкода</div>
     <div id="barcode-reader"></div>
-    <div id="barcode-status" class="food-search-status">наведи камеру на штрихкод продукта</div>
-    <button class="btn btn-ghost" style="margin-top:12px" onclick="UI.closeBarcodeScanner()">отмена</button>
+    <div id="barcode-status" class="food-search-status">наведи камеру на штрихкод, держи ровно на расстоянии 10-15см</div>
+    <div class="input-group" style="margin-top:6px">
+      <label>не сканируется? введи код вручную</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="barcode-manual-input" inputmode="numeric" placeholder="например: 4601674084738" style="flex:1" onkeydown="if(event.key==='Enter') UI.submitManualBarcode()">
+        <button class="btn btn-primary btn-sm" onclick="UI.submitManualBarcode()">найти</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="UI.closeBarcodeScanner()">отмена</button>
   </div>
 </div>
 
@@ -2392,7 +2399,7 @@ const Reminders = {
 // ══════════════════════════════════════════════════════
 // APP UPDATER
 // ══════════════════════════════════════════════════════
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.5.1';
 
 const AppUpdater = {
   init() {
@@ -4025,14 +4032,28 @@ const UI={
     const modal=document.getElementById('barcode-modal');
     const statusEl=document.getElementById('barcode-status');
     modal.classList.add('open');
-    statusEl.textContent='наведи камеру на штрихкод продукта';
+    statusEl.textContent='наведи камеру на штрихкод, держи ровно на расстоянии 10-15см';
+    document.getElementById('barcode-manual-input').value='';
     if(typeof Html5Qrcode==='undefined'){statusEl.textContent='сканер не загрузился, проверь интернет';return;}
-    UI._barcodeScanner=new Html5Qrcode('barcode-reader');
-    const config={fps:10,qrbox:{width:250,height:150},formatsToSupport:[
-      Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E,
-      Html5QrcodeSupportedFormats.CODE_128
-    ]};
+    UI._barcodeScanner=new Html5Qrcode('barcode-reader',{
+      formatsToSupport:[
+        Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128
+      ],
+      experimentalFeatures:{useBarCodeDetectorIfSupported:true},
+      verbose:false
+    });
+    const config={
+      fps:10,
+      qrbox:(viewfinderW,viewfinderH)=>{
+        const w=Math.round(Math.min(viewfinderW,viewfinderH)*0.9);
+        return {width:w,height:Math.round(w*0.45)};
+      },
+      aspectRatio:1,
+      disableFlip:true,
+      videoConstraints:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080},focusMode:'continuous'}
+    };
     UI._barcodeScanner.start({facingMode:'environment'},config,
       (decodedText)=>{
         UI.closeBarcodeScanner();
@@ -4041,6 +4062,13 @@ const UI={
       },
       ()=>{}
     ).catch(()=>{statusEl.textContent='нет доступа к камере';});
+  },
+  submitManualBarcode(){
+    const code=document.getElementById('barcode-manual-input').value.trim();
+    if(!code){alert('введи штрихкод');return;}
+    UI.closeBarcodeScanner();
+    UI.openFoodModal();
+    Tracker.lookupBarcode(code);
   },
   closeBarcodeScanner(){
     const modal=document.getElementById('barcode-modal');
@@ -4369,11 +4397,17 @@ Install.init();
     <div class="card" style="padding:18px;margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
-          <div style="font-size:20px;font-weight:800">версия 2.5.0</div>
+          <div style="font-size:20px;font-weight:800">версия 2.5.1</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">последнее обновление</div>
         </div>
         <button onclick="AppUpdater.forceUpdate()" style="background:var(--accent);color:#fff;border:none;border-radius:50px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">обновить</button>
       </div>
+
+      <div class="changelog-version">v2.5.1 — питание: база продуктов и штрихкоды</div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">поиск продуктов в дневнике питания по базе Open Food Facts — калории подставляются автоматически</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">пересчёт калорий по граммовке порции</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">сканер штрихкодов через камеру — наводишь на упаковку и продукт находится сам</div></div>
+      <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">ручной ввод штрихкода, если сканер не распознаёт код</div></div>
 
       <div class="changelog-version">v2.5.0 — профили и username</div>
       <div class="changelog-item"><div class="changelog-dot"></div><div class="changelog-text">профиль пользователя — посты, статистика, кнопка добавить в друзья</div></div>
