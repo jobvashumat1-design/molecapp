@@ -3121,7 +3121,8 @@ const Feed = {
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           комменты
         </button>
-        ${uid===ADMIN_ID?`<button class="post-action-btn" style="font-size:10px;color:var(--muted);margin-left:auto" onclick="Feed.copyPostId('${p.id}')" title="скопировать ID">ID</button>`:''}
+        ${isAdmin()?`<button class="post-action-btn" style="font-size:10px;color:var(--muted);margin-left:auto" onclick="Feed.copyPostId('${p.id}')" title="скопировать ID">ID</button>
+        <button class="post-action-btn" style="font-size:10px;color:#f75c5c" onclick="Feed.deletePost('${p.id}')" title="удалить пост">🗑</button>`:''}
       </div>
       <div id="comments-${p.id}" style="display:none"></div>
     </div>`;
